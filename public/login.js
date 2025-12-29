@@ -5,56 +5,48 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeBtn = document.getElementById("close-login-overlay");
   const form = document.getElementById("login-form");
 
-  const emailInput = document.getElementById("login-email");
-  const passInput = document.getElementById("login-password"); // ✅ important
+  if (!form) {
+    console.warn("login-form introuvable");
+    return;
+  }
 
-  const openBtn = document.getElementById("open-login-overlay");
+  // 🔐 Champs UNIQUEMENT dans le form login
+  const emailInput = form.querySelector('input[name="email"]');
+  const passInput  = form.querySelector('input[name="password"]');
 
   function openLogin() {
-    if (!loginOverlay) return;
-    loginOverlay.classList.add("active");
+    loginOverlay?.classList.add("active");
   }
 
   function closeLogin() {
-    if (!loginOverlay) return;
-    loginOverlay.classList.remove("active");
+    loginOverlay?.classList.remove("active");
   }
 
   window.openLoginOverlay = openLogin;
 
-  if (openBtn) {
-    openBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      openLogin();
-    });
-  }
+  document.getElementById("open-login-overlay")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    openLogin();
+  });
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      closeLogin();
-    });
-  }
+  closeBtn?.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeLogin();
+  });
 
-  if (loginOverlay) {
-    loginOverlay.addEventListener("click", (e) => {
-      if (e.target === loginOverlay) closeLogin();
-    });
-  }
+  loginOverlay?.addEventListener("click", (e) => {
+    if (e.target === loginOverlay) closeLogin();
+  });
 
   const params = new URLSearchParams(window.location.search);
   if (params.get("login") === "required") openLogin();
 
-  if (!form) {
-    console.warn("login-form introuvable (id=login-form)");
-    return;
-  }
-
+  // ✅ SUBMIT LOGIN
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const email = (emailInput?.value || "").trim();
-    const password = (passInput?.value || "").trim();
+    const email = emailInput?.value.trim();
+    const password = passInput?.value.trim();
 
     if (!email || !password) {
       alert("Please fill all fields.");
@@ -76,10 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       closeLogin();
-      window.location.href = data.redirectTo || "/phantomcard.html"; // ✅
+      window.location.href = data.redirectTo || "/phantomcard.html";
     } catch (err) {
       console.error(err);
-      alert("Server error. Check terminal.");
+      alert("Server error.");
     }
   });
 });
