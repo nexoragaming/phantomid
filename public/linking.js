@@ -1,39 +1,43 @@
 console.log("linking.js connecté");
 
+// === DOM ===
 const discordStatus = document.getElementById("discord-status");
 const discordBtn = document.getElementById("discord-connect");
-const discordConnect = document.getElementById("discord-connected")
+const discordConnected = document.getElementById("discord-connected");
 
-// 1) Lire le paramètre ?discord=...
+// === Params URL ===
 const params = new URLSearchParams(window.location.search);
-const discordParam = params.get("discord"); // "linked" ou null
+const discordParam = params.get("discord"); // "linked" | null
 
-// 2) Mettre l'UI selon le paramètre
+// === UI STATE ===
 if (discordParam === "linked") {
   if (discordStatus) discordStatus.textContent = "Linked ✅";
+
   if (discordBtn) {
     discordBtn.classList.add("connected");
-    discordConnect.classList.add("active");
+    discordBtn.disabled = true;
   }
+
+  if (discordConnected) {
+    discordConnected.classList.add("active");
+  }
+
+  // petit délai UX avant redirection
+  setTimeout(() => {
+    window.location.href = "/phantomcard.html";
+  }, 600);
+
 } else {
   if (discordStatus) discordStatus.textContent = "Not linked";
-  if (discordBtn) {
 
+  if (discordBtn) {
     discordBtn.disabled = false;
   }
 }
 
-// 3) Click → démarre OAuth
-
+// === CLICK → OAuth Discord (DOMAINE PUBLIC) ===
 if (discordBtn) {
   discordBtn.addEventListener("click", () => {
     window.location.href = "https://phantomid.onrender.com/auth/discord";
   });
-}
-
-const param = new URLSearchParams(window.location.search);
-
-if (param.get("discord") === "linked") {
-  // Discord OK → continuer
-  window.location.href = "/phantomcard.html";
 }
