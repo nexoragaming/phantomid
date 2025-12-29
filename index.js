@@ -38,8 +38,16 @@ const pendingSignups = {}; // pendingId -> { username,email,password,phantomId,c
 const users = {}; // userId -> user data
 const usersByEmail = {}; // email -> userId
 
+let phantomCounter = 1; // ⚠️ en prod/DB: ça doit être persistent
+
 function newId(prefix = "u") {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
+}
+
+function nextPhantomId() {
+  // PH000001, PH000002, ...
+  const n = phantomCounter++;
+  return `PH${String(n).padStart(6, "0")}`;
 }
 
 function requireAuth(req, res, next) {
@@ -59,19 +67,16 @@ function goHome(queryString) {
   return frontUrl(`/index.html${qs}`);
 }
 
-// ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
-
-// fallback si quelqu’un tape /login dans la barre URL
 app.get("/login", (req, res) => res.redirect(goHome("login=required")));
 
 // =====================================================
 // 1) SIGNUP START (pending)
 // =====================================================
 app.post("/signup/start", (req, res) => {
-  const { username, email, password, phantomId } = req.body;
+  const { username, email, password } = req.body;
 
-  if (!username || !email || !password || !phantomId) {
+  if (!username || !email || !password) {
     return res.status(400).json({ ok: false, error: "Missing fields" });
   }
 
@@ -80,19 +85,12 @@ app.post("/signup/start", (req, res) => {
     return res.status(409).json({ ok: false, error: "Email already used" });
   }
 
-  const pid = String(phantomId).trim().toUpperCase();
-  if (!/^PH\d{6}$/.test(pid)) {
-    return res
-      .status(400)
-      .json({ ok: false, error: "Invalid PhantomID format (ex: PH000001)" });
-  }
-
   const pendingId = newId("pending");
   pendingSignups[pendingId] = {
     username: String(username).trim(),
     email: emailKey,
-    password: String(password), // beta
-    phantomId: pid,
+    password: String(password),
+    phantomId: nextPhantomId(), // ✅ généré automatiquement
     createdAt: Date.now(),
   };
 
@@ -126,7 +124,7 @@ app.get("/auth/discord", (req, res) => {
 });
 
 // =====================================================
-// 3) DISCORD CALLBACK (create user + linking)
+// 3) DISCORD CALLBACK
 // =====================================================
 app.get("/auth/discord/callback", async (req, res) => {
   try {
@@ -149,7 +147,7 @@ app.get("/auth/discord/callback", async (req, res) => {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: "authorization_code",
         code: String(code),
-        redirect_uri: process.env.DISCORD_REDIRECT_URI, // must match exactly
+        redirect_uri: process.env.DISCORD_REDIRECT_URI,
       }),
     });
 
@@ -206,7 +204,7 @@ app.get("/auth/discord/callback", async (req, res) => {
       return res.redirect(goHome("discord=error"));
     }
 
-    // ===== If pending signup -> create account now =====
+    // ===== pending signup -> create user =====
     const pendingId = req.session.pendingId;
 
     if (pendingId && pendingSignups[pendingId]) {
@@ -221,7 +219,7 @@ app.get("/auth/discord/callback", async (req, res) => {
       const userId = newId("user");
       users[userId] = {
         id: userId,
-        phantomId: pending.phantomId, // ✅ STORED
+        phantomId: pending.phantomId, // ✅ stored
         username: pending.username,
         email: pending.email,
         password: pending.password,
@@ -238,11 +236,9 @@ app.get("/auth/discord/callback", async (req, res) => {
 
       req.session.userId = userId;
 
-      // ✅ overlays: retour sur index
       return res.redirect(goHome("signup=done&discord=linked"));
     }
 
-    // sinon: juste linking
     return res.redirect(goHome("discord=linked"));
   } catch (e) {
     console.error(e);
@@ -286,7 +282,7 @@ app.get("/me", requireAuth, (req, res) => {
     ok: true,
     user: {
       id: user.id,
-      phantomId: user.phantomId, // ✅ RETURNED
+      phantomId: user.phantomId,
       username: user.username,
       email: user.email,
       verifiedDiscord: user.verifiedDiscord,

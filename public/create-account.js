@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("linkingOverlay:", !!linkingOverlay);
 
   console.log("dup check:", {
-    phantom_id: document.querySelectorAll("#phantom_id").length,
     username: document.querySelectorAll("#username").length,
     email: document.querySelectorAll("#email").length,
     password: document.querySelectorAll("#password").length,
@@ -26,34 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     e.stopPropagation();
 
-    // ✅ Lire DANS le form
-    const phantomIdEl = form.querySelector("#phantom_id");
     const usernameEl = form.querySelector("#username");
     const emailEl = form.querySelector("#email");
     const passwordEl = form.querySelector("#password");
     const confirmEl = form.querySelector("#confirm-password");
 
-    const phantomId = (phantomIdEl?.value || "").trim().toUpperCase();
     const username = (usernameEl?.value || "").trim();
     const email = (emailEl?.value || "").trim();
     const password = passwordEl?.value || "";
     const confirmPassword = confirmEl?.value || "";
 
-    console.log("SUBMIT values:", {
-      phantomId,
-      username,
-      email,
-      passwordLen: password.length,
-      confirmLen: confirmPassword.length,
-    });
-
-    if (!phantomId || !username || !email || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       alert("Please fill all fields.");
-      return;
-    }
-
-    if (!/^PH\\d{6}$/i.test(phantomId)) {
-      alert("Invalid PhantomID format. Example: PH000001");
       return;
     }
 
@@ -62,11 +45,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 1) pending signup + phantomId
+    // 1) pending signup (serveur génère PHxxxxxx)
     const resp = await fetch("/signup/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phantomId, username, email, password }),
+      body: JSON.stringify({ username, email, password }),
     });
 
     let data;
@@ -84,13 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 2) Ouvre linking overlay
+    // 2) Overlays
     if (createOverlay) createOverlay.classList.remove("active");
     if (linkingOverlay) linkingOverlay.classList.add("active");
 
-    console.log("✅ linking overlay ouvert → lancement OAuth");
-
-    // 3) Lance OAuth Discord
+    // 3) OAuth Discord
     window.location.href = "https://phantomid.onrender.com/auth/discord";
   });
 });
