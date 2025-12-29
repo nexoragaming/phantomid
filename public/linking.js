@@ -27,7 +27,7 @@ if (discordParam === "linked") {
 
 if (discordBtn) {
   discordBtn.addEventListener("click", () => {
-    window.location.href = "http://localhost:3000/auth/discord";
+    href = "https://phantomid.onrender.com/auth/discord";
   });
 }
 
