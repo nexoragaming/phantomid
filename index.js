@@ -19,10 +19,9 @@ app.use(cookieParser());
 // Helper env
 const IS_PROD = process.env.NODE_ENV === "production";
 
-// Ton front (où est hébergé linking.html / phantomcard.html)
+// Ton front (si tu sers le front ailleurs, ex: phantomid.com)
+// sinon laisse vide => express.static("public")
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || "";
-// ex: https://phantomid.com
-// si vide -> redirige vers les pages servies par express.static("public")
 
 // ===== Session =====
 app.use(
@@ -32,15 +31,14 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      // Si ton FRONT est sur un autre domaine que onrender, il faut souvent "none" en prod
       sameSite: IS_PROD ? "none" : "lax",
-      secure: IS_PROD, // Render HTTPS => true en prod
+      secure: IS_PROD,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
     },
   })
 );
 
-// Static files (si tu sers ton front ici)
+// Static files
 app.use(express.static("public"));
 
 // ===== "DB" temporaire en mémoire (beta) =====
@@ -59,17 +57,23 @@ function requireAuth(req, res, next) {
   next();
 }
 
+// helper: construit une URL vers le front (si FRONTEND_BASE_URL est set)
 function frontUrl(pathAndQuery) {
-  // helper: construit une URL front si FRONTEND_BASE_URL est set, sinon route locale
   if (FRONTEND_BASE_URL) return `${FRONTEND_BASE_URL}${pathAndQuery}`;
   return pathAndQuery;
+}
+
+// helper: retourne toujours sur index (puis overlay gère via query params)
+function goHome(queryString) {
+  const qs = queryString ? `?${queryString}` : "";
+  return frontUrl(`/index.html${qs}`);
 }
 
 // ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
 
-// (Optionnel) évite l’écran blanc si quelqu’un va sur /login en GET
-app.get("/login", (req, res) => res.redirect(frontUrl("/index.html?login=required")));
+// Optionnel: évite l’écran "Cannot GET /login" si quelqu’un tape l’URL
+app.get("/login", (req, res) => res.redirect(goHome("login=required")));
 
 // =====================================================
 // 1) SIGNUP START (on ne crée PAS le compte ici)
@@ -94,7 +98,9 @@ app.post("/signup/start", (req, res) => {
     createdAt: Date.now(),
   };
 
+  // IMPORTANT: on garde pendingId en session
   req.session.pendingId = pendingId;
+
   return res.json({ ok: true });
 });
 
@@ -106,7 +112,6 @@ app.get("/auth/discord", (req, res) => {
   if (!redirectUri) return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
   if (!process.env.DISCORD_CLIENT_ID) return res.status(500).send("Missing DISCORD_CLIENT_ID in env.");
 
-  // IMPORTANT: redirect_uri DOIT être le callback exact (…/auth/discord/callback)
   const scope = "identify guilds.join";
   const state = Math.random().toString(16).slice(2);
 
@@ -127,7 +132,7 @@ app.get("/auth/discord", (req, res) => {
 // =====================================================
 // 3) DISCORD CALLBACK
 // - join server + role
-// - SI pending signup existe -> crée le compte + login + redirect phantomcard
+// - SI pending signup existe -> crée le compte + login + redirect home
 // =====================================================
 app.get("/auth/discord/callback", async (req, res) => {
   try {
@@ -136,14 +141,16 @@ app.get("/auth/discord/callback", async (req, res) => {
     console.log("DISCORD CALLBACK query:", req.query);
 
     if (error) {
-      const errUrl = frontUrl(`/linking.html?discord=error&reason=${encodeURIComponent(String(error))}`);
-      return res.redirect(errUrl);
+      // retour home avec erreur (overlay peut lire discord=error)
+      return res.redirect(goHome(`discord=error`));
     }
 
     if (!code) {
-      return res.status(400).send("No code returned by Discord.");
+      // pas de code => erreur
+      return res.redirect(goHome(`discord=error`));
     }
 
+    // check state
     if (!state || state !== req.session.discordState) {
       return res.status(400).send("Invalid state (security check failed).");
     }
@@ -164,7 +171,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!tokenResp.ok) {
       const err = await tokenResp.text();
       console.error("TOKEN ERROR:", err);
-      return res.status(500).send("Token exchange failed: " + err);
+      return res.redirect(goHome(`discord=error`));
     }
 
     const tokenData = await tokenResp.json();
@@ -178,13 +185,13 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!meResp.ok) {
       const err = await meResp.text();
       console.error("ME ERROR:", err);
-      return res.status(500).send("Get /users/@me failed: " + err);
+      return res.redirect(goHome(`discord=error`));
     }
 
     const me = await meResp.json();
     const discordUserId = me.id;
 
-    // 3) Add to guild (optionnel mais tu l’utilises)
+    // 3) Add to guild
     const addResp = await fetch(
       `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
       {
@@ -200,7 +207,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!addResp.ok) {
       const err = await addResp.text();
       console.error("ADD GUILD ERROR:", err);
-      return res.status(500).send("Add guild member failed: " + err);
+      return res.redirect(goHome(`discord=error`));
     }
 
     // 4) Add role PhantomID
@@ -215,18 +222,19 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!roleResp.ok) {
       const err = await roleResp.text();
       console.error("ADD ROLE ERROR:", err);
-      return res.status(500).send("Add role failed: " + err);
+      return res.redirect(goHome(`discord=error`));
     }
 
     // ===== SI pending signup -> on crée le compte ici =====
     const pendingId = req.session.pendingId;
+
     if (pendingId && pendingSignups[pendingId]) {
       const pending = pendingSignups[pendingId];
 
       if (usersByEmail[pending.email]) {
         delete pendingSignups[pendingId];
         delete req.session.pendingId;
-        return res.status(409).send("Email already used.");
+        return res.redirect(goHome(`signup=error&reason=email_used`));
       }
 
       const userId = newId("user");
@@ -242,19 +250,24 @@ app.get("/auth/discord/callback", async (req, res) => {
       };
       usersByEmail[pending.email] = userId;
 
+      // cleanup
       delete pendingSignups[pendingId];
       delete req.session.pendingId;
 
+      // login auto
       req.session.userId = userId;
 
-      return res.redirect(frontUrl("/phantomcard.html?signup=done"));
+      // ✅ IMPORTANT: retour sur index (overlays)
+      // discord=linked déclenche ton linking.js
+      // signup=done si tu veux afficher un overlay "account created"
+      return res.redirect(goHome(`signup=done&discord=linked`));
     }
 
-    // Sinon: simple linking
-    return res.redirect(frontUrl("/linking.html?discord=linked"));
+    // Sinon: simple linking → retour sur index
+    return res.redirect(goHome(`discord=linked`));
   } catch (e) {
     console.error(e);
-    return res.redirect(frontUrl("/linking.html?discord=error"));
+    return res.redirect(goHome(`discord=error`));
   }
 });
 
@@ -281,7 +294,7 @@ app.post("/login", (req, res) => {
 
   req.session.userId = user.id;
 
-  // ✅ pour ton overlay (login.js)
+  // Ton overlay login.js attend redirectTo
   return res.json({ ok: true, redirectTo: "/phantomcard.html" });
 });
 
@@ -290,6 +303,8 @@ app.post("/login", (req, res) => {
 // =====================================================
 app.get("/me", requireAuth, (req, res) => {
   const user = users[req.session.userId];
+  if (!user) return res.status(404).json({ ok: false, error: "User not found" });
+
   return res.json({
     ok: true,
     user: {
