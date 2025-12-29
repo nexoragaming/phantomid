@@ -8,11 +8,23 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// IMPORTANT Render / reverse proxy
+app.set("trust proxy", 1);
+
 // ===== Middlewares =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Helper env
+const IS_PROD = process.env.NODE_ENV === "production";
+
+// Ton front (où est hébergé linking.html / phantomcard.html)
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || ""; 
+// ex: https://phantomid.com
+// si tu laisses vide, ça redirige vers les pages servies par express.static("public")
+
+// ===== Session =====
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev_secret_change_me",
@@ -20,13 +32,17 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false, // en prod Render -> true (HTTPS) si tu mets derrière proxy, sinon laisse false pour beta
+      // Si ton FRONT est sur un autre domaine que onrender,
+      // "lax" peut bloquer le cookie dans certains flows.
+      // Mets "none" en prod et secure=true si tu utilises phantomid.com (recommandé).
+      sameSite: IS_PROD ? "none" : "lax",
+      secure: IS_PROD, // Render HTTPS => true en prod
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
     },
   })
 );
 
+// Static files (si tu sers ton front ici)
 app.use(express.static("public"));
 
 // ===== "DB" temporaire en mémoire (beta) =====
@@ -70,9 +86,7 @@ app.post("/signup/start", (req, res) => {
     createdAt: Date.now(),
   };
 
-  // on garde le pendingId dans session (c’est important)
   req.session.pendingId = pendingId;
-
   return res.json({ ok: true });
 });
 
@@ -80,21 +94,25 @@ app.post("/signup/start", (req, res) => {
 // 2) DISCORD AUTH (redirige Discord)
 // =====================================================
 app.get("/auth/discord", (req, res) => {
-  const redirectUri = encodeURIComponent(process.env.DISCORD_REDIRECT_URI);
-  const scope = encodeURIComponent("identify guilds.join");
+  // IMPORTANT: redirect_uri DOIT être le callback exact
+  const redirectUri = process.env.DISCORD_REDIRECT_URI;
+  if (!redirectUri) {
+    return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
+  }
+
+  const scope = "identify guilds.join";
   const state = Math.random().toString(16).slice(2);
 
-  // on stock state pour sécurité
   req.session.discordState = state;
 
   const url =
-    `https://discord.com/api/oauth2/authorize` +
-    `?client_id=${process.env.DISCORD_CLIENT_ID}` +
-    `&redirect_uri=${redirectUri}` +
+    `https://discord.com/oauth2/authorize` +
+    `?client_id=${encodeURIComponent(process.env.DISCORD_CLIENT_ID)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
     `&response_type=code` +
-    `&scope=${scope}` +
+    `&scope=${encodeURIComponent(scope)}` +
     `&prompt=consent` +
-    `&state=${state}`;
+    `&state=${encodeURIComponent(state)}`;
 
   return res.redirect(url);
 });
@@ -108,15 +126,20 @@ app.get("/auth/discord/callback", async (req, res) => {
   try {
     const { code, error, error_description, state } = req.query;
 
+    // Log debug (très utile en prod)
+    console.log("DISCORD CALLBACK query:", req.query);
+
     if (error) {
-      return res
-        .status(400)
-        .send(
-          `Discord OAuth error: ${error}${error_description ? " - " + error_description : ""}`
-        );
+      // redirige vers front avec erreur
+      const errUrl = FRONTEND_BASE_URL
+        ? `${FRONTEND_BASE_URL}/linking.html?discord=error`
+        : `/index.html?discord=error`;
+      return res.redirect(errUrl);
     }
 
-    if (!code) return res.status(400).send("No code returned by Discord.");
+    if (!code) {
+      return res.status(400).send("No code returned by Discord.");
+    }
 
     // check state
     if (!state || state !== req.session.discordState) {
@@ -132,6 +155,7 @@ app.get("/auth/discord/callback", async (req, res) => {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: "authorization_code",
         code: String(code),
+        // IMPORTANT: doit matcher EXACTEMENT ce que tu as envoyé dans /auth/discord
         redirect_uri: process.env.DISCORD_REDIRECT_URI,
       }),
     });
@@ -198,7 +222,6 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (pendingId && pendingSignups[pendingId]) {
       const pending = pendingSignups[pendingId];
 
-      // Email déjà utilisé ?
       if (usersByEmail[pending.email]) {
         delete pendingSignups[pendingId];
         delete req.session.pendingId;
@@ -218,22 +241,30 @@ app.get("/auth/discord/callback", async (req, res) => {
       };
       usersByEmail[pending.email] = userId;
 
-      // cleanup
       delete pendingSignups[pendingId];
       delete req.session.pendingId;
 
-      // login auto
       req.session.userId = userId;
 
-      // redirect final beta
-      return res.redirect("/phantomcard.html?signup=done");
+      // Redirige vers front
+      const okUrl = FRONTEND_BASE_URL
+        ? `${FRONTEND_BASE_URL}/phantomcard.html?signup=done`
+        : `/phantomcard.html?signup=done`;
+      return res.redirect(okUrl);
     }
 
-    // sinon juste rediriger overlay
-    return res.redirect("/index.html?discord=linked");
+    // Sinon: simple linking
+    const linkedUrl = FRONTEND_BASE_URL
+      ? `${FRONTEND_BASE_URL}/linking.html?discord=linked`
+      : `/index.html?discord=linked`;
+
+    return res.redirect(linkedUrl);
   } catch (e) {
     console.error(e);
-    res.status(500).send("Unexpected server error: " + String(e));
+    const errUrl = FRONTEND_BASE_URL
+      ? `${FRONTEND_BASE_URL}/linking.html?discord=error`
+      : `/index.html?discord=error`;
+    return res.redirect(errUrl);
   }
 });
 
@@ -245,7 +276,8 @@ app.post("/login", (req, res) => {
   const emailKey = String(email || "").toLowerCase().trim();
   const pass = String(password || "");
 
-  if (!emailKey || !pass) return res.status(400).json({ ok: false, error: "Missing fields" });
+  if (!emailKey || !pass)
+    return res.status(400).json({ ok: false, error: "Missing fields" });
 
   const userId = usersByEmail[emailKey];
   if (!userId) return res.status(401).json({ ok: false, error: "Invalid login" });
@@ -288,4 +320,7 @@ app.post("/logout", (req, res) => {
 // ===== Start server =====
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`PhantomID running on port ${PORT}`);
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("FRONTEND_BASE_URL:", FRONTEND_BASE_URL || "(serving static)");
+  console.log("DISCORD_REDIRECT_URI:", process.env.DISCORD_REDIRECT_URI);
 });
