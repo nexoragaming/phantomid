@@ -59,3 +59,29 @@ editBtn.addEventListener("click", function (){
     overlayCardSlot.appendChild(cardClone);
     
 })
+
+console.log("phantomcard.js connecté");
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const phantomIdEl = document.getElementById("user-phantomid");
+
+  try {
+    const resp = await fetch("/me", { method: "GET" });
+    const data = await resp.json().catch(() => ({}));
+
+    if (!resp.ok || !data.ok || !data.user) {
+      // pas logged
+      window.location.href = "/index.html?login=required";
+      return;
+    }
+
+    const phantomId = data.user.phantomId || "";
+    if (phantomIdEl) {
+      phantomIdEl.textContent = `@ ${phantomId}`;
+    }
+  } catch (err) {
+    console.error(err);
+    // fallback: retourne au login
+    window.location.href = "/index.html?login=required";
+  }
+});
