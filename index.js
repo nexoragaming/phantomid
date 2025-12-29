@@ -20,9 +20,9 @@ app.use(cookieParser());
 const IS_PROD = process.env.NODE_ENV === "production";
 
 // Ton front (où est hébergé linking.html / phantomcard.html)
-const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || ""; 
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || "";
 // ex: https://phantomid.com
-// si tu laisses vide, ça redirige vers les pages servies par express.static("public")
+// si vide -> redirige vers les pages servies par express.static("public")
 
 // ===== Session =====
 app.use(
@@ -32,9 +32,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      // Si ton FRONT est sur un autre domaine que onrender,
-      // "lax" peut bloquer le cookie dans certains flows.
-      // Mets "none" en prod et secure=true si tu utilises phantomid.com (recommandé).
+      // Si ton FRONT est sur un autre domaine que onrender, il faut souvent "none" en prod
       sameSite: IS_PROD ? "none" : "lax",
       secure: IS_PROD, // Render HTTPS => true en prod
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
@@ -55,13 +53,23 @@ function newId(prefix = "u") {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.session?.userId)
+  if (!req.session?.userId) {
     return res.status(401).json({ ok: false, error: "Not logged in" });
+  }
   next();
+}
+
+function frontUrl(pathAndQuery) {
+  // helper: construit une URL front si FRONTEND_BASE_URL est set, sinon route locale
+  if (FRONTEND_BASE_URL) return `${FRONTEND_BASE_URL}${pathAndQuery}`;
+  return pathAndQuery;
 }
 
 // ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
+
+// (Optionnel) évite l’écran blanc si quelqu’un va sur /login en GET
+app.get("/login", (req, res) => res.redirect(frontUrl("/index.html?login=required")));
 
 // =====================================================
 // 1) SIGNUP START (on ne crée PAS le compte ici)
@@ -94,12 +102,11 @@ app.post("/signup/start", (req, res) => {
 // 2) DISCORD AUTH (redirige Discord)
 // =====================================================
 app.get("/auth/discord", (req, res) => {
-  // IMPORTANT: redirect_uri DOIT être le callback exact
   const redirectUri = process.env.DISCORD_REDIRECT_URI;
-  if (!redirectUri) {
-    return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
-  }
+  if (!redirectUri) return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
+  if (!process.env.DISCORD_CLIENT_ID) return res.status(500).send("Missing DISCORD_CLIENT_ID in env.");
 
+  // IMPORTANT: redirect_uri DOIT être le callback exact (…/auth/discord/callback)
   const scope = "identify guilds.join";
   const state = Math.random().toString(16).slice(2);
 
@@ -126,14 +133,10 @@ app.get("/auth/discord/callback", async (req, res) => {
   try {
     const { code, error, error_description, state } = req.query;
 
-    // Log debug (très utile en prod)
     console.log("DISCORD CALLBACK query:", req.query);
 
     if (error) {
-      // redirige vers front avec erreur
-      const errUrl = FRONTEND_BASE_URL
-        ? `${FRONTEND_BASE_URL}/linking.html?discord=error`
-        : `/index.html?discord=error`;
+      const errUrl = frontUrl(`/linking.html?discord=error&reason=${encodeURIComponent(String(error))}`);
       return res.redirect(errUrl);
     }
 
@@ -141,7 +144,6 @@ app.get("/auth/discord/callback", async (req, res) => {
       return res.status(400).send("No code returned by Discord.");
     }
 
-    // check state
     if (!state || state !== req.session.discordState) {
       return res.status(400).send("Invalid state (security check failed).");
     }
@@ -155,8 +157,7 @@ app.get("/auth/discord/callback", async (req, res) => {
         client_secret: process.env.DISCORD_CLIENT_SECRET,
         grant_type: "authorization_code",
         code: String(code),
-        // IMPORTANT: doit matcher EXACTEMENT ce que tu as envoyé dans /auth/discord
-        redirect_uri: process.env.DISCORD_REDIRECT_URI,
+        redirect_uri: process.env.DISCORD_REDIRECT_URI, // MUST match exactly
       }),
     });
 
@@ -183,7 +184,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     const me = await meResp.json();
     const discordUserId = me.id;
 
-    // 3) Add to guild
+    // 3) Add to guild (optionnel mais tu l’utilises)
     const addResp = await fetch(
       `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
       {
@@ -246,38 +247,29 @@ app.get("/auth/discord/callback", async (req, res) => {
 
       req.session.userId = userId;
 
-      // Redirige vers front
-      const okUrl = FRONTEND_BASE_URL
-        ? `${FRONTEND_BASE_URL}/phantomcard.html?signup=done`
-        : `/phantomcard.html?signup=done`;
-      return res.redirect(okUrl);
+      return res.redirect(frontUrl("/phantomcard.html?signup=done"));
     }
 
     // Sinon: simple linking
-    const linkedUrl = FRONTEND_BASE_URL
-      ? `${FRONTEND_BASE_URL}/linking.html?discord=linked`
-      : `/index.html?discord=linked`;
-
-    return res.redirect(linkedUrl);
+    return res.redirect(frontUrl("/linking.html?discord=linked"));
   } catch (e) {
     console.error(e);
-    const errUrl = FRONTEND_BASE_URL
-      ? `${FRONTEND_BASE_URL}/linking.html?discord=error`
-      : `/index.html?discord=error`;
-    return res.redirect(errUrl);
+    return res.redirect(frontUrl("/linking.html?discord=error"));
   }
 });
 
 // =====================================================
-// 4) LOGIN
+// 4) LOGIN (overlay -> fetch POST)
 // =====================================================
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
+
   const emailKey = String(email || "").toLowerCase().trim();
   const pass = String(password || "");
 
-  if (!emailKey || !pass)
+  if (!emailKey || !pass) {
     return res.status(400).json({ ok: false, error: "Missing fields" });
+  }
 
   const userId = usersByEmail[emailKey];
   if (!userId) return res.status(401).json({ ok: false, error: "Invalid login" });
@@ -288,7 +280,9 @@ app.post("/login", (req, res) => {
   }
 
   req.session.userId = user.id;
-  return res.json({ ok: true });
+
+  // ✅ pour ton overlay (login.js)
+  return res.json({ ok: true, redirectTo: "/phantomcard.html" });
 });
 
 // =====================================================

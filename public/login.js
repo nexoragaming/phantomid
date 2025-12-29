@@ -6,9 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("login-form");
 
   const emailInput = document.getElementById("login-email");
-  const passInput = document.getElementById("login-confirm-password");
+  const passInput = document.getElementById("login-password"); // ✅ important
 
-  // Bouton navbar "Log in" (si tu en as un)
   const openBtn = document.getElementById("open-login-overlay");
 
   function openLogin() {
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loginOverlay.classList.remove("active");
   }
 
-  // Expose pour ouvrir le login via query param (?login=required)
   window.openLoginOverlay = openLogin;
 
   if (openBtn) {
@@ -38,18 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // clic en dehors du box = close (optionnel)
   if (loginOverlay) {
     loginOverlay.addEventListener("click", (e) => {
       if (e.target === loginOverlay) closeLogin();
     });
   }
 
-  // ✅ Ouvrir automatiquement l’overlay si redirect ?login=required
   const params = new URLSearchParams(window.location.search);
-  if (params.get("login") === "required") {
-    openLogin();
-  }
+  if (params.get("login") === "required") openLogin();
 
   if (!form) {
     console.warn("login-form introuvable (id=login-form)");
@@ -81,9 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // ✅ ferme l'overlay et redirect (route protégée)
       closeLogin();
-      window.location.href = data.redirectTo || "/phantomcard";
+      window.location.href = data.redirectTo || "/phantomcard.html"; // ✅
     } catch (err) {
       console.error(err);
       alert("Server error. Check terminal.");
