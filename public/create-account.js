@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("form:", !!form);
   console.log("createOverlay:", !!createOverlay);
-  console.log("linkingOverlay:", !!linkingOverlay);
 
   console.log("dup check:", {
     username: document.querySelectorAll("#username").length,
@@ -67,9 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 2) Overlays
-    if (createOverlay) createOverlay.classList.remove("active");
-    if (linkingOverlay) linkingOverlay.classList.add("active");
 
     // 3) OAuth Discord
     window.location.href = "https://phantomid.onrender.com/auth/discord";

@@ -39,7 +39,6 @@ const pool = new Pool({
   ssl: IS_PROD ? { rejectUnauthorized: false } : false, // Render = SSL requis en prod
 });
 
-// petite sanity check (log seulement)
 pool
   .query("SELECT 1")
   .then(() => console.log("✅ PostgreSQL connecté"))
@@ -53,7 +52,6 @@ app.use(
     store: new PgSession({
       pool,
       tableName: "session",
-      // auto-create table si elle existe pas (connect-pg-simple sait la créer)
       createTableIfMissing: true,
     }),
     secret: process.env.SESSION_SECRET || "dev_secret_change_me",
@@ -83,29 +81,19 @@ function normalizeEmail(email) {
   return String(email || "").toLowerCase().trim();
 }
 
-// Génère un PhantomID simple: PH + 6 digits (unique)
-async function generateUniquePhantomId() {
-  for (let i = 0; i < 8; i++) {
-    const num = Math.floor(Math.random() * 1000000)
-      .toString()
-      .padStart(6, "0");
-    const phantomId = `PH${num}`;
-
-    const check = await pool.query("SELECT 1 FROM users WHERE phantom_id = $1", [
-      phantomId,
-    ]);
-    if (check.rowCount === 0) return phantomId;
-  }
-  // fallback si malchance
-  return `PH${Date.now().toString().slice(-6)}`;
+// ✅ PhantomID SEQ: PH000001, PH000002, ...
+async function nextPhantomId() {
+  // Sequence phantom_id_seq -> start 1
+  const r = await pool.query("SELECT nextval('phantom_id_seq') AS n");
+  const n = Number(r.rows[0].n);
+  return `PH${String(n).padStart(6, "0")}`;
 }
 
 // ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
 
 // =====================================================
-// 0) INIT DB (facultatif) - crée la table users si absente
-// (tu l’as déjà fait dans DBeaver, mais on garde safe)
+// 0) INIT DB (crée table + sequence si absents)
 // =====================================================
 app.get("/_init_db", async (req, res) => {
   try {
@@ -119,6 +107,28 @@ app.get("/_init_db", async (req, res) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // ✅ Sequence pour PhantomID (commence à 1)
+    await pool.query(`
+      CREATE SEQUENCE IF NOT EXISTS phantom_id_seq
+      START WITH 1
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+    `);
+
+    // ✅ Si tu as déjà des users, on recale la séquence sur le max existant
+    // Exemple: si PH000123 existe, prochain sera 124
+    await pool.query(`
+      SELECT setval(
+        'phantom_id_seq',
+        COALESCE((
+          SELECT MAX(CAST(SUBSTRING(phantom_id FROM 3) AS INT)) FROM users
+        ), 0)
+      );
+    `);
+
     return res.json({ ok: true });
   } catch (e) {
     console.error(e);
@@ -133,16 +143,12 @@ app.post("/signup/start", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // username est dans ton overlay, on le garde, mais
-    // ta table users n'a pas username pour l'instant.
-    // Donc on le garde en session pour plus tard si tu veux l'ajouter au DB.
     if (!username || !email || !password) {
       return res.status(400).json({ ok: false, error: "Missing fields" });
     }
 
     const emailKey = normalizeEmail(email);
 
-    // check email existant
     const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
       emailKey,
     ]);
@@ -150,7 +156,6 @@ app.post("/signup/start", async (req, res) => {
       return res.status(409).json({ ok: false, error: "Email already used" });
     }
 
-    // stock pending dans session
     req.session.pendingSignup = {
       username: String(username).trim(),
       email: emailKey,
@@ -166,7 +171,7 @@ app.post("/signup/start", async (req, res) => {
 });
 
 // =====================================================
-// 2) DISCORD AUTH (redirige Discord)
+// 2) DISCORD AUTH
 // =====================================================
 app.get("/auth/discord", (req, res) => {
   const redirectUri = process.env.DISCORD_REDIRECT_URI;
@@ -192,22 +197,14 @@ app.get("/auth/discord", (req, res) => {
 
 // =====================================================
 // 3) DISCORD CALLBACK
-// - join server + role
-// - si pending signup => crée user en DB + login + redirect phantomcard
-// - sinon si déjà logged => update discord_id (link) + redirect phantomcard
+// - pending signup => crée user en DB avec PH000001+
 // =====================================================
 app.get("/auth/discord/callback", async (req, res) => {
   try {
     const { code, error, state } = req.query;
 
-    console.log("DISCORD CALLBACK query:", req.query);
-
-    if (error) {
-      return res.redirect(frontUrl("/index.html?discord=error"));
-    }
-
+    if (error) return res.redirect(frontUrl("/index.html?discord=error"));
     if (!code) return res.status(400).send("No code returned by Discord.");
-
     if (!state || state !== req.session.discordState) {
       return res.status(400).send("Invalid state (security check failed).");
     }
@@ -282,11 +279,10 @@ app.get("/auth/discord/callback", async (req, res) => {
       return res.status(500).send("Add role failed: " + err);
     }
 
-    // ===== A) pending signup => create user in DB =====
     const pending = req.session.pendingSignup;
 
+    // ===== A) pending signup => create user in DB =====
     if (pending?.email && pending?.password) {
-      // re-check email (sécurité)
       const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
         pending.email,
       ]);
@@ -295,7 +291,8 @@ app.get("/auth/discord/callback", async (req, res) => {
         return res.redirect(frontUrl("/index.html?signup=email_used"));
       }
 
-      const phantomId = await generateUniquePhantomId();
+      // ✅ PhantomID séquentiel
+      const phantomId = await nextPhantomId();
       const passwordHash = await bcrypt.hash(pending.password, 12);
 
       const ins = await pool.query(
@@ -305,17 +302,13 @@ app.get("/auth/discord/callback", async (req, res) => {
         [phantomId, pending.email, passwordHash, discordUserId]
       );
 
-      // login
       req.session.userId = ins.rows[0].id;
-
-      // cleanup pending
       delete req.session.pendingSignup;
 
-      // redirect phantomcard (overlay flow OK)
       return res.redirect(frontUrl("/phantomcard.html?signup=done"));
     }
 
-    // ===== B) user déjà logged => simple link discord_id =====
+    // ===== B) user déjà logged => link discord_id =====
     if (req.session?.userId) {
       await pool.query("UPDATE users SET discord_id = $1 WHERE id = $2", [
         discordUserId,
@@ -324,7 +317,6 @@ app.get("/auth/discord/callback", async (req, res) => {
       return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
     }
 
-    // ===== C) neither pending nor logged => just come back home
     return res.redirect(frontUrl("/index.html?discord=linked"));
   } catch (e) {
     console.error(e);
@@ -333,7 +325,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 });
 
 // =====================================================
-// 4) LOGIN (overlay -> fetch POST)
+// 4) LOGIN
 // =====================================================
 app.post("/login", async (req, res) => {
   try {
@@ -362,7 +354,6 @@ app.post("/login", async (req, res) => {
     }
 
     req.session.userId = user.id;
-
     return res.json({ ok: true, redirectTo: "/phantomcard.html" });
   } catch (e) {
     console.error(e);
@@ -371,7 +362,7 @@ app.post("/login", async (req, res) => {
 });
 
 // =====================================================
-// 5) WHO AM I  (pour afficher PhantomID sur la PhantomCard)
+// 5) /me (PhantomCard)
 // =====================================================
 app.get("/me", requireAuth, async (req, res) => {
   try {
@@ -390,7 +381,7 @@ app.get("/me", requireAuth, async (req, res) => {
       ok: true,
       user: {
         id: u.id,
-        phantomId: u.phantom_id, // IMPORTANT: phantomId (camelCase) pour ton front
+        phantomId: u.phantom_id,
         email: u.email,
         discordId: u.discord_id || null,
         verifiedDiscord: !!u.discord_id,
