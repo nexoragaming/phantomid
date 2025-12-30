@@ -2,23 +2,60 @@ import express from "express";
 import dotenv from "dotenv";
 import session from "express-session";
 import cookieParser from "cookie-parser";
+import pg from "pg";
+import connectPgSimple from "connect-pg-simple";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
+// IMPORTANT reverse proxy (Render)
 app.set("trust proxy", 1);
 
+// ===== Middlewares =====
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const IS_PROD = process.env.NODE_ENV === "production";
-const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || "";
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || ""; // optionnel
+
+function frontUrl(path = "/") {
+  if (!FRONTEND_BASE_URL) return path; // sert public/ directement
+  return `${FRONTEND_BASE_URL}${path}`;
+}
+
+// ===== Postgres =====
+const { Pool } = pg;
+
+if (!process.env.DATABASE_URL) {
+  console.warn("⚠️ DATABASE_URL manquant (Render Postgres). Mets-le dans les env vars.");
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: IS_PROD ? { rejectUnauthorized: false } : false, // Render = SSL requis en prod
+});
+
+// petite sanity check (log seulement)
+pool
+  .query("SELECT 1")
+  .then(() => console.log("✅ PostgreSQL connecté"))
+  .catch((e) => console.error("❌ PostgreSQL connexion fail:", e));
+
+// ===== Session store Postgres =====
+const PgSession = connectPgSimple(session);
 
 app.use(
   session({
+    store: new PgSession({
+      pool,
+      tableName: "session",
+      // auto-create table si elle existe pas (connect-pg-simple sait la créer)
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "dev_secret_change_me",
     resave: false,
     saveUninitialized: false,
@@ -26,30 +63,15 @@ app.use(
       httpOnly: true,
       sameSite: IS_PROD ? "none" : "lax",
       secure: IS_PROD,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
     },
   })
 );
 
+// Static files
 app.use(express.static("public"));
 
-// ===== DB mémoire (beta) =====
-const pendingSignups = {}; // pendingId -> { username,email,password,phantomId,createdAt }
-const users = {}; // userId -> user data
-const usersByEmail = {}; // email -> userId
-
-let phantomCounter = 1; // ⚠️ en prod/DB: ça doit être persistent
-
-function newId(prefix = "u") {
-  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
-}
-
-function nextPhantomId() {
-  // PH000001, PH000002, ...
-  const n = phantomCounter++;
-  return `PH${String(n).padStart(6, "0")}`;
-}
-
+// ===== Helpers =====
 function requireAuth(req, res, next) {
   if (!req.session?.userId) {
     return res.status(401).json({ ok: false, error: "Not logged in" });
@@ -57,58 +79,103 @@ function requireAuth(req, res, next) {
   next();
 }
 
-function frontUrl(pathAndQuery) {
-  if (FRONTEND_BASE_URL) return `${FRONTEND_BASE_URL}${pathAndQuery}`;
-  return pathAndQuery;
+function normalizeEmail(email) {
+  return String(email || "").toLowerCase().trim();
 }
 
-function goHome(queryString) {
-  const qs = queryString ? `?${queryString}` : "";
-  return frontUrl(`/index.html${qs}`);
+// Génère un PhantomID simple: PH + 6 digits (unique)
+async function generateUniquePhantomId() {
+  for (let i = 0; i < 8; i++) {
+    const num = Math.floor(Math.random() * 1000000)
+      .toString()
+      .padStart(6, "0");
+    const phantomId = `PH${num}`;
+
+    const check = await pool.query("SELECT 1 FROM users WHERE phantom_id = $1", [
+      phantomId,
+    ]);
+    if (check.rowCount === 0) return phantomId;
+  }
+  // fallback si malchance
+  return `PH${Date.now().toString().slice(-6)}`;
 }
 
+// ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
-app.get("/login", (req, res) => res.redirect(goHome("login=required")));
 
 // =====================================================
-// 1) SIGNUP START (pending)
+// 0) INIT DB (facultatif) - crée la table users si absente
+// (tu l’as déjà fait dans DBeaver, mais on garde safe)
 // =====================================================
-app.post("/signup/start", (req, res) => {
-  const { username, email, password } = req.body;
-
-  if (!username || !email || !password) {
-    return res.status(400).json({ ok: false, error: "Missing fields" });
+app.get("/_init_db", async (req, res) => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        phantom_id VARCHAR(32) UNIQUE NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        discord_id VARCHAR(32),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "init db failed" });
   }
-
-  const emailKey = String(email).toLowerCase().trim();
-  if (usersByEmail[emailKey]) {
-    return res.status(409).json({ ok: false, error: "Email already used" });
-  }
-
-  const pendingId = newId("pending");
-  pendingSignups[pendingId] = {
-    username: String(username).trim(),
-    email: emailKey,
-    password: String(password),
-    phantomId: nextPhantomId(), // ✅ généré automatiquement
-    createdAt: Date.now(),
-  };
-
-  req.session.pendingId = pendingId;
-  return res.json({ ok: true });
 });
 
 // =====================================================
-// 2) DISCORD AUTH
+// 1) SIGNUP START (pending en session, pas de compte encore)
+// =====================================================
+app.post("/signup/start", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // username est dans ton overlay, on le garde, mais
+    // ta table users n'a pas username pour l'instant.
+    // Donc on le garde en session pour plus tard si tu veux l'ajouter au DB.
+    if (!username || !email || !password) {
+      return res.status(400).json({ ok: false, error: "Missing fields" });
+    }
+
+    const emailKey = normalizeEmail(email);
+
+    // check email existant
+    const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
+      emailKey,
+    ]);
+    if (exists.rowCount > 0) {
+      return res.status(409).json({ ok: false, error: "Email already used" });
+    }
+
+    // stock pending dans session
+    req.session.pendingSignup = {
+      username: String(username).trim(),
+      email: emailKey,
+      password: String(password),
+      createdAt: Date.now(),
+    };
+
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// =====================================================
+// 2) DISCORD AUTH (redirige Discord)
 // =====================================================
 app.get("/auth/discord", (req, res) => {
   const redirectUri = process.env.DISCORD_REDIRECT_URI;
-  if (!redirectUri) return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
-  if (!process.env.DISCORD_CLIENT_ID) return res.status(500).send("Missing DISCORD_CLIENT_ID in env.");
+  if (!redirectUri) {
+    return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
+  }
 
   const scope = "identify guilds.join";
   const state = Math.random().toString(16).slice(2);
-
   req.session.discordState = state;
 
   const url =
@@ -125,6 +192,9 @@ app.get("/auth/discord", (req, res) => {
 
 // =====================================================
 // 3) DISCORD CALLBACK
+// - join server + role
+// - si pending signup => crée user en DB + login + redirect phantomcard
+// - sinon si déjà logged => update discord_id (link) + redirect phantomcard
 // =====================================================
 app.get("/auth/discord/callback", async (req, res) => {
   try {
@@ -132,7 +202,11 @@ app.get("/auth/discord/callback", async (req, res) => {
 
     console.log("DISCORD CALLBACK query:", req.query);
 
-    if (error || !code) return res.redirect(goHome("discord=error"));
+    if (error) {
+      return res.redirect(frontUrl("/index.html?discord=error"));
+    }
+
+    if (!code) return res.status(400).send("No code returned by Discord.");
 
     if (!state || state !== req.session.discordState) {
       return res.status(400).send("Invalid state (security check failed).");
@@ -152,21 +226,23 @@ app.get("/auth/discord/callback", async (req, res) => {
     });
 
     if (!tokenResp.ok) {
-      console.error("TOKEN ERROR:", await tokenResp.text());
-      return res.redirect(goHome("discord=error"));
+      const err = await tokenResp.text();
+      console.error("TOKEN ERROR:", err);
+      return res.status(500).send("Token exchange failed: " + err);
     }
 
     const tokenData = await tokenResp.json();
     const userAccessToken = tokenData.access_token;
 
-    // 2) Get /users/@me
+    // 2) Get user
     const meResp = await fetch("https://discord.com/api/users/@me", {
       headers: { Authorization: `Bearer ${userAccessToken}` },
     });
 
     if (!meResp.ok) {
-      console.error("ME ERROR:", await meResp.text());
-      return res.redirect(goHome("discord=error"));
+      const err = await meResp.text();
+      console.error("ME ERROR:", err);
+      return res.status(500).send("Get /users/@me failed: " + err);
     }
 
     const me = await meResp.json();
@@ -186,8 +262,9 @@ app.get("/auth/discord/callback", async (req, res) => {
     );
 
     if (!addResp.ok) {
-      console.error("ADD GUILD ERROR:", await addResp.text());
-      return res.redirect(goHome("discord=error"));
+      const err = await addResp.text();
+      console.error("ADD GUILD ERROR:", err);
+      return res.status(500).send("Add guild member failed: " + err);
     }
 
     // 4) Add role
@@ -200,95 +277,129 @@ app.get("/auth/discord/callback", async (req, res) => {
     );
 
     if (!roleResp.ok) {
-      console.error("ADD ROLE ERROR:", await roleResp.text());
-      return res.redirect(goHome("discord=error"));
+      const err = await roleResp.text();
+      console.error("ADD ROLE ERROR:", err);
+      return res.status(500).send("Add role failed: " + err);
     }
 
-    // ===== pending signup -> create user =====
-    const pendingId = req.session.pendingId;
+    // ===== A) pending signup => create user in DB =====
+    const pending = req.session.pendingSignup;
 
-    if (pendingId && pendingSignups[pendingId]) {
-      const pending = pendingSignups[pendingId];
-
-      if (usersByEmail[pending.email]) {
-        delete pendingSignups[pendingId];
-        delete req.session.pendingId;
-        return res.redirect(goHome("signup=error&reason=email_used"));
+    if (pending?.email && pending?.password) {
+      // re-check email (sécurité)
+      const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
+        pending.email,
+      ]);
+      if (exists.rowCount > 0) {
+        delete req.session.pendingSignup;
+        return res.redirect(frontUrl("/index.html?signup=email_used"));
       }
 
-      const userId = newId("user");
-      users[userId] = {
-        id: userId,
-        phantomId: pending.phantomId, // ✅ stored
-        username: pending.username,
-        email: pending.email,
-        password: pending.password,
-        discordUserId,
-        verifiedDiscord: true,
-        createdAt: Date.now(),
-        premium: false,
-      };
+      const phantomId = await generateUniquePhantomId();
+      const passwordHash = await bcrypt.hash(pending.password, 12);
 
-      usersByEmail[pending.email] = userId;
+      const ins = await pool.query(
+        `INSERT INTO users (phantom_id, email, password_hash, discord_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id`,
+        [phantomId, pending.email, passwordHash, discordUserId]
+      );
 
-      delete pendingSignups[pendingId];
-      delete req.session.pendingId;
+      // login
+      req.session.userId = ins.rows[0].id;
 
-      req.session.userId = userId;
+      // cleanup pending
+      delete req.session.pendingSignup;
 
-      return res.redirect(goHome("signup=done&discord=linked"));
+      // redirect phantomcard (overlay flow OK)
+      return res.redirect(frontUrl("/phantomcard.html?signup=done"));
     }
 
-    return res.redirect(goHome("discord=linked"));
+    // ===== B) user déjà logged => simple link discord_id =====
+    if (req.session?.userId) {
+      await pool.query("UPDATE users SET discord_id = $1 WHERE id = $2", [
+        discordUserId,
+        req.session.userId,
+      ]);
+      return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
+    }
+
+    // ===== C) neither pending nor logged => just come back home
+    return res.redirect(frontUrl("/index.html?discord=linked"));
   } catch (e) {
     console.error(e);
-    return res.redirect(goHome("discord=error"));
+    return res.redirect(frontUrl("/index.html?discord=error"));
   }
 });
 
 // =====================================================
-// 4) LOGIN
+// 4) LOGIN (overlay -> fetch POST)
 // =====================================================
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const emailKey = normalizeEmail(email);
+    const pass = String(password || "");
 
-  const emailKey = String(email || "").toLowerCase().trim();
-  const pass = String(password || "");
+    if (!emailKey || !pass) {
+      return res.status(400).json({ ok: false, error: "Missing fields" });
+    }
 
-  if (!emailKey || !pass) {
-    return res.status(400).json({ ok: false, error: "Missing fields" });
+    const q = await pool.query(
+      "SELECT id, password_hash FROM users WHERE email = $1",
+      [emailKey]
+    );
+
+    if (q.rowCount === 0) {
+      return res.status(401).json({ ok: false, error: "Invalid login" });
+    }
+
+    const user = q.rows[0];
+    const ok = await bcrypt.compare(pass, user.password_hash);
+
+    if (!ok) {
+      return res.status(401).json({ ok: false, error: "Invalid login" });
+    }
+
+    req.session.userId = user.id;
+
+    return res.json({ ok: true, redirectTo: "/phantomcard.html" });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "Server error" });
   }
-
-  const userId = usersByEmail[emailKey];
-  if (!userId) return res.status(401).json({ ok: false, error: "Invalid login" });
-
-  const user = users[userId];
-  if (!user || user.password !== pass) {
-    return res.status(401).json({ ok: false, error: "Invalid login" });
-  }
-
-  req.session.userId = user.id;
-  return res.json({ ok: true, redirectTo: "/phantomcard.html" });
 });
 
 // =====================================================
-// 5) WHO AM I
+// 5) WHO AM I  (pour afficher PhantomID sur la PhantomCard)
 // =====================================================
-app.get("/me", requireAuth, (req, res) => {
-  const user = users[req.session.userId];
-  if (!user) return res.status(404).json({ ok: false, error: "User not found" });
+app.get("/me", requireAuth, async (req, res) => {
+  try {
+    const q = await pool.query(
+      "SELECT id, phantom_id, email, discord_id FROM users WHERE id = $1",
+      [req.session.userId]
+    );
 
-  return res.json({
-    ok: true,
-    user: {
-      id: user.id,
-      phantomId: user.phantomId,
-      username: user.username,
-      email: user.email,
-      verifiedDiscord: user.verifiedDiscord,
-      premium: user.premium,
-    },
-  });
+    if (q.rowCount === 0) {
+      return res.status(401).json({ ok: false, error: "Not logged in" });
+    }
+
+    const u = q.rows[0];
+
+    return res.json({
+      ok: true,
+      user: {
+        id: u.id,
+        phantomId: u.phantom_id, // IMPORTANT: phantomId (camelCase) pour ton front
+        email: u.email,
+        discordId: u.discord_id || null,
+        verifiedDiscord: !!u.discord_id,
+      },
+    });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
 });
 
 // =====================================================
@@ -298,6 +409,7 @@ app.post("/logout", (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
 });
 
+// ===== Start server =====
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`PhantomID running on port ${PORT}`);
   console.log("NODE_ENV:", process.env.NODE_ENV);
