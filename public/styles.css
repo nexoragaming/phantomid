@@ -960,6 +960,8 @@ span .rate {
 }
 
 .user-phantomid {
+    color:#d1d1d1;
+    text-shadow:0 0 20px #d1d1d1;
     margin-top: 0;
     margin-bottom: 0;
 }
