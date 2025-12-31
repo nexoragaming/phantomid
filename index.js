@@ -75,6 +75,19 @@ app.use(
 
 // Static files
 app.use(express.static("public"));
+// ===== Clean URLs (no .html) =====
+app.get("/", (req, res) => {
+  res.sendFile("index.html", { root: "public" });
+});
+
+app.get("/settings", (req, res) => {
+  res.sendFile("settings.html", { root: "public" });
+});
+
+app.get("/phantomcard", (req, res) => {
+  res.sendFile("phantomcard.html", { root: "public" });
+});
+
 
 // ===== Helpers =====
 function normalizeEmail(email) {
