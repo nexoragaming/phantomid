@@ -16,7 +16,7 @@ app.set("trust proxy", 1);
 
 // ===== Middlewares =====
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true })); // HTML forms
 app.use(cookieParser());
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -70,13 +70,6 @@ app.use(
 app.use(express.static("public"));
 
 // ===== Helpers =====
-function requireAuth(req, res, next) {
-  if (!req.session?.userId) {
-    return res.status(401).json({ ok: false, error: "Not logged in" });
-  }
-  next();
-}
-
 function normalizeEmail(email) {
   return String(email || "").toLowerCase().trim();
 }
@@ -94,19 +87,26 @@ async function nextPhantomId() {
 }
 
 // =====================================================
-// INIT DB AU DÉMARRAGE (table + sequence + setval safe)
+// INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
 // =====================================================
 async function initDb() {
-  // 1) table users
+  // 1) table users (première création)
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       phantom_id VARCHAR(32) UNIQUE NOT NULL,
+      username VARCHAR(32),
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       discord_id VARCHAR(32),
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+  `);
+
+  // 1b) si table existait AVANT username -> ajouter colonne safe
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS username VARCHAR(32);
   `);
 
   // 2) sequence phantom_id_seq (min 1)
@@ -158,9 +158,7 @@ app.post("/signup/start", async (req, res) => {
 
     const emailKey = normalizeEmail(email);
 
-    const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
-      emailKey,
-    ]);
+    const exists = await pool.query("SELECT id FROM users WHERE email = $1", [emailKey]);
     if (exists.rowCount > 0) {
       return res.status(409).json({ ok: false, error: "Email already used" });
     }
@@ -292,9 +290,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 
     // ===== A) pending signup => create user in DB =====
     if (pending?.email && pending?.password) {
-      const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
-        pending.email,
-      ]);
+      const exists = await pool.query("SELECT id FROM users WHERE email = $1", [pending.email]);
       if (exists.rowCount > 0) {
         delete req.session.pendingSignup;
         return res.redirect(frontUrl("/index.html?signup=email_used"));
@@ -304,11 +300,12 @@ app.get("/auth/discord/callback", async (req, res) => {
       const phantomId = await nextPhantomId();
       const passwordHash = await bcrypt.hash(pending.password, 12);
 
+      // ✅ FIX: ON INSÈRE username !!!
       const ins = await pool.query(
-        `INSERT INTO users (phantom_id, email, password_hash, discord_id)
-         VALUES ($1, $2, $3, $4)
+        `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
+         VALUES ($1, $2, $3, $4, $5)
          RETURNING id`,
-        [phantomId, pending.email, passwordHash, discordUserId]
+        [phantomId, pending.username, pending.email, passwordHash, discordUserId]
       );
 
       req.session.userId = ins.rows[0].id;
@@ -347,10 +344,7 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ ok: false, error: "Missing fields" });
     }
 
-    const q = await pool.query(
-      "SELECT id, password_hash FROM users WHERE email = $1",
-      [emailKey]
-    );
+    const q = await pool.query("SELECT id, password_hash FROM users WHERE email = $1", [emailKey]);
 
     if (q.rowCount === 0) {
       return res.status(401).json({ ok: false, error: "Invalid login" });
@@ -400,7 +394,7 @@ app.get("/me", async (req, res) => {
       ok: true,
       user: {
         id: u.id,
-        username: u.username,              // ✅ AJOUT
+        username: u.username, // ✅
         phantomId: u.phantom_id,
         email: u.email,
         discordId: u.discord_id || null,
@@ -412,7 +406,6 @@ app.get("/me", async (req, res) => {
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
-
 
 // =====================================================
 // 6) LOGOUT
