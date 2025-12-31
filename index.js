@@ -73,8 +73,11 @@ app.use(
   })
 );
 
+// =====================================================
 // Static files
+// =====================================================
 app.use(express.static("public"));
+
 // ===== Clean URLs (no .html) =====
 app.get("/", (req, res) => {
   res.sendFile("index.html", { root: "public" });
@@ -88,6 +91,19 @@ app.get("/phantomcard", (req, res) => {
   res.sendFile("phantomcard.html", { root: "public" });
 });
 
+app.get("/tournaments", (req, res) => {
+  res.sendFile("tournaments.html", { root: "public" });
+});
+
+app.get("/rating-system", (req, res) => {
+  res.sendFile("rating-system.html", { root: "public" });
+});
+
+// (Optionnel mais conseillé) : si quelqu’un tape .html, on redirige vers l’URL propre
+app.get("/*.html", (req, res) => {
+  const clean = req.path.replace(/\.html$/i, "");
+  return res.redirect(301, clean || "/");
+});
 
 // ===== Helpers =====
 function normalizeEmail(email) {
@@ -200,7 +216,6 @@ app.post("/signup/start", async (req, res) => {
     }
 
     // reset pending (propre)
-    req.session.pendingSignup = null;
     req.session.pendingSignup = {
       username: String(username).trim(),
       email: emailKey,
@@ -248,7 +263,7 @@ app.get("/auth/discord/callback", async (req, res) => {
   try {
     const { code, error, state } = req.query;
 
-    if (error) return res.redirect(frontUrl("/index.html?discord=error"));
+    if (error) return res.redirect(frontUrl("/?discord=error"));
     if (!code) return res.status(400).send("No code returned by Discord.");
     if (!state || state !== req.session.discordState) {
       return res.status(400).send("Invalid state (security check failed).");
@@ -270,7 +285,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!tokenResp.ok) {
       const err = await tokenResp.text();
       console.error("TOKEN ERROR:", err);
-      return res.redirect(frontUrl("/index.html?discord=error"));
+      return res.redirect(frontUrl("/?discord=error"));
     }
 
     const tokenData = await tokenResp.json();
@@ -284,7 +299,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     if (!meResp.ok) {
       const err = await meResp.text();
       console.error("ME ERROR:", err);
-      return res.redirect(frontUrl("/index.html?discord=error"));
+      return res.redirect(frontUrl("/?discord=error"));
     }
 
     const me = await meResp.json();
@@ -295,7 +310,7 @@ app.get("/auth/discord/callback", async (req, res) => {
     // A) pending expiré => cleanup
     if (pending && isPendingExpired(pending)) {
       delete req.session.pendingSignup;
-      return res.redirect(frontUrl("/index.html?signup=expired"));
+      return res.redirect(frontUrl("/?signup=expired"));
     }
 
     // B) Si user déjà logged => link discord_id (avec check anti-vol)
@@ -306,7 +321,7 @@ app.get("/auth/discord/callback", async (req, res) => {
       );
 
       if (taken.rowCount > 0) {
-        return res.redirect(frontUrl("/phantomcard.html?discord=already_linked"));
+        return res.redirect(frontUrl("/phantomcard?discord=already_linked"));
       }
 
       await pool.query("UPDATE users SET discord_id = $1 WHERE id = $2", [
@@ -330,7 +345,7 @@ app.get("/auth/discord/callback", async (req, res) => {
       if (!addResp.ok) {
         const err = await addResp.text();
         console.error("ADD GUILD ERROR:", err);
-        return res.redirect(frontUrl("/index.html?discord=error"));
+        return res.redirect(frontUrl("/?discord=error"));
       }
 
       // Add role
@@ -345,10 +360,10 @@ app.get("/auth/discord/callback", async (req, res) => {
       if (!roleResp.ok) {
         const err = await roleResp.text();
         console.error("ADD ROLE ERROR:", err);
-        return res.redirect(frontUrl("/index.html?discord=error"));
+        return res.redirect(frontUrl("/?discord=error"));
       }
 
-      return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
+      return res.redirect(frontUrl("/phantomcard?discord=linked"));
     }
 
     // C) Idempotence: si ce discord_id existe déjà -> log in ce user
@@ -377,7 +392,7 @@ app.get("/auth/discord/callback", async (req, res) => {
       if (!addResp.ok) {
         const err = await addResp.text();
         console.error("ADD GUILD ERROR:", err);
-        return res.redirect(frontUrl("/index.html?discord=error"));
+        return res.redirect(frontUrl("/?discord=error"));
       }
 
       // Add role
@@ -392,10 +407,10 @@ app.get("/auth/discord/callback", async (req, res) => {
       if (!roleResp.ok) {
         const err = await roleResp.text();
         console.error("ADD ROLE ERROR:", err);
-        return res.redirect(frontUrl("/index.html?discord=error"));
+        return res.redirect(frontUrl("/?discord=error"));
       }
 
-      return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
+      return res.redirect(frontUrl("/phantomcard?discord=linked"));
     }
 
     // D) pending signup => create user (transaction)
@@ -413,7 +428,7 @@ app.get("/auth/discord/callback", async (req, res) => {
         if (existsEmail.rowCount > 0) {
           await client.query("ROLLBACK");
           delete req.session.pendingSignup;
-          return res.redirect(frontUrl("/index.html?signup=email_used"));
+          return res.redirect(frontUrl("/?signup=email_used"));
         }
 
         // PhantomID dans le même client (transaction-safe)
@@ -451,7 +466,7 @@ app.get("/auth/discord/callback", async (req, res) => {
         if (!addResp.ok) {
           const err = await addResp.text();
           console.error("ADD GUILD ERROR:", err);
-          return res.redirect(frontUrl("/index.html?discord=error"));
+          return res.redirect(frontUrl("/?discord=error"));
         }
 
         // Add role
@@ -466,10 +481,10 @@ app.get("/auth/discord/callback", async (req, res) => {
         if (!roleResp.ok) {
           const err = await roleResp.text();
           console.error("ADD ROLE ERROR:", err);
-          return res.redirect(frontUrl("/index.html?discord=error"));
+          return res.redirect(frontUrl("/?discord=error"));
         }
 
-        return res.redirect(frontUrl("/phantomcard.html?signup=done"));
+        return res.redirect(frontUrl("/phantomcard?signup=done"));
       } catch (e) {
         try {
           await client.query("ROLLBACK");
@@ -478,24 +493,24 @@ app.get("/auth/discord/callback", async (req, res) => {
         const msg = String(e?.message || "");
 
         if (msg.includes("users_discord_id_unique")) {
-          return res.redirect(frontUrl("/index.html?discord=already_linked"));
+          return res.redirect(frontUrl("/?discord=already_linked"));
         }
         if (msg.includes("users_email_key")) {
-          return res.redirect(frontUrl("/index.html?signup=email_used"));
+          return res.redirect(frontUrl("/?signup=email_used"));
         }
 
         console.error("❌ create user tx error:", e);
-        return res.redirect(frontUrl("/index.html?discord=error"));
+        return res.redirect(frontUrl("/?discord=error"));
       } finally {
         client.release();
       }
     }
 
     // E) Rien à créer / lier => retour home
-    return res.redirect(frontUrl("/index.html?discord=linked"));
+    return res.redirect(frontUrl("/?discord=linked"));
   } catch (e) {
     console.error("❌ discord callback error:", e);
-    return res.redirect(frontUrl("/index.html?discord=error"));
+    return res.redirect(frontUrl("/?discord=error"));
   }
 });
 
@@ -526,7 +541,7 @@ app.post("/login", async (req, res) => {
     }
 
     req.session.userId = user.id;
-    return res.json({ ok: true, redirectTo: "/phantomcard.html" });
+    return res.json({ ok: true, redirectTo: "/phantomcard" }); // URL propre
   } catch (e) {
     console.error(e);
     return res.status(500).json({ ok: false, error: "Server error" });
