@@ -15,8 +15,8 @@ closePremiumBtn.addEventListener("click", function (){
 document.addEventListener("keydown", function (event) {
   console.log(event.key);
   if (event.key === "Escape") {
-  premiumOverlay.classList.remove("active")
-}
+    premiumOverlay.classList.remove("active")
+  }
 });
 
 premiumOverlay.addEventListener("click", function () {
@@ -29,6 +29,7 @@ premiumBox.addEventListener("click", function (event){
     event.stopPropagation("premium-box")
 })
 
+
 //Overlay Edit PhantomCard
 const editPhantomCardOverlay = document.getElementById("edit-phantomcard-overlay");
 const editBtn = document.getElementById("edit-btn");
@@ -37,8 +38,6 @@ const editPhantomcardBox = document.getElementById("edit-phantomcard-box");
 editBtn.addEventListener("click", function (){
     editPhantomCardOverlay.classList.add("active")
 })
-
-
 
 const phantomCard = document.getElementById("phantomcard");
 const overlayCardSlot = document.getElementById("overlay-card-slot");
@@ -64,6 +63,7 @@ console.log("phantomcard.js connecté");
 
 document.addEventListener("DOMContentLoaded", async () => {
   const phantomIdEl = document.getElementById("user-phantomid");
+  const usernameEl = document.getElementById("user-username");
 
   try {
     const resp = await fetch("/me", { method: "GET" });
@@ -75,13 +75,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    const phantomId = data.user.phantomId || "";
+    // ✅ PhantomID
+    const phantomId = data.user.phantomId || data.user.phantom_id || "";
     if (phantomIdEl) {
       phantomIdEl.textContent = `@ ${phantomId}`;
     }
+
+    // ✅ Username
+    const username = data.user.username || "";
+    if (usernameEl) {
+      usernameEl.textContent = username;
+    }
+
   } catch (err) {
     console.error(err);
-    // fallback: retourne au login
     window.location.href = "/index.html?login=required";
   }
 });
