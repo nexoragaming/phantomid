@@ -27,6 +27,13 @@ function frontUrl(path = "/") {
   return `${FRONTEND_BASE_URL}${path}`;
 }
 
+// ===== Pending TTL =====
+const PENDING_TTL_MS = 1000 * 60 * 20; // 20 minutes
+function isPendingExpired(p) {
+  const t = Number(p?.createdAt || 0);
+  return !t || Date.now() - t > PENDING_TTL_MS;
+}
+
 // ===== Postgres =====
 const { Pool } = pg;
 
@@ -88,6 +95,7 @@ async function nextPhantomId() {
 
 // =====================================================
 // INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
+// + constraints anti doublons discord_id
 // =====================================================
 async function initDb() {
   // 1) table users (première création)
@@ -107,6 +115,21 @@ async function initDb() {
   await pool.query(`
     ALTER TABLE users
     ADD COLUMN IF NOT EXISTS username VARCHAR(32);
+  `);
+
+  // 1c) unique discord_id (nullable => OK)
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'users_discord_id_unique'
+      ) THEN
+        ALTER TABLE users
+        ADD CONSTRAINT users_discord_id_unique UNIQUE (discord_id);
+      END IF;
+    END $$;
   `);
 
   // 2) sequence phantom_id_seq (min 1)
@@ -163,6 +186,8 @@ app.post("/signup/start", async (req, res) => {
       return res.status(409).json({ ok: false, error: "Email already used" });
     }
 
+    // reset pending (propre)
+    req.session.pendingSignup = null;
     req.session.pendingSignup = {
       username: String(username).trim(),
       email: emailKey,
@@ -204,7 +229,7 @@ app.get("/auth/discord", (req, res) => {
 
 // =====================================================
 // 3) DISCORD CALLBACK
-// - pending signup => crée user en DB avec PH000001+
+// - hardening: TTL pending, idempotence discord_id, anti-vol, transaction create
 // =====================================================
 app.get("/auth/discord/callback", async (req, res) => {
   try {
@@ -252,78 +277,208 @@ app.get("/auth/discord/callback", async (req, res) => {
     const me = await meResp.json();
     const discordUserId = me.id;
 
-    // 3) Add to guild
-    const addResp = await fetch(
-      `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ access_token: userAccessToken }),
-      }
-    );
-
-    if (!addResp.ok) {
-      const err = await addResp.text();
-      console.error("ADD GUILD ERROR:", err);
-      return res.redirect(frontUrl("/index.html?discord=error"));
-    }
-
-    // 4) Add role
-    const roleResp = await fetch(
-      `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
-      {
-        method: "PUT",
-        headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
-      }
-    );
-
-    if (!roleResp.ok) {
-      const err = await roleResp.text();
-      console.error("ADD ROLE ERROR:", err);
-      return res.redirect(frontUrl("/index.html?discord=error"));
-    }
-
     const pending = req.session.pendingSignup;
 
-    // ===== A) pending signup => create user in DB =====
-    if (pending?.email && pending?.password) {
-      const exists = await pool.query("SELECT id FROM users WHERE email = $1", [pending.email]);
-      if (exists.rowCount > 0) {
-        delete req.session.pendingSignup;
-        return res.redirect(frontUrl("/index.html?signup=email_used"));
-      }
-
-      // ✅ PhantomID séquentiel
-      const phantomId = await nextPhantomId();
-      const passwordHash = await bcrypt.hash(pending.password, 12);
-
-      // ✅ FIX: ON INSÈRE username !!!
-      const ins = await pool.query(
-        `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING id`,
-        [phantomId, pending.username, pending.email, passwordHash, discordUserId]
-      );
-
-      req.session.userId = ins.rows[0].id;
+    // A) pending expiré => cleanup
+    if (pending && isPendingExpired(pending)) {
       delete req.session.pendingSignup;
-
-      return res.redirect(frontUrl("/phantomcard.html?signup=done"));
+      return res.redirect(frontUrl("/index.html?signup=expired"));
     }
 
-    // ===== B) user déjà logged => link discord_id =====
+    // B) Si user déjà logged => link discord_id (avec check anti-vol)
     if (req.session?.userId) {
+      const taken = await pool.query(
+        "SELECT id FROM users WHERE discord_id = $1 AND id <> $2 LIMIT 1",
+        [discordUserId, req.session.userId]
+      );
+
+      if (taken.rowCount > 0) {
+        return res.redirect(frontUrl("/phantomcard.html?discord=already_linked"));
+      }
+
       await pool.query("UPDATE users SET discord_id = $1 WHERE id = $2", [
         discordUserId,
         req.session.userId,
       ]);
+
+      // Add to guild
+      const addResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ access_token: userAccessToken }),
+        }
+      );
+
+      if (!addResp.ok) {
+        const err = await addResp.text();
+        console.error("ADD GUILD ERROR:", err);
+        return res.redirect(frontUrl("/index.html?discord=error"));
+      }
+
+      // Add role
+      const roleResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+        }
+      );
+
+      if (!roleResp.ok) {
+        const err = await roleResp.text();
+        console.error("ADD ROLE ERROR:", err);
+        return res.redirect(frontUrl("/index.html?discord=error"));
+      }
+
       return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
     }
 
-    // Rien à créer / lier => retour home
+    // C) Idempotence: si ce discord_id existe déjà -> log in ce user
+    const existingByDiscord = await pool.query(
+      "SELECT id FROM users WHERE discord_id = $1 LIMIT 1",
+      [discordUserId]
+    );
+
+    if (existingByDiscord.rowCount > 0) {
+      req.session.userId = existingByDiscord.rows[0].id;
+      delete req.session.pendingSignup;
+
+      // Add to guild
+      const addResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ access_token: userAccessToken }),
+        }
+      );
+
+      if (!addResp.ok) {
+        const err = await addResp.text();
+        console.error("ADD GUILD ERROR:", err);
+        return res.redirect(frontUrl("/index.html?discord=error"));
+      }
+
+      // Add role
+      const roleResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+        }
+      );
+
+      if (!roleResp.ok) {
+        const err = await roleResp.text();
+        console.error("ADD ROLE ERROR:", err);
+        return res.redirect(frontUrl("/index.html?discord=error"));
+      }
+
+      return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
+    }
+
+    // D) pending signup => create user (transaction)
+    if (pending?.email && pending?.password) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+
+        // Re-check email (anti race)
+        const existsEmail = await client.query(
+          "SELECT id FROM users WHERE email = $1 LIMIT 1",
+          [pending.email]
+        );
+
+        if (existsEmail.rowCount > 0) {
+          await client.query("ROLLBACK");
+          delete req.session.pendingSignup;
+          return res.redirect(frontUrl("/index.html?signup=email_used"));
+        }
+
+        // PhantomID dans le même client (transaction-safe)
+        const r = await client.query("SELECT nextval('phantom_id_seq') AS n");
+        const n = Number(r.rows[0].n);
+        const phantomId = `PH${String(n).padStart(6, "0")}`;
+
+        const passwordHash = await bcrypt.hash(pending.password, 12);
+
+        const ins = await client.query(
+          `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id`,
+          [phantomId, pending.username, pending.email, passwordHash, discordUserId]
+        );
+
+        await client.query("COMMIT");
+
+        req.session.userId = ins.rows[0].id;
+        delete req.session.pendingSignup;
+
+        // Add to guild
+        const addResp = await fetch(
+          `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ access_token: userAccessToken }),
+          }
+        );
+
+        if (!addResp.ok) {
+          const err = await addResp.text();
+          console.error("ADD GUILD ERROR:", err);
+          return res.redirect(frontUrl("/index.html?discord=error"));
+        }
+
+        // Add role
+        const roleResp = await fetch(
+          `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+          {
+            method: "PUT",
+            headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+          }
+        );
+
+        if (!roleResp.ok) {
+          const err = await roleResp.text();
+          console.error("ADD ROLE ERROR:", err);
+          return res.redirect(frontUrl("/index.html?discord=error"));
+        }
+
+        return res.redirect(frontUrl("/phantomcard.html?signup=done"));
+      } catch (e) {
+        try {
+          await client.query("ROLLBACK");
+        } catch {}
+
+        const msg = String(e?.message || "");
+
+        if (msg.includes("users_discord_id_unique")) {
+          return res.redirect(frontUrl("/index.html?discord=already_linked"));
+        }
+        if (msg.includes("users_email_key")) {
+          return res.redirect(frontUrl("/index.html?signup=email_used"));
+        }
+
+        console.error("❌ create user tx error:", e);
+        return res.redirect(frontUrl("/index.html?discord=error"));
+      } finally {
+        client.release();
+      }
+    }
+
+    // E) Rien à créer / lier => retour home
     return res.redirect(frontUrl("/index.html?discord=linked"));
   } catch (e) {
     console.error("❌ discord callback error:", e);
@@ -394,7 +549,7 @@ app.get("/me", async (req, res) => {
       ok: true,
       user: {
         id: u.id,
-        username: u.username, // ✅
+        username: u.username,
         phantomId: u.phantom_id,
         email: u.email,
         discordId: u.discord_id || null,
