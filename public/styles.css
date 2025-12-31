@@ -908,9 +908,9 @@ span .rate {
 /*leur paramètre sont dans tooltip img*/
 
 .rating-box{
-    position: fixed;
+    position:static;
     display: grid;
-    margin-left: 680px;
+    margin-left: 150px;
     margin-top: 60px;
     height: 175px;
     margin-bottom:0 ;
