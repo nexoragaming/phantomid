@@ -839,7 +839,7 @@ input::placeholder {
     justify-content: center;
     background-color: #d1d1d1;
     border-radius: 5px ;
-    width: 240px;
+    max-width: 100%;
     height: 30px;
     padding: 5px;
     margin-bottom: 1%;
@@ -873,6 +873,10 @@ input::placeholder {
     justify-self: center;
     width: 900px;
     background-image: url(https://i.imgur.com/rRswcEF.jpeg) ;
+}
+
+.phantomcard-center-section{
+    margin: 0;
 }
 
 .info span {
@@ -910,7 +914,7 @@ span .rate {
 .rating-box{
     display: grid;
     align-items: center;
-    margin-left: 150px;
+    margin-left: 0px;
     margin-top: 60px;
     height: 175px;
     margin-bottom:0 ;
@@ -931,11 +935,14 @@ span .rate {
 }
 
 .rate-icon {
-      flex: 0 0 auto;
     height: 135px;
     margin-top: 0;
     margin-bottom: 0px;
     margin-top: 0;
+}
+
+.badges-rates {
+    display: flex;
 }
 
 
@@ -1402,6 +1409,7 @@ ol {
 
 
 .upgrade-btn-box {
+    max-width: 100%;
     display: flex;
     justify-content: center;
 }
