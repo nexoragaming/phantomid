@@ -952,7 +952,9 @@ span .rate {
 }
 
 .username-box p {
+    height: 60px;
     font-size: xx-large;
+    font-weight: bold;
     color: white;
 }
 
