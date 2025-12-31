@@ -374,23 +374,33 @@ app.post("/login", async (req, res) => {
 // =====================================================
 // 5) /me (PhantomCard)
 // =====================================================
-app.get("/me", requireAuth, async (req, res) => {
+app.get("/me", async (req, res) => {
   try {
-    const q = await pool.query(
-      "SELECT id, phantom_id, email, discord_id FROM users WHERE id = $1",
-      [req.session.userId]
-    );
-
-    if (q.rowCount === 0) {
+    const userId = req.session?.userId;
+    if (!userId) {
       return res.status(401).json({ ok: false, error: "Not logged in" });
     }
 
-    const u = q.rows[0];
+    const q = `
+      SELECT id, username, phantom_id, email, discord_id
+      FROM users
+      WHERE id = $1
+      LIMIT 1
+    `;
+    const r = await pool.query(q, [userId]);
+
+    if (r.rowCount === 0) {
+      req.session.destroy(() => {});
+      return res.status(401).json({ ok: false, error: "Session invalid" });
+    }
+
+    const u = r.rows[0];
 
     return res.json({
       ok: true,
       user: {
         id: u.id,
+        username: u.username,              // ✅ AJOUT
         phantomId: u.phantom_id,
         email: u.email,
         discordId: u.discord_id || null,
@@ -398,10 +408,11 @@ app.get("/me", requireAuth, async (req, res) => {
       },
     });
   } catch (e) {
-    console.error(e);
+    console.error("GET /me error:", e);
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
+
 
 // =====================================================
 // 6) LOGOUT
