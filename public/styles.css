@@ -1686,7 +1686,119 @@ ol {
 }
 
 
+/* Setting */
 
+.setting-overlay {
+    display: grid;
+    justify-content: center;
+    justify-self: center;
+    border: 3px solid white;
+    border-radius: 5px;
+    padding: 20px;
+    background-color: #0e0e0e;
+}
+
+.setting-title {
+    text-align: center;
+}
+
+.setting-section-title {
+    color: white;
+    font-weight: bold;
+}
+
+.info-box {
+    display: grid;
+    gap:20px;
+}
+
+.setting-info {
+    display: flex;
+    gap: 250px;
+    border: 1px solid #572bde;
+    border-radius: 5px ;
+    padding: 5px ;
+    background-color: #000000;
+}
+
+.date-name {
+    color: white;
+    font-weight: bold;
+}
+
+.user-data {
+    color: #ffffff;
+    text-align: left;
+}
+
+.security-action {
+    display: grid;
+    gap: 20px
+}
+
+
+.verify-account-box {
+    padding: 5px;
+    background-color: #000000;
+    border:1px solid #572bde;
+    border-radius: 5px;
+    width: 205px;
+}
+
+.verify-account-box:hover{
+    background-color: #000;
+    transform: scale(1.05);
+}
+
+.verify-account-text {
+     color: #572bde;
+    background: none;
+    border: none;
+}
+
+.verify-account-text:hover {
+    color: #572bde;
+    background: none;
+    transform: none;
+}
+
+.verify-account-icon {
+    height: 25px;
+}
+
+.change-password-btn {
+    color: #572bde;
+       padding: 5px;
+    background-color: #000000;
+    border:1px solid #572bde;
+    border-radius: 5px;
+    width: 210px;
+}
+
+.change-password-btn:hover {
+     background-color: #000;
+     border:1px solid #572bde;
+     border-radius: 5px;
+    transform: scale(1.05);
+}
+
+.danger-action {
+    display: grid;
+    gap:35px
+}
+
+.delete-account-btn {
+    font-size: smaller;
+    color: red;
+    background: none;
+    border: none;
+}
+
+.delete-account-btn:hover {
+    border: none;
+    color: #fff;
+    background: none;
+}
 
 /*Overlay*/
 

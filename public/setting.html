@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+
+
+<div class="setting-overlay">
+<h1 class="setting-title"> Account settings </h1>
+
+<div class="account-info">
+<p class="setting-section-title"> Account info </p>
+<div class="info-box">
+<div class="setting-info"><p class="date-name"> Username </p> <p id="user-username" class="user-data"></p></div>
+<div class="setting-info"><p class="date-name"> PhantomID </p>  <p id="user-phantomid" class="user-data"></p></div>
+<div class="setting-info"><p class="date-name"> Discord status </p> <p id="discord-status" class="user-data"></p></div>
+</div>
+</div>
+
+<div class="account-security">
+    <p class="setting-section-title"> Security </p> 
+    <div class="security-action">
+    <div class="verify-account-box">
+    <a class="verify-account-text"> Verify Account </a>
+    <img src="https://i.imgur.com/f4Uyncj.png" class="verify-account-icon">
+    </div>
+    <a class="change-password-btn"> Change Password </a>
+</div>
+</div>
+
+<div class="active-sessions">
+    <p class="setting-section-title"> Active Sessions </p>
+    <!-- La ville avec le pays, le navigateur avec le système d'exploitation + Currently Active -->    <a> Log Out </a>
+    <!-- La ville avec le pays, le navigateur avec le système d'exploitation + (ex: Last Active 2 hours ago)   -->    <a> Log Out Session</a>
+</div>
+
+
+<div class="danger-zone">
+<p class="setting-section-title"> Danger zone </p>
+<div class="danger-action">
+<a> Log Out All Other Sessions </a>
+<a class="delete-account-btn"> Delete Account </a>
+</div>
+</div>
+
+</div>
+</div>
+<script src="setting.js"></script>
+</body>
+</html>
