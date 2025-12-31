@@ -951,6 +951,11 @@ span .rate {
     text-shadow: 0 0 20px white;
 }
 
+.username-box p {
+    font-size: xx-large;
+    color: white;
+}
+
 .user-phantomid {
     margin-top: 0;
     margin-bottom: 0;
