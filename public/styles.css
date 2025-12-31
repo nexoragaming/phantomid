@@ -908,8 +908,9 @@ span .rate {
 /*leur paramètre sont dans tooltip img*/
 
 .rating-box{
+    position: fixed;
     display: grid;
-    margin-left: 100px;
+    margin-left: 680px;
     margin-top: 35px;
     height: 175px;
 }
@@ -933,29 +934,27 @@ span .rate {
 
 
 .username-box {
-    padding-left: 0 ;
-    margin-left: 0;
-    width: 250px;
+    margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;        /* espace entre le nom et le drapeau */
+  max-width: 100%;
+  min-width: 0;     /* important en flex */
 }
 
-.username{
-    font-size: 45px;
-    font-weight: 700;
-     position: relative;
-    margin-top: 2%;   
-    margin-bottom: 0;
-    margin-left: 0;
-    margin-right: 0;
+
+.username-box p {
+    white-space: nowrap;
+/*   overflow: hidden; */
+
+  text-overflow: ellipsis;
+  max-width: 520px;
+    font-size: 35px;
+    margin: 0;
+    font-weight: bold;
     /*Les couleurs seront varible avec le choix de l'utilisateur*/
     color:white;
     text-shadow: 0 0 20px white;
-}
-
-.username-box p {
-    height: 60px;
-    font-size: xx-large;
-    font-weight: bold;
-    color: white;
 }
 
 .user-phantomid {
@@ -974,20 +973,15 @@ span .rate {
     gap: 0 ;
 }
 
-.username-flag {
-    position: relative;
-    display: flex;
-    gap:0;
-    margin: 0;
-    padding: 0;
-}
 
 
 
 
 .flags {
+    flex: 0 0 auto;
     margin: 15px;
     height: 55px;
+    width: 55px;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 0;
