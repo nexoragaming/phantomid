@@ -67,9 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 2) Overlays
-    if (createOverlay) createOverlay.classList.remove("active");
-    if (linkingOverlay) linkingOverlay.classList.add("active");
 
     // 3) OAuth Discord
     window.location.href = "https://phantomid.onrender.com/auth/discord";
