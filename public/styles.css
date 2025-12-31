@@ -911,8 +911,10 @@ span .rate {
     position: fixed;
     display: grid;
     margin-left: 680px;
-    margin-top: 35px;
+    margin-top: 60px;
     height: 175px;
+    margin-bottom:0 ;
+    padding: 0;
 }
 
 .user-rate {
