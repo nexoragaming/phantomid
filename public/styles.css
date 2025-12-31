@@ -908,16 +908,19 @@ span .rate {
 /*leur paramètre sont dans tooltip img*/
 
 .rating-box{
-    position:static;
     display: grid;
+    align-items: center;
     margin-left: 150px;
     margin-top: 60px;
     height: 175px;
     margin-bottom:0 ;
     padding: 0;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .user-rate {
+    white-space: nowrap; 
     text-align: center;
     margin: 0;
     font-weight: 700;
@@ -928,6 +931,7 @@ span .rate {
 }
 
 .rate-icon {
+      flex: 0 0 auto;
     height: 135px;
     margin-top: 0;
     margin-bottom: 0px;
