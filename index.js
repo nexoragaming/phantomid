@@ -36,7 +36,7 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: IS_PROD ? { rejectUnauthorized: false } : false,
+  ssl: IS_PROD ? { rejectUnauthorized: false } : false, // Render = SSL requis en prod
 });
 
 pool
@@ -59,10 +59,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      // NOTE: si ton front est sur le même domaine, tu peux mettre lax même en prod.
       sameSite: IS_PROD ? "none" : "lax",
       secure: IS_PROD,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
     },
   })
 );
@@ -82,10 +81,23 @@ function normalizeEmail(email) {
   return String(email || "").toLowerCase().trim();
 }
 
+// ✅ PhantomID SEQ: PH000001, PH000002, ...
+async function nextPhantomId() {
+  try {
+    const r = await pool.query("SELECT nextval('phantom_id_seq') AS n");
+    const n = Number(r.rows[0].n);
+    return `PH${String(n).padStart(6, "0")}`;
+  } catch (e) {
+    console.error("❌ nextPhantomId error:", e);
+    throw new Error("phantom_id_seq missing (initDb not executed?)");
+  }
+}
+
 // =====================================================
-// ✅ INIT DB AUTO AU BOOT (plus besoin de /_init_db)
+// INIT DB AU DÉMARRAGE (table + sequence + setval safe)
 // =====================================================
 async function initDb() {
+  // 1) table users
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -97,63 +109,44 @@ async function initDb() {
     );
   `);
 
-  // pending signup persisté (plus de perte au restart)
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS pending_signups (
-      id UUID PRIMARY KEY,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      username VARCHAR(64) NOT NULL,
-      password_hash TEXT NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  // séquence PhantomID
+  // 2) sequence phantom_id_seq (min 1)
   await pool.query(`
     CREATE SEQUENCE IF NOT EXISTS phantom_id_seq
     START WITH 1
     INCREMENT BY 1
-    NO MINVALUE
+    MINVALUE 1
     NO MAXVALUE
     CACHE 1;
   `);
 
-  // recale la séquence sur le max existant
-  await pool.query(`
-    SELECT setval(
-      'phantom_id_seq',
-      COALESCE((
-        SELECT MAX(CAST(SUBSTRING(phantom_id FROM 3) AS INT)) FROM users
-      ), 0)
-    );
+  // 3) recaler la sequence sur le max PHxxxxxx existant
+  const maxRes = await pool.query(`
+    SELECT COALESCE(
+      MAX(CAST(SUBSTRING(phantom_id FROM 3) AS INT)),
+      0
+    ) AS max_n
+    FROM users;
   `);
 
-  console.log("✅ DB init OK (users + pending_signups + phantom_id_seq)");
-}
+  const maxN = Number(maxRes.rows[0].max_n || 0);
 
-// ✅ PhantomID SEQ: PH000001, PH000002, ...
-async function nextPhantomId(client = pool) {
-  const r = await client.query("SELECT nextval('phantom_id_seq') AS n");
-  const n = Number(r.rows[0].n);
-  return `PH${String(n).padStart(6, "0")}`;
+  if (maxN < 1) {
+    // IMPORTANT: ne jamais setval à 0 si MINVALUE=1
+    // is_called=false => nextval renvoie exactement 1
+    await pool.query(`SELECT setval('phantom_id_seq', 1, false);`);
+  } else {
+    // is_called=true => nextval renvoie maxN + 1
+    await pool.query(`SELECT setval('phantom_id_seq', $1, true);`, [maxN]);
+  }
+
+  console.log("✅ initDb ok. max phantom =", maxN);
 }
 
 // ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
 
-// (Optionnel) tu peux garder /_init_db si tu veux, mais plus nécessaire
-app.get("/_init_db", async (req, res) => {
-  try {
-    await initDb();
-    return res.json({ ok: true });
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ ok: false, error: "init db failed" });
-  }
-});
-
 // =====================================================
-// 1) SIGNUP START (pending en DB + id en session)
+// 1) SIGNUP START (pending en session, pas de compte encore)
 // =====================================================
 app.post("/signup/start", async (req, res) => {
   try {
@@ -172,25 +165,12 @@ app.post("/signup/start", async (req, res) => {
       return res.status(409).json({ ok: false, error: "Email already used" });
     }
 
-    // empêche plusieurs pending pour le même email
-    const existsPending = await pool.query(
-      "SELECT id FROM pending_signups WHERE email = $1",
-      [emailKey]
-    );
-    if (existsPending.rowCount > 0) {
-      return res.status(409).json({ ok: false, error: "Signup pending already exists" });
-    }
-
-    const pendingId = cryptoRandomUUID();
-    const passwordHash = await bcrypt.hash(String(password), 12);
-
-    await pool.query(
-      `INSERT INTO pending_signups (id, email, username, password_hash)
-       VALUES ($1, $2, $3, $4)`,
-      [pendingId, emailKey, String(username).trim(), passwordHash]
-    );
-
-    req.session.pendingSignupId = pendingId;
+    req.session.pendingSignup = {
+      username: String(username).trim(),
+      email: emailKey,
+      password: String(password),
+      createdAt: Date.now(),
+    };
 
     return res.json({ ok: true });
   } catch (e) {
@@ -198,18 +178,6 @@ app.post("/signup/start", async (req, res) => {
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
-
-// petit helper uuid (sans lib)
-function cryptoRandomUUID() {
-  // Node 18+ a crypto.randomUUID, mais on garde simple ESM
-  // eslint-disable-next-line no-undef
-  return (globalThis.crypto?.randomUUID?.() ??
-    "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0;
-      const v = c === "x" ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    }));
-}
 
 // =====================================================
 // 2) DISCORD AUTH
@@ -286,101 +254,67 @@ app.get("/auth/discord/callback", async (req, res) => {
     const me = await meResp.json();
     const discordUserId = me.id;
 
-    // 3) Add to guild (si ça fail, on log mais on continue — pas bloquant pour créer le compte)
-    try {
-      const addResp = await fetch(
-        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ access_token: userAccessToken }),
-        }
-      );
-
-      if (!addResp.ok) {
-        const err = await addResp.text();
-        console.error("ADD GUILD ERROR:", err);
+    // 3) Add to guild
+    const addResp = await fetch(
+      `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ access_token: userAccessToken }),
       }
-    } catch (e) {
-      console.error("ADD GUILD EX:", e);
+    );
+
+    if (!addResp.ok) {
+      const err = await addResp.text();
+      console.error("ADD GUILD ERROR:", err);
+      return res.redirect(frontUrl("/index.html?discord=error"));
     }
 
-    // 4) Add role (si ça fail, on log mais on continue)
-    try {
-      const roleResp = await fetch(
-        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
-        {
-          method: "PUT",
-          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
-        }
-      );
-
-      if (!roleResp.ok) {
-        const err = await roleResp.text();
-        console.error("ADD ROLE ERROR:", err);
+    // 4) Add role
+    const roleResp = await fetch(
+      `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
       }
-    } catch (e) {
-      console.error("ADD ROLE EX:", e);
+    );
+
+    if (!roleResp.ok) {
+      const err = await roleResp.text();
+      console.error("ADD ROLE ERROR:", err);
+      return res.redirect(frontUrl("/index.html?discord=error"));
     }
+
+    const pending = req.session.pendingSignup;
 
     // ===== A) pending signup => create user in DB =====
-    const pendingId = req.session.pendingSignupId;
-
-    if (pendingId) {
-      const p = await pool.query(
-        "SELECT email, username, password_hash FROM pending_signups WHERE id = $1",
-        [pendingId]
-      );
-
-      if (p.rowCount === 0) {
-        delete req.session.pendingSignupId;
-        return res.redirect(frontUrl("/index.html?discord=error"));
-      }
-
-      const pending = p.rows[0];
-
-      // email déjà utilisé ?
+    if (pending?.email && pending?.password) {
       const exists = await pool.query("SELECT id FROM users WHERE email = $1", [
         pending.email,
       ]);
       if (exists.rowCount > 0) {
-        await pool.query("DELETE FROM pending_signups WHERE id = $1", [pendingId]);
-        delete req.session.pendingSignupId;
+        delete req.session.pendingSignup;
         return res.redirect(frontUrl("/index.html?signup=email_used"));
       }
 
-      // transaction pour éviter bugs
-      const client = await pool.connect();
-      try {
-        await client.query("BEGIN");
+      // ✅ PhantomID séquentiel
+      const phantomId = await nextPhantomId();
+      const passwordHash = await bcrypt.hash(pending.password, 12);
 
-        const phantomId = await nextPhantomId(client);
+      const ins = await pool.query(
+        `INSERT INTO users (phantom_id, email, password_hash, discord_id)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id`,
+        [phantomId, pending.email, passwordHash, discordUserId]
+      );
 
-        const ins = await client.query(
-          `INSERT INTO users (phantom_id, email, password_hash, discord_id)
-           VALUES ($1, $2, $3, $4)
-           RETURNING id`,
-          [phantomId, pending.email, pending.password_hash, discordUserId]
-        );
+      req.session.userId = ins.rows[0].id;
+      delete req.session.pendingSignup;
 
-        await client.query("DELETE FROM pending_signups WHERE id = $1", [pendingId]);
-
-        await client.query("COMMIT");
-
-        req.session.userId = ins.rows[0].id;
-        delete req.session.pendingSignupId;
-
-        return res.redirect(frontUrl("/phantomcard.html?signup=done"));
-      } catch (e) {
-        await client.query("ROLLBACK");
-        console.error("CREATE USER TX ERROR:", e);
-        return res.redirect(frontUrl("/index.html?discord=error"));
-      } finally {
-        client.release();
-      }
+      return res.redirect(frontUrl("/phantomcard.html?signup=done"));
     }
 
     // ===== B) user déjà logged => link discord_id =====
@@ -392,10 +326,10 @@ app.get("/auth/discord/callback", async (req, res) => {
       return res.redirect(frontUrl("/phantomcard.html?discord=linked"));
     }
 
-    // aucun pending + pas logged
+    // Rien à créer / lier => retour home
     return res.redirect(frontUrl("/index.html?discord=linked"));
   } catch (e) {
-    console.error("CALLBACK ERROR:", e);
+    console.error("❌ discord callback error:", e);
     return res.redirect(frontUrl("/index.html?discord=error"));
   }
 });
@@ -477,16 +411,17 @@ app.post("/logout", (req, res) => {
 });
 
 // ===== Start server =====
-initDb()
-  .then(() => {
+(async () => {
+  try {
+    await initDb();
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`PhantomID running on port ${PORT}`);
       console.log("NODE_ENV:", process.env.NODE_ENV);
       console.log("FRONTEND_BASE_URL:", FRONTEND_BASE_URL || "(serving static)");
       console.log("DISCORD_REDIRECT_URI:", process.env.DISCORD_REDIRECT_URI);
     });
-  })
-  .catch((e) => {
-    console.error("❌ initDb failed:", e);
+  } catch (e) {
+    console.error("❌ initDb failed, server not started:", e);
     process.exit(1);
-  });
+  }
+})();
