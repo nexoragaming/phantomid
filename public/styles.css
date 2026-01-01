@@ -1009,7 +1009,7 @@ span .rate {
 }
 
 .profil-picture {
-    border: 3px solid white;
+    border: 3px solid #572bde;
     border-radius: 100%;
     margin: 20px;
     height: 200px;
@@ -1931,4 +1931,12 @@ position: fixed;
 
 #setting-overlay.active{
     display: flex;
+}
+
+.coming-soon-overlay {
+position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
 }
