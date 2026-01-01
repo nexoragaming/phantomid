@@ -884,7 +884,7 @@ input::placeholder {
 }
 
 span .rate {
-    color: #8B5088;
+    text-align: center;
 }
 
 
@@ -930,7 +930,6 @@ span .rate {
     font-weight: 700;
     font-size: xx-large;
     /* couleur variable selon le rang */ 
-    color: #8B5088 ;
     text-shadow: 0 0 20px #8B5088;
 }
 

@@ -99,17 +99,17 @@ function applyRatingUI(ratingRaw) {
 
   // ⚠️ Ajuste juste les paths si tes images sont ailleurs
   const RATES = {
-    Unrated: { label: "Unrated", color: "#9CA3AF", icon: "/novice.png" },
+    Unrated: { label: "Unrated", color: "#9CA3AF", icon: "/assets/rate-icon/novice.png" },
 
-    Bronze: { label: "Bronze", color: "#CD7F32", icon: "/assets/rates/bronze.png" },
-    Silver: { label: "Silver", color: "#C0C0C0", icon: "/assets/rates/silver.png" },
-    Gold: { label: "Gold", color: "#D4AF37", icon: "/assets/rates/gold.png" },
+    Novice: { label: "Novice", color: "#CD7F32", icon: "/assets/rate-icon/novice.png" },
+    Adept: { label: "Adept", color: "#C0C0C0", icon: "/assets/rates-icon/adept.png" },
+    Expert: { label: "Expert", color: "#D4AF37", icon: "/assets/rates-icon/expert.png" },
 
-    Platinum: { label: "Platinum", color: "#4FD1C5", icon: "/assets/rates/platinum.png" },
-    Diamond: { label: "Diamond", color: "#60A5FA", icon: "/assets/rates/diamond.png" },
-
-    Master: { label: "Master", color: "#A855F7", icon: "/assets/rates/master.png" },
-    Phantom: { label: "Phantom", color: "#FF4DFF", icon: "/assets/rates/phantom.png" },
+    Elite: { label: "Elite", color: "#4FD1C5", icon: "/assets/rates-icon/elite.png" },
+    Master: { label: "Master", color: "#60A5FA", icon: "/assets/rates-icon/master.png" },
+    Grandmaster: { label: "Grandmaster", color: "#A855F7", icon: "/assets/rates-icon/grandmaster.png" },
+    Legend: { label: "Legend", color: "#A855F7", icon: "/assets/rates-icon/legend.png" },
+    Immortal: { label: "Immortal", color: "#8B5088", icon: "/assets/rates-icon/immortal-icon.png" },
   };
 
   const cfg = RATES[rating] || RATES.Unrated;
