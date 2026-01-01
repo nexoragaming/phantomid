@@ -9,17 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const countrySelect = document.getElementById("country-selector"); // ⚠️ ajuste si ton select a un autre id
   const flagImg = document.getElementById("flags"); // ✅ tu as dit id="flags"
 
-  // Option placeholder
-countrySelect.innerHTML = "";
-const opt0 = document.createElement("option");
-opt0.value = "";
-opt0.textContent = "Select a country";
-opt0.selected = true;
-opt0.disabled = true;
-opt0.hidden = true; // optionnel (le retire de la dropdown)
-countrySelect.appendChild(opt0);
-
-
   console.log("form:", !!form);
   console.log("createOverlay:", !!createOverlay);
   console.log("linkingOverlay:", !!linkingOverlay);
@@ -63,12 +52,15 @@ countrySelect.appendChild(opt0);
   async function loadCountriesIntoSelect() {
     if (!countrySelect) return;
 
-    // Option placeholder
+    // ✅ Placeholder (selected + disabled)
     countrySelect.innerHTML = "";
-    const opt0 = document.createElement("option");
-    opt0.value = "";
-    opt0.textContent = "Select a country";
-    countrySelect.appendChild(opt0);
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = "Select a country";
+    placeholder.selected = true;
+    placeholder.disabled = true;
+    placeholder.hidden = true; // optionnel (le retire de la dropdown)
+    countrySelect.appendChild(placeholder);
 
     try {
       const resp = await fetch("/api/countries", { method: "GET" });
@@ -76,8 +68,7 @@ countrySelect.appendChild(opt0);
 
       if (!resp.ok || !data.ok || !Array.isArray(data.countries)) {
         console.error("❌ /api/countries error:", data);
-        // On laisse juste le placeholder si ça fail
-        return;
+        return; // on laisse juste le placeholder
       }
 
       for (const c of data.countries) {
@@ -91,15 +82,10 @@ countrySelect.appendChild(opt0);
         countrySelect.appendChild(opt);
       }
 
-      // Default: si rien choisi, on peut mettre un défaut (optionnel)
-      // Ex: Canada
-      if (!countrySelect.value) {
-        const defaultCode = "CA";
-        const hasDefault = [...countrySelect.options].some((o) => o.value === defaultCode);
-        if (hasDefault) countrySelect.value = defaultCode;
-      }
+      // ✅ PAS de default (CA) : on force l'utilisateur à choisir
+      // (donc on ne touche pas à countrySelect.value)
 
-      // Apply flag initial
+      // Apply flag initial (aucun pays choisi => pas de flag)
       setFlagByCode(countrySelect.value);
 
       // Update flag on change
