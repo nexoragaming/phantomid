@@ -120,3 +120,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.location.href = "/index.html?login=required";
   }
 });
+
+
+//Systeme de rating
+// ===== Rating UI (PhantomCard) =====
+function applyRatingUI(ratingRaw) {
+  const rating = String(ratingRaw || "Unrated").trim();
+
+  const rateIconEl = document.getElementById("rate-icon");
+  const userRateEl = document.getElementById("user-rate");
+
+  if (!rateIconEl || !userRateEl) return;
+
+  // Map rating -> (label, color, icon)
+  // ⚠️ Remplace les paths par TES fichiers réels (public/assets/...)
+  const RATES = {
+    Unrated: { label: "Unrated", color: "#9CA3AF", icon: "/novice.png" },
+
+    Bronze: { label: "Bronze", color: "#CD7F32", icon: "/assets/rates/bronze.png" },
+    Silver: { label: "Silver", color: "#C0C0C0", icon: "/assets/rates/silver.png" },
+    Gold: { label: "Gold", color: "#D4AF37", icon: "/assets/rates/gold.png" },
+
+    Platinum: { label: "Platinum", color: "#4FD1C5", icon: "/assets/rates/platinum.png" },
+    Diamond: { label: "Diamond", color: "#60A5FA", icon: "/assets/rates/diamond.png" },
+
+    Master: { label: "Master", color: "#A855F7", icon: "/assets/rates/master.png" },
+    Phantom: { label: "Phantom", color: "#FF4DFF", icon: "/assets/rates/phantom.png" },
+  };
+
+  // Fallback safe si rating inconnu
+  const cfg = RATES[rating] || { label: rating, color: "#9CA3AF", icon: "/assets/rates/unrated.png" };
+
+  // DOM updates
+  userRateEl.textContent = cfg.label;
+  userRateEl.style.color = cfg.color;
+
+  rateIconEl.src = cfg.icon;
+  rateIconEl.alt = `${cfg.label} icon`;
+}
+
+// Exemple d’utilisation : après ton fetch /me
+// const data = await res.json();
+// applyRatingUI(data.user?.rating);
