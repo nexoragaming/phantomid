@@ -1,5 +1,12 @@
 console.log("navbar.js connecté");
 
+// ⚠️ Anti-flash IMMEDIAT : on cache les 2 navbars dès le chargement du script
+const navGuestEarly = document.getElementById("nav-guest");
+const navUserEarly = document.getElementById("nav-user");
+
+if (navGuestEarly) navGuestEarly.style.display = "none";
+if (navUserEarly) navUserEarly.style.display = "none";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const navGuest = document.getElementById("nav-guest");
   const navUser = document.getElementById("nav-user");
@@ -17,10 +24,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 1) Check session
   try {
-    const resp = await fetch("/me", { method: "GET" });
+    const resp = await fetch("/me", { method: "GET", credentials: "include" });
     const data = await resp.json().catch(() => ({}));
 
-    if (data.ok) {
+    if (resp.ok && data?.ok) {
       showUser();
     } else {
       showGuest();
@@ -36,14 +43,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
 
       try {
-        await fetch("/logout", { method: "POST" });
+        await fetch("/logout", { method: "POST", credentials: "include" });
       } catch (err) {
         console.error("Logout error:", err);
       }
 
-      // UI + reload landing clean
       showGuest();
-      window.location.href = "/index.html";
+      window.location.href = "/";
     });
   }
 });
