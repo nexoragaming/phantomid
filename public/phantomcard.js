@@ -116,6 +116,7 @@ function applyRatingUI(ratingRaw) {
 
   userRateEl.textContent = cfg.label;
   userRateEl.style.color = cfg.color;
+  userRateEl.style.textShadow = `0 0 20px ${cfg.color}`;
 
   rateIconEl.src = cfg.icon;
   rateIconEl.alt = `${cfg.label} icon`;
