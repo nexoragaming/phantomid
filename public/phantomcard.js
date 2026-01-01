@@ -122,7 +122,39 @@ function applyRatingUI(ratingRaw) {
 }
 
 // =====================================================
-// Load user data + apply rating
+// Avatar + Badges (Premium / Verified / Builder)
+// =====================================================
+// IMPORTANT: Ces IDs doivent exister dans ton HTML :
+// - Avatar: <img id="profile-avatar" ...>
+// - Badges: <img id="badge-premium"> <img id="badge-verified"> <img id="badge-builder">
+function applyAvatarAndBadges(user) {
+  // Avatar
+  const avatarEl = document.getElementById("profile-avatar");
+  const fallbackAvatar = "/assets/phantomid-logo.png";
+  const avatarUrl = (user?.avatarUrl && String(user.avatarUrl).trim()) || fallbackAvatar;
+
+  if (avatarEl) {
+    avatarEl.src = avatarUrl;
+    avatarEl.alt = "Profile avatar";
+  }
+
+  // Badges
+  const premiumEl = document.getElementById("badge-premium");
+  const verifiedEl = document.getElementById("badge-verified");
+  const builderEl = document.getElementById("badge-builder");
+
+  const toggle = (el, on) => {
+    if (!el) return;
+    el.style.display = on ? "inline-flex" : "none";
+  };
+
+  toggle(premiumEl, !!user?.badges?.premium);
+  toggle(verifiedEl, !!user?.badges?.verified);
+  toggle(builderEl, !!user?.badges?.builder);
+}
+
+// =====================================================
+// Load user data + apply rating + avatar + badges
 // =====================================================
 document.addEventListener("DOMContentLoaded", async () => {
   const phantomIdEl = document.getElementById("user-phantomid");
@@ -146,8 +178,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const username = data.user.username || "";
     if (usernameEl) usernameEl.textContent = username;
 
-    // ✅ Rating (IMPORTANT: c'est ici qu'on applique vraiment l'UI)
+    // ✅ Rating
     applyRatingUI(data.user.rating);
+
+    // ✅ Avatar + Badges
+    applyAvatarAndBadges(data.user);
   } catch (err) {
     console.error(err);
     window.location.href = "/?login=required";
