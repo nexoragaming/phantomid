@@ -99,7 +99,7 @@ function applyRatingUI(ratingRaw) {
 
   // ⚠️ Ajuste juste les paths si tes images sont ailleurs
   const RATES = {
-    Unrated: { label: "Unrated", color: "#9CA3AF", icon: "/assets/rate-icon/novice.png" },
+    Unrated: { label: "Unrated", color: "#d1d1d1", icon: "/assets/rate-icon/unrated-icon.png" },
 
     Novice: { label: "Novice", color: "#CD7F32", icon: "/assets/rate-icon/novice.png" },
     Adept: { label: "Adept", color: "#C0C0C0", icon: "/assets/rates-icon/adept.png" },
