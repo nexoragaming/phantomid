@@ -22,7 +22,7 @@
             <a class="logo" href="/" id="logo"> <img class="logo" src="https://i.imgur.com/fqYSWjQ.png" alt="PhantomID logo"> </a>
             </div>
             <a href="/tournaments"> Tournaments </a>
-            <a href="creator-access-registrer.html"> Creator access </a>
+            <a href="/creator-access"> Creator access </a>
             <a href="/rating-system"> Rating system </a>
             <a href="/phantomcard"> My PhantomCard </a>
             <a id="nav-logout"> Log out </a>
@@ -34,7 +34,7 @@
 
 <section>
 
-<a href="/settings"> Setting </a>
+<a href="/settings" id="open-setting-btn"> Setting </a>
 
 <div class="upgrade-edit">
     <div class="edit-phantomcard" id="edit-btn"> 
@@ -183,47 +183,33 @@
 <!-- Overlay -->
 
 <div id="edit-phantomcard-overlay">
-
 <div class="edit-phantomcard-box" id="edit-phantomcard-box">
 <div class="cancel-save">
 <a class="cancel-btn"> Cancel </a>
 <a class="save-btn"> Save </a>
 </div>
-
-
-
 <div id="overlay-card-slot">
   </div>
-  
+</div>
 </div>
 
-
-
-
-</div>
 </div>
 
 
 
 <div id="premium-overlay">
 <div class="premium-overlay" id="premium-box">
-
    <div class="close-overlay-btn" id="close-premium-overlay">
    <a> Close</a>
     </div>
-
 <div class="premium-header">
     <h1 class="premium-title"> Upgrade to <span class="phantomid-premium">PhantomID Premium</span> </h1>
     <img src="https://i.imgur.com/ZLs8xLZ.png" alt="phantomid-premium-logo" class="phantomid-premium-logo">
 </div>
-
 <p class="premium-subtitle"> Unlock exclusive customization and visibility advantages. </p> <!-- Sinon on peut aussi dire avec 2 mois offerts -->
-
-
   <p class="premium-price">
     Only <strong>$3.24/month</strong> • 2 months free
   </p>
-
 <div class="comparison-section">
   <table class="comparison-table">
     <thead>
@@ -287,11 +273,6 @@
     </tbody>
   </table>
 </div>
-
-
-
-
-
     <!-- Améliore en comparant inclus et non inclus avec l'abonnement gratuit -->
 
     <!-- Button pour choisir l'option -->
@@ -307,6 +288,48 @@
 </div>
 
 
+
+<div class="setting-overlay">
+<div class="setting-box">
+<h1 class="setting-title"> Account settings </h1>
+
+<div class="account-info">
+<p class="setting-section-title"> Account info </p>
+<div class="info-box">
+<div class="setting-info"><p class="date-name"> Username </p> <p id="user-username" class="user-data"></p></div>
+<div class="setting-info"><p class="date-name"> PhantomID </p>  <p id="user-phantomid" class="user-data"></p></div>
+<div class="setting-info"><p class="date-name"> Discord status </p> <p id="discord-status" class="user-data"></p></div>
+</div>
+</div>
+
+<div class="account-security">
+    <p class="setting-section-title"> Security </p> 
+    <div class="security-action">
+    <div class="verify-account-box">
+    <a class="verify-account-text"> Verify Account </a>
+    <img src="https://i.imgur.com/f4Uyncj.png" class="verify-account-icon">
+    </div>
+    <a class="change-password-btn"> Change Password </a>
+</div>
+</div>
+
+<div class="active-sessions">
+    <p class="setting-section-title"> Active Sessions </p>
+    <!-- La ville avec le pays, le navigateur avec le système d'exploitation + Currently Active -->    <a> Log Out </a>
+    <!-- La ville avec le pays, le navigateur avec le système d'exploitation + (ex: Last Active 2 hours ago)   -->    <a> Log Out Session</a>
+</div>
+
+
+<div class="danger-zone">
+<p class="setting-section-title"> Danger zone </p>
+<div class="danger-action">
+<a> Log Out All Other Sessions </a>
+<a class="delete-account-btn"> Delete Account </a>
+</div>
+</div>
+<script src="settings.js"></script>
+</div>
+</div>
 
 
 

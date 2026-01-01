@@ -99,6 +99,10 @@ app.get("/rating-system", (req, res) => {
   res.sendFile("rating-system.html", { root: "public" });
 });
 
+app.get("/creator-access", (req, res) => {
+  res.sendFile("creator-access-registrer.html", { root: "public" });
+});
+
 // (Optionnel mais conseillé) : si quelqu’un tape .html, on redirige vers l’URL propre
 app.get("/*.html", (req, res) => {
   const clean = req.path.replace(/\.html$/i, "");

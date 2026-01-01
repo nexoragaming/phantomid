@@ -1908,3 +1908,15 @@ position: fixed;
     color: #000000;
 }
 
+.setting-overlay {
+    position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.setting-overlay.active{
+    display: flex;
+}

@@ -59,6 +59,34 @@ editBtn.addEventListener("click", function (){
     
 })
 
+
+//Overlay setting
+const openSettingBtn = document.getElementById("open-setting-btn");
+const settingOverlay = document.getElementById("setting-overlay");
+
+openSettingBtn.addEventListener("click", function (){
+    settingOverlay.classList.add("active");
+})
+
+
+document.addEventListener("keydown", function (event) {
+  console.log(event.key);
+  if (event.key === "Escape") {
+    settingOverlay.classList.remove("active")
+  }
+});
+
+settingOverlay.addEventListener("click", function () {
+    settingOverlay.classList.remove("active")
+});
+
+const settingBox = document.getElementById("setting-box");
+
+settingBox.addEventListener("click", function (event){
+    event.stopPropagation("setting-box")
+})
+
+
 console.log("phantomcard.js connecté");
 
 document.addEventListener("DOMContentLoaded", async () => {
