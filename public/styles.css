@@ -27,10 +27,6 @@ nav {
     margin-left: 3%;
 }
 
-#nav-guest,
-#nav-user {
-  display: none;
-}
 
 
 /* Quand on sait que c’est guest */
