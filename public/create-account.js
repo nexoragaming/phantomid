@@ -9,6 +9,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const countrySelect = document.getElementById("country-selector"); // ⚠️ ajuste si ton select a un autre id
   const flagImg = document.getElementById("flags"); // ✅ tu as dit id="flags"
 
+  // Option placeholder
+countrySelect.innerHTML = "";
+const opt0 = document.createElement("option");
+opt0.value = "";
+opt0.textContent = "Select a country";
+opt0.selected = true;
+opt0.disabled = true;
+opt0.hidden = true; // optionnel (le retire de la dropdown)
+countrySelect.appendChild(opt0);
+
+
   console.log("form:", !!form);
   console.log("createOverlay:", !!createOverlay);
   console.log("linkingOverlay:", !!linkingOverlay);
