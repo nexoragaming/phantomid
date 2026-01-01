@@ -1688,7 +1688,7 @@ ol {
 
 /* Setting */
 
-.setting-overlay {
+.setting-box {
     display: grid;
     justify-content: center;
     justify-self: center;
