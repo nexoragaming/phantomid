@@ -717,11 +717,7 @@ input::placeholder {
     width: 80px;
 }
 
-.create-account-selector {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
+
 
 .create-account-selector select {
     color: #572bde;
