@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("form.create-account-form");
 
   // 🔽 Country UI
-  const countrySelect = document.getElementById("country"); // ⚠️ ajuste si ton select a un autre id
+  const countrySelect = document.getElementById("country-selector"); // ⚠️ ajuste si ton select a un autre id
   const flagImg = document.getElementById("flags"); // ✅ tu as dit id="flags"
 
   console.log("form:", !!form);
