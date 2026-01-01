@@ -129,6 +129,7 @@ async function nextPhantomId() {
 // =====================================================
 // INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
 // + constraints anti doublons discord_id
+// + rating (default Unrated)
 // =====================================================
 async function initDb() {
   // 1) table users (première création)
@@ -140,6 +141,7 @@ async function initDb() {
       email VARCHAR(255) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       discord_id VARCHAR(32),
+      rating VARCHAR(32) DEFAULT 'Unrated',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -163,6 +165,18 @@ async function initDb() {
         ADD CONSTRAINT users_discord_id_unique UNIQUE (discord_id);
       END IF;
     END $$;
+  `);
+
+  // 1d) rating (nullable mais default = Unrated) + backfill anciens users
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS rating VARCHAR(32) DEFAULT 'Unrated';
+  `);
+
+  await pool.query(`
+    UPDATE users
+    SET rating = 'Unrated'
+    WHERE rating IS NULL;
   `);
 
   // 2) sequence phantom_id_seq (min 1)
@@ -442,6 +456,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 
         const passwordHash = await bcrypt.hash(pending.password, 12);
 
+        // rating: pas besoin de l’insérer (DEFAULT 'Unrated' côté DB)
         const ins = await client.query(
           `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
            VALUES ($1, $2, $3, $4, $5)
@@ -563,7 +578,7 @@ app.get("/me", async (req, res) => {
     }
 
     const q = `
-      SELECT id, username, phantom_id, email, discord_id
+      SELECT id, username, phantom_id, email, discord_id, rating
       FROM users
       WHERE id = $1
       LIMIT 1
@@ -586,6 +601,7 @@ app.get("/me", async (req, res) => {
         email: u.email,
         discordId: u.discord_id || null,
         verifiedDiscord: !!u.discord_id,
+        rating: u.rating || "Unrated",
       },
     });
   } catch (e) {
@@ -622,8 +638,6 @@ app.post("/account/username", async (req, res) => {
     return res.status(500).json({ ok: false, error: "Server error" });
   }
 });
-
-
 
 // =====================================================
 // 6) LOGOUT
