@@ -825,6 +825,10 @@ input::placeholder {
 
 /* PhantomCard */
 
+#open-setting-btn {
+    background-color: #dbdbdb4d;
+}
+
 .upgrade-edit {
     display: flex;
     justify-content: left;
@@ -913,6 +917,7 @@ span .rate {
 
 .rating-box{
     display: grid;
+    justify-content: center;
     align-items: center;
     margin-left: 0px;
     margin-top: 60px;
@@ -934,6 +939,7 @@ span .rate {
 }
 
 .rate-icon {
+    justify-self: center;
     height: 135px;
     margin-top: 0;
     margin-bottom: 0px;

@@ -130,6 +130,7 @@ async function nextPhantomId() {
 // INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
 // + constraints anti doublons discord_id
 // + rating (default Unrated)
+// + avatar default + badges (premium/verified/builder)
 // =====================================================
 async function initDb() {
   // 1) table users (première création)
@@ -142,6 +143,10 @@ async function initDb() {
       password_hash TEXT NOT NULL,
       discord_id VARCHAR(32),
       rating VARCHAR(32) DEFAULT 'Unrated',
+      avatar_url TEXT DEFAULT '/assets/phantomid-logo.png',
+      is_premium BOOLEAN DEFAULT FALSE,
+      is_verified BOOLEAN DEFAULT FALSE,
+      is_builder BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `);
@@ -177,6 +182,51 @@ async function initDb() {
     UPDATE users
     SET rating = 'Unrated'
     WHERE rating IS NULL;
+  `);
+
+  // 1e) avatar + badges (defaults) + backfill anciens users
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT '/assets/phantomid-logo.png';
+  `);
+
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE;
+  `);
+
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE;
+  `);
+
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS is_builder BOOLEAN DEFAULT FALSE;
+  `);
+
+  await pool.query(`
+    UPDATE users
+    SET avatar_url = '/assets/phantomid-logo.png'
+    WHERE avatar_url IS NULL OR avatar_url = '';
+  `);
+
+  await pool.query(`
+    UPDATE users
+    SET is_premium = FALSE
+    WHERE is_premium IS NULL;
+  `);
+
+  await pool.query(`
+    UPDATE users
+    SET is_verified = FALSE
+    WHERE is_verified IS NULL;
+  `);
+
+  await pool.query(`
+    UPDATE users
+    SET is_builder = FALSE
+    WHERE is_builder IS NULL;
   `);
 
   // 2) sequence phantom_id_seq (min 1)
@@ -456,7 +506,7 @@ app.get("/auth/discord/callback", async (req, res) => {
 
         const passwordHash = await bcrypt.hash(pending.password, 12);
 
-        // rating: pas besoin de l’insérer (DEFAULT 'Unrated' côté DB)
+        // rating/avatar/badges: pas besoin de les insérer (DEFAULT côté DB)
         const ins = await client.query(
           `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
            VALUES ($1, $2, $3, $4, $5)
@@ -578,7 +628,8 @@ app.get("/me", async (req, res) => {
     }
 
     const q = `
-      SELECT id, username, phantom_id, email, discord_id, rating
+      SELECT id, username, phantom_id, email, discord_id, rating,
+             avatar_url, is_premium, is_verified, is_builder
       FROM users
       WHERE id = $1
       LIMIT 1
@@ -592,6 +643,9 @@ app.get("/me", async (req, res) => {
 
     const u = r.rows[0];
 
+    const avatarUrl =
+      (u.avatar_url && String(u.avatar_url).trim()) || "/assets/phantomid-logo.png";
+
     return res.json({
       ok: true,
       user: {
@@ -602,6 +656,13 @@ app.get("/me", async (req, res) => {
         discordId: u.discord_id || null,
         verifiedDiscord: !!u.discord_id,
         rating: u.rating || "Unrated",
+
+        avatarUrl,
+        badges: {
+          premium: !!u.is_premium,
+          verified: !!u.is_verified,
+          builder: !!u.is_builder,
+        },
       },
     });
   } catch (e) {
