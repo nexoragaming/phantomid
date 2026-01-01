@@ -36,16 +36,16 @@ async function loadAccountInfo() {
 
   if (!res.ok || !data.ok) {
     // Pas connecté -> tu peux fermer l'overlay, rediriger, etc.
-    setText("user-username", "—");
-    setText("user-phantomid", "—");
+    setText("setting-user-username", "—");
+    setText("setting-user-phantomid", "—");
     setText("discord-status", "Not logged in");
     console.warn("Not logged in or /me failed:", data);
     return;
   }
 
   const u = data.user || {};
-  setText("user-username", u.username || "(no username)");
-  setText("user-phantomid", u.phantomId || "—");
+  setText("setting-user-username", u.username || "(no username)");
+  setText("setting-user-phantomid", u.phantomId || "—");
   setDiscordStatus(!!u.verifiedDiscord);
 }
 
