@@ -27,6 +27,22 @@ nav {
     margin-left: 3%;
 }
 
+#nav-guest,
+#nav-user {
+  display: none;
+}
+
+
+/* Quand on sait que c’est guest */
+body[data-auth="guest"] #nav-guest {
+  display: flex; /* ou block selon ton nav */
+}
+
+/* Quand on sait que c’est user */
+body[data-auth="user"] #nav-user {
+  display: flex;
+}
+
 .nav-guest {
     display: flex;
     justify-content: center;
@@ -1934,7 +1950,7 @@ position: fixed;
 }
 
 .coming-soon-overlay {
-  background: #d1d1d1;
+  background: rgba(0,0,0,0.7);
   opacity: 40%;
 }
 
