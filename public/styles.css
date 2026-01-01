@@ -879,7 +879,7 @@ input::placeholder {
     margin-right: 20%;
     justify-self: center;
     width: 900px;
-    background-image: url(https://i.imgur.com/rRswcEF.jpeg) ;
+    background-image: url(/assets/phantomcard-default-bg.jpg)  ;
 }
 
 .phantomcard-center-section{
