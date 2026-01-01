@@ -56,6 +56,9 @@ editBtn?.addEventListener("click", function () {
 
   // 4. Ajouter la copie dans l'overlay
   overlayCardSlot.appendChild(cardClone);
+
+  // Optionnel: si tu veux que le drapeau/rating/badges s'appliquent aussi sur le clone,
+  // il faudrait les cibler dans cardClone (on fera ça plus tard si tu veux).
 });
 
 editPhantomCardOverlay?.addEventListener("click", function () {
@@ -119,7 +122,6 @@ function applyRatingUI(ratingRaw) {
   userRateEl.style.textShadow = `0 0 20px ${cfg.color}`;
   rateIconEl.style.filter = `drop-shadow(0 0 16px ${cfg.color})`;
 
-
   rateIconEl.src = cfg.icon;
   rateIconEl.alt = `${cfg.label} icon`;
 }
@@ -157,7 +159,36 @@ function applyAvatarAndBadges(user) {
 }
 
 // =====================================================
-// Load user data + apply rating + avatar + badges
+// Country Flag (PhantomCard)
+// =====================================================
+// IMPORTANT: <img id="flags">
+function flagUrlFromCode(code) {
+  const c = String(code || "").trim().toLowerCase();
+  if (!c || c.length !== 2) return "";
+  return `https://flagcdn.com/w80/${c}.png`;
+}
+
+function applyFlagUI(countryCodeRaw) {
+  const flagsEl = document.getElementById("flags");
+  if (!flagsEl) return;
+
+  const code = String(countryCodeRaw || "").trim().toUpperCase();
+  const url = flagUrlFromCode(code);
+
+  if (!url) {
+    // fallback: tu peux mettre un placeholder si tu veux
+    // flagsEl.src = "/assets/flags/unknown.png";
+    flagsEl.removeAttribute("src");
+    flagsEl.alt = "No flag";
+    return;
+  }
+
+  flagsEl.src = url;
+  flagsEl.alt = `Flag ${code}`;
+}
+
+// =====================================================
+// Load user data + apply rating + avatar + badges + flag
 // =====================================================
 document.addEventListener("DOMContentLoaded", async () => {
   const phantomIdEl = document.getElementById("user-phantomid");
@@ -168,7 +199,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = await resp.json().catch(() => ({}));
 
     if (!resp.ok || !data.ok || !data.user) {
-      // pas logged
       window.location.href = "/?login=required";
       return;
     }
@@ -186,6 +216,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ✅ Avatar + Badges
     applyAvatarAndBadges(data.user);
+
+    // ✅ Flag
+    // supporte: user.country OU user.countryCode
+    const countryCode = data.user.country || data.user.countryCode || "";
+    applyFlagUI(countryCode);
   } catch (err) {
     console.error(err);
     window.location.href = "/?login=required";

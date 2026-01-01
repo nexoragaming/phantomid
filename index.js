@@ -629,7 +629,8 @@ app.get("/me", async (req, res) => {
 
     const q = `
       SELECT id, username, phantom_id, email, discord_id, rating,
-             avatar_url, is_premium, is_verified, is_builder
+             avatar_url, is_premium, is_verified, is_builder,
+             country
       FROM users
       WHERE id = $1
       LIMIT 1
@@ -646,6 +647,9 @@ app.get("/me", async (req, res) => {
     const avatarUrl =
       (u.avatar_url && String(u.avatar_url).trim()) || "/assets/phantomid-logo.png";
 
+    const country =
+      (u.country && String(u.country).trim().toUpperCase()) || null; // ex: "CA"
+
     return res.json({
       ok: true,
       user: {
@@ -655,9 +659,12 @@ app.get("/me", async (req, res) => {
         email: u.email,
         discordId: u.discord_id || null,
         verifiedDiscord: !!u.discord_id,
-        rating: u.rating || "Unrated",
 
+        rating: u.rating || "Unrated",
         avatarUrl,
+
+        country, // ✅ pour afficher le drapeau
+
         badges: {
           premium: !!u.is_premium,
           verified: !!u.is_verified,
