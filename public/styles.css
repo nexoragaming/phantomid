@@ -1004,6 +1004,7 @@ span .rate {
     flex: 0 0 auto;
     margin: 15px;
     height: 55px;
+    border-radius:5px ;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 0;
