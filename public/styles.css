@@ -1908,7 +1908,7 @@ position: fixed;
     color: #000000;
 }
 
-.setting-overlay {
+#setting-overlay {
     position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.7);
@@ -1917,6 +1917,6 @@ position: fixed;
   align-items: center;
 }
 
-.setting-overlay.active{
+#setting-overlay.active{
     display: flex;
 }
