@@ -109,6 +109,8 @@ app.get("/*.html", (req, res) => {
   return res.redirect(301, clean || "/");
 });
 
+
+
 // ===== Helpers =====
 function normalizeEmail(email) {
   return String(email || "").toLowerCase().trim();
@@ -125,6 +127,30 @@ async function nextPhantomId() {
     throw new Error("phantom_id_seq missing (initDb not executed?)");
   }
 }
+
+// ================================
+// ✅ API ROUTES (ICI)
+// ================================
+
+// 👉 ICI : /api/countries
+app.get("/api/countries", (req, res) => {
+  return res.json({
+    ok: true,
+    countries: [
+      { code: "CA", name: "Canada" },
+      { code: "US", name: "United States" },
+      { code: "FR", name: "France" },
+      { code: "GB", name: "United Kingdom" },
+      { code: "DE", name: "Germany" },
+      { code: "ES", name: "Spain" },
+      { code: "IT", name: "Italy" },
+      { code: "JP", name: "Japan" },
+      { code: "KR", name: "South Korea" },
+      { code: "BR", name: "Brazil" },
+    ],
+  });
+});
+
 
 // =====================================================
 // INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
