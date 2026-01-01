@@ -1939,5 +1939,8 @@ position: fixed;
 }
 
 .coming-soon-overlay h2 {
+    justify-self: center;
+    align-self: center;
     text-align: center;
+    color: white;
 }
