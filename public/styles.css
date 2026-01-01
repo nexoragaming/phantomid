@@ -29,15 +29,6 @@ nav {
 
 
 
-/* Quand on sait que c’est guest */
-body[data-auth="guest"] #nav-guest {
-  display: flex; /* ou block selon ton nav */
-}
-
-/* Quand on sait que c’est user */
-body[data-auth="user"] #nav-user {
-  display: flex;
-}
 
 .nav-guest {
     display: flex;
