@@ -1937,3 +1937,7 @@ position: fixed;
   background: rgba(0,0,0,0.7);
   opacity: 40%;
 }
+
+.coming-soon-overlay h2 {
+    text-align: center;
+}
