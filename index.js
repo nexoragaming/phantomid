@@ -6,10 +6,6 @@ import pg from "pg";
 import connectPgSimple from "connect-pg-simple";
 import bcrypt from "bcrypt";
 
-// ✅ SITEMAP
-import { SitemapStream, streamToPromise } from "sitemap";
-import { Readable } from "stream";
-
 dotenv.config();
 
 const app = express();
@@ -29,25 +25,6 @@ const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || ""; // optionnel
 function frontUrl(path = "/") {
   if (!FRONTEND_BASE_URL) return path; // sert public/ directement
   return `${FRONTEND_BASE_URL}${path}`;
-}
-
-// ✅ Helper: base URL pour sitemap/robots (prend en compte proxy/HTTPS)
-function getPublicBaseUrl(req) {
-  // si tu veux forcer un domaine canonique, mets PUBLIC_BASE_URL=https://phantomid.com
-  const envBase = process.env.PUBLIC_BASE_URL;
-  if (envBase) return envBase.replace(/\/+$/, "");
-
-  const proto = (req.headers["x-forwarded-proto"] || req.protocol || "http")
-    .toString()
-    .split(",")[0]
-    .trim();
-
-  const host = (req.headers["x-forwarded-host"] || req.get("host") || "")
-    .toString()
-    .split(",")[0]
-    .trim();
-
-  return `${proto}://${host}`.replace(/\/+$/, "");
 }
 
 // ===== Pending TTL =====
@@ -97,58 +74,6 @@ app.use(
 );
 
 // =====================================================
-// ✅ SEO: robots.txt + sitemap.xml (AVANT static files)
-// =====================================================
-
-// robots.txt
-app.get("/robots.txt", (req, res) => {
-  const base = getPublicBaseUrl(req);
-  res.type("text/plain").send(
-    [
-      "User-agent: *",
-      "Allow: /",
-      "",
-      // Optionnel: empêcher l’indexation des routes auth/privées
-      "Disallow: /auth/",
-      "Disallow: /signup/",
-      "Disallow: /login/",
-      "Disallow: /logout/",
-      "Disallow: /account/",
-      "Disallow: /me",
-      "Disallow: /settings",
-      "",
-      `Sitemap: ${base}/sitemap.xml`,
-      "",
-    ].join("\n")
-  );
-});
-
-// sitemap.xml
-app.get("/sitemap.xml", async (req, res) => {
-  try {
-    const base = getPublicBaseUrl(req);
-
-    const links = [
-      { url: "/", changefreq: "daily", priority: 1.0 },
-      { url: "/phantomcard", changefreq: "weekly", priority: 0.8 },
-      { url: "/tournaments", changefreq: "weekly", priority: 0.8 },
-      { url: "/rating-system", changefreq: "monthly", priority: 0.6 },
-      { url: "/creator-access", changefreq: "monthly", priority: 0.6 },
-    ];
-
-    res.header("Content-Type", "application/xml");
-
-    const stream = new SitemapStream({ hostname: base });
-    const xml = await streamToPromise(Readable.from(links).pipe(stream));
-
-    res.send(xml.toString());
-  } catch (e) {
-    console.error("❌ sitemap error:", e);
-    res.status(500).send("sitemap error");
-  }
-});
-
-// =====================================================
 // Static files
 // =====================================================
 app.use(express.static("public"));
@@ -184,6 +109,8 @@ app.get("/*.html", (req, res) => {
   return res.redirect(301, clean || "/");
 });
 
+
+
 // ===== Helpers =====
 function normalizeEmail(email) {
   return String(email || "").toLowerCase().trim();
@@ -210,205 +137,206 @@ app.get("/api/countries", (req, res) => {
   return res.json({
     ok: true,
     countries: [
-      { code: "AF", name: "Afghanistan" },
-      { code: "AL", name: "Albania" },
-      { code: "DZ", name: "Algeria" },
-      { code: "AD", name: "Andorra" },
-      { code: "AO", name: "Angola" },
-      { code: "AG", name: "Antigua and Barbuda" },
-      { code: "AR", name: "Argentina" },
-      { code: "AM", name: "Armenia" },
-      { code: "AU", name: "Australia" },
-      { code: "AT", name: "Austria" },
-      { code: "AZ", name: "Azerbaijan" },
+  { code: "AF", name: "Afghanistan" },
+  { code: "AL", name: "Albania" },
+  { code: "DZ", name: "Algeria" },
+  { code: "AD", name: "Andorra" },
+  { code: "AO", name: "Angola" },
+  { code: "AG", name: "Antigua and Barbuda" },
+  { code: "AR", name: "Argentina" },
+  { code: "AM", name: "Armenia" },
+  { code: "AU", name: "Australia" },
+  { code: "AT", name: "Austria" },
+  { code: "AZ", name: "Azerbaijan" },
 
-      { code: "BS", name: "Bahamas" },
-      { code: "BH", name: "Bahrain" },
-      { code: "BD", name: "Bangladesh" },
-      { code: "BB", name: "Barbados" },
-      { code: "BY", name: "Belarus" },
-      { code: "BE", name: "Belgium" },
-      { code: "BZ", name: "Belize" },
-      { code: "BJ", name: "Benin" },
-      { code: "BT", name: "Bhutan" },
-      { code: "BO", name: "Bolivia" },
-      { code: "BA", name: "Bosnia and Herzegovina" },
-      { code: "BW", name: "Botswana" },
-      { code: "BR", name: "Brazil" },
-      { code: "BN", name: "Brunei" },
-      { code: "BG", name: "Bulgaria" },
-      { code: "BF", name: "Burkina Faso" },
-      { code: "BI", name: "Burundi" },
+  { code: "BS", name: "Bahamas" },
+  { code: "BH", name: "Bahrain" },
+  { code: "BD", name: "Bangladesh" },
+  { code: "BB", name: "Barbados" },
+  { code: "BY", name: "Belarus" },
+  { code: "BE", name: "Belgium" },
+  { code: "BZ", name: "Belize" },
+  { code: "BJ", name: "Benin" },
+  { code: "BT", name: "Bhutan" },
+  { code: "BO", name: "Bolivia" },
+  { code: "BA", name: "Bosnia and Herzegovina" },
+  { code: "BW", name: "Botswana" },
+  { code: "BR", name: "Brazil" },
+  { code: "BN", name: "Brunei" },
+  { code: "BG", name: "Bulgaria" },
+  { code: "BF", name: "Burkina Faso" },
+  { code: "BI", name: "Burundi" },
 
-      { code: "KH", name: "Cambodia" },
-      { code: "CM", name: "Cameroon" },
-      { code: "CA", name: "Canada" },
-      { code: "CV", name: "Cape Verde" },
-      { code: "CF", name: "Central African Republic" },
-      { code: "TD", name: "Chad" },
-      { code: "CL", name: "Chile" },
-      { code: "CN", name: "China" },
-      { code: "CO", name: "Colombia" },
-      { code: "KM", name: "Comoros" },
-      { code: "CG", name: "Congo" },
-      { code: "CR", name: "Costa Rica" },
-      { code: "HR", name: "Croatia" },
-      { code: "CU", name: "Cuba" },
-      { code: "CY", name: "Cyprus" },
-      { code: "CZ", name: "Czech Republic" },
+  { code: "KH", name: "Cambodia" },
+  { code: "CM", name: "Cameroon" },
+  { code: "CA", name: "Canada" },
+  { code: "CV", name: "Cape Verde" },
+  { code: "CF", name: "Central African Republic" },
+  { code: "TD", name: "Chad" },
+  { code: "CL", name: "Chile" },
+  { code: "CN", name: "China" },
+  { code: "CO", name: "Colombia" },
+  { code: "KM", name: "Comoros" },
+  { code: "CG", name: "Congo" },
+  { code: "CR", name: "Costa Rica" },
+  { code: "HR", name: "Croatia" },
+  { code: "CU", name: "Cuba" },
+  { code: "CY", name: "Cyprus" },
+  { code: "CZ", name: "Czech Republic" },
 
-      { code: "DK", name: "Denmark" },
-      { code: "DJ", name: "Djibouti" },
-      { code: "DM", name: "Dominica" },
-      { code: "DO", name: "Dominican Republic" },
+  { code: "DK", name: "Denmark" },
+  { code: "DJ", name: "Djibouti" },
+  { code: "DM", name: "Dominica" },
+  { code: "DO", name: "Dominican Republic" },
 
-      { code: "EC", name: "Ecuador" },
-      { code: "EG", name: "Egypt" },
-      { code: "SV", name: "El Salvador" },
-      { code: "GQ", name: "Equatorial Guinea" },
-      { code: "ER", name: "Eritrea" },
-      { code: "EE", name: "Estonia" },
-      { code: "ET", name: "Ethiopia" },
+  { code: "EC", name: "Ecuador" },
+  { code: "EG", name: "Egypt" },
+  { code: "SV", name: "El Salvador" },
+  { code: "GQ", name: "Equatorial Guinea" },
+  { code: "ER", name: "Eritrea" },
+  { code: "EE", name: "Estonia" },
+  { code: "ET", name: "Ethiopia" },
 
-      { code: "FJ", name: "Fiji" },
-      { code: "FI", name: "Finland" },
-      { code: "FR", name: "France" },
+  { code: "FJ", name: "Fiji" },
+  { code: "FI", name: "Finland" },
+  { code: "FR", name: "France" },
 
-      { code: "GA", name: "Gabon" },
-      { code: "GM", name: "Gambia" },
-      { code: "GE", name: "Georgia" },
-      { code: "DE", name: "Germany" },
-      { code: "GH", name: "Ghana" },
-      { code: "GR", name: "Greece" },
-      { code: "GD", name: "Grenada" },
-      { code: "GT", name: "Guatemala" },
-      { code: "GN", name: "Guinea" },
-      { code: "GW", name: "Guinea-Bissau" },
-      { code: "GY", name: "Guyana" },
+  { code: "GA", name: "Gabon" },
+  { code: "GM", name: "Gambia" },
+  { code: "GE", name: "Georgia" },
+  { code: "DE", name: "Germany" },
+  { code: "GH", name: "Ghana" },
+  { code: "GR", name: "Greece" },
+  { code: "GD", name: "Grenada" },
+  { code: "GT", name: "Guatemala" },
+  { code: "GN", name: "Guinea" },
+  { code: "GW", name: "Guinea-Bissau" },
+  { code: "GY", name: "Guyana" },
 
-      { code: "HT", name: "Haiti" },
-      { code: "HN", name: "Honduras" },
-      { code: "HU", name: "Hungary" },
+  { code: "HT", name: "Haiti" },
+  { code: "HN", name: "Honduras" },
+  { code: "HU", name: "Hungary" },
 
-      { code: "IS", name: "Iceland" },
-      { code: "IN", name: "India" },
-      { code: "ID", name: "Indonesia" },
-      { code: "IR", name: "Iran" },
-      { code: "IQ", name: "Iraq" },
-      { code: "IE", name: "Ireland" },
-      { code: "IL", name: "Israel" },
-      { code: "IT", name: "Italy" },
+  { code: "IS", name: "Iceland" },
+  { code: "IN", name: "India" },
+  { code: "ID", name: "Indonesia" },
+  { code: "IR", name: "Iran" },
+  { code: "IQ", name: "Iraq" },
+  { code: "IE", name: "Ireland" },
+  { code: "IL", name: "Israel" },
+  { code: "IT", name: "Italy" },
 
-      { code: "JM", name: "Jamaica" },
-      { code: "JP", name: "Japan" },
-      { code: "JO", name: "Jordan" },
+  { code: "JM", name: "Jamaica" },
+  { code: "JP", name: "Japan" },
+  { code: "JO", name: "Jordan" },
 
-      { code: "KZ", name: "Kazakhstan" },
-      { code: "KE", name: "Kenya" },
-      { code: "KI", name: "Kiribati" },
-      { code: "KW", name: "Kuwait" },
-      { code: "KG", name: "Kyrgyzstan" },
+  { code: "KZ", name: "Kazakhstan" },
+  { code: "KE", name: "Kenya" },
+  { code: "KI", name: "Kiribati" },
+  { code: "KW", name: "Kuwait" },
+  { code: "KG", name: "Kyrgyzstan" },
 
-      { code: "LA", name: "Laos" },
-      { code: "LV", name: "Latvia" },
-      { code: "LB", name: "Lebanon" },
-      { code: "LS", name: "Lesotho" },
-      { code: "LR", name: "Liberia" },
-      { code: "LY", name: "Libya" },
-      { code: "LI", name: "Liechtenstein" },
-      { code: "LT", name: "Lithuania" },
-      { code: "LU", name: "Luxembourg" },
+  { code: "LA", name: "Laos" },
+  { code: "LV", name: "Latvia" },
+  { code: "LB", name: "Lebanon" },
+  { code: "LS", name: "Lesotho" },
+  { code: "LR", name: "Liberia" },
+  { code: "LY", name: "Libya" },
+  { code: "LI", name: "Liechtenstein" },
+  { code: "LT", name: "Lithuania" },
+  { code: "LU", name: "Luxembourg" },
 
-      { code: "MG", name: "Madagascar" },
-      { code: "MW", name: "Malawi" },
-      { code: "MY", name: "Malaysia" },
-      { code: "MV", name: "Maldives" },
-      { code: "ML", name: "Mali" },
-      { code: "MT", name: "Malta" },
-      { code: "MH", name: "Marshall Islands" },
-      { code: "MR", name: "Mauritania" },
-      { code: "MU", name: "Mauritius" },
-      { code: "MX", name: "Mexico" },
-      { code: "MD", name: "Moldova" },
-      { code: "MC", name: "Monaco" },
-      { code: "MN", name: "Mongolia" },
-      { code: "ME", name: "Montenegro" },
-      { code: "MA", name: "Morocco" },
-      { code: "MZ", name: "Mozambique" },
-      { code: "MM", name: "Myanmar" },
+  { code: "MG", name: "Madagascar" },
+  { code: "MW", name: "Malawi" },
+  { code: "MY", name: "Malaysia" },
+  { code: "MV", name: "Maldives" },
+  { code: "ML", name: "Mali" },
+  { code: "MT", name: "Malta" },
+  { code: "MH", name: "Marshall Islands" },
+  { code: "MR", name: "Mauritania" },
+  { code: "MU", name: "Mauritius" },
+  { code: "MX", name: "Mexico" },
+  { code: "MD", name: "Moldova" },
+  { code: "MC", name: "Monaco" },
+  { code: "MN", name: "Mongolia" },
+  { code: "ME", name: "Montenegro" },
+  { code: "MA", name: "Morocco" },
+  { code: "MZ", name: "Mozambique" },
+  { code: "MM", name: "Myanmar" },
 
-      { code: "NA", name: "Namibia" },
-      { code: "NP", name: "Nepal" },
-      { code: "NL", name: "Netherlands" },
-      { code: "NZ", name: "New Zealand" },
-      { code: "NI", name: "Nicaragua" },
-      { code: "NE", name: "Niger" },
-      { code: "NG", name: "Nigeria" },
-      { code: "KP", name: "North Korea" },
-      { code: "NO", name: "Norway" },
+  { code: "NA", name: "Namibia" },
+  { code: "NP", name: "Nepal" },
+  { code: "NL", name: "Netherlands" },
+  { code: "NZ", name: "New Zealand" },
+  { code: "NI", name: "Nicaragua" },
+  { code: "NE", name: "Niger" },
+  { code: "NG", name: "Nigeria" },
+  { code: "KP", name: "North Korea" },
+  { code: "NO", name: "Norway" },
 
-      { code: "OM", name: "Oman" },
+  { code: "OM", name: "Oman" },
 
-      { code: "PK", name: "Pakistan" },
-      { code: "PA", name: "Panama" },
-      { code: "PG", name: "Papua New Guinea" },
-      { code: "PY", name: "Paraguay" },
-      { code: "PE", name: "Peru" },
-      { code: "PH", name: "Philippines" },
-      { code: "PL", name: "Poland" },
-      { code: "PT", name: "Portugal" },
+  { code: "PK", name: "Pakistan" },
+  { code: "PA", name: "Panama" },
+  { code: "PG", name: "Papua New Guinea" },
+  { code: "PY", name: "Paraguay" },
+  { code: "PE", name: "Peru" },
+  { code: "PH", name: "Philippines" },
+  { code: "PL", name: "Poland" },
+  { code: "PT", name: "Portugal" },
 
-      { code: "QA", name: "Qatar" },
+  { code: "QA", name: "Qatar" },
 
-      { code: "RO", name: "Romania" },
-      { code: "RU", name: "Russia" },
-      { code: "RW", name: "Rwanda" },
+  { code: "RO", name: "Romania" },
+  { code: "RU", name: "Russia" },
+  { code: "RW", name: "Rwanda" },
 
-      { code: "SA", name: "Saudi Arabia" },
-      { code: "SN", name: "Senegal" },
-      { code: "RS", name: "Serbia" },
-      { code: "SC", name: "Seychelles" },
-      { code: "SL", name: "Sierra Leone" },
-      { code: "SG", name: "Singapore" },
-      { code: "SK", name: "Slovakia" },
-      { code: "SI", name: "Slovenia" },
-      { code: "ZA", name: "South Africa" },
-      { code: "KR", name: "South Korea" },
-      { code: "ES", name: "Spain" },
-      { code: "LK", name: "Sri Lanka" },
-      { code: "SD", name: "Sudan" },
-      { code: "SR", name: "Suriname" },
-      { code: "SE", name: "Sweden" },
-      { code: "CH", name: "Switzerland" },
-      { code: "SY", name: "Syria" },
+  { code: "SA", name: "Saudi Arabia" },
+  { code: "SN", name: "Senegal" },
+  { code: "RS", name: "Serbia" },
+  { code: "SC", name: "Seychelles" },
+  { code: "SL", name: "Sierra Leone" },
+  { code: "SG", name: "Singapore" },
+  { code: "SK", name: "Slovakia" },
+  { code: "SI", name: "Slovenia" },
+  { code: "ZA", name: "South Africa" },
+  { code: "KR", name: "South Korea" },
+  { code: "ES", name: "Spain" },
+  { code: "LK", name: "Sri Lanka" },
+  { code: "SD", name: "Sudan" },
+  { code: "SR", name: "Suriname" },
+  { code: "SE", name: "Sweden" },
+  { code: "CH", name: "Switzerland" },
+  { code: "SY", name: "Syria" },
 
-      { code: "TW", name: "Taiwan" },
-      { code: "TJ", name: "Tajikistan" },
-      { code: "TZ", name: "Tanzania" },
-      { code: "TH", name: "Thailand" },
-      { code: "TG", name: "Togo" },
-      { code: "TO", name: "Tonga" },
-      { code: "TN", name: "Tunisia" },
-      { code: "TR", name: "Turkey" },
-      { code: "TM", name: "Turkmenistan" },
+  { code: "TW", name: "Taiwan" },
+  { code: "TJ", name: "Tajikistan" },
+  { code: "TZ", name: "Tanzania" },
+  { code: "TH", name: "Thailand" },
+  { code: "TG", name: "Togo" },
+  { code: "TO", name: "Tonga" },
+  { code: "TN", name: "Tunisia" },
+  { code: "TR", name: "Turkey" },
+  { code: "TM", name: "Turkmenistan" },
 
-      { code: "UA", name: "Ukraine" },
-      { code: "AE", name: "United Arab Emirates" },
-      { code: "GB", name: "United Kingdom" },
-      { code: "US", name: "United States" },
-      { code: "UY", name: "Uruguay" },
-      { code: "UZ", name: "Uzbekistan" },
+  { code: "UA", name: "Ukraine" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "US", name: "United States" },
+  { code: "UY", name: "Uruguay" },
+  { code: "UZ", name: "Uzbekistan" },
 
-      { code: "VE", name: "Venezuela" },
-      { code: "VN", name: "Vietnam" },
+  { code: "VE", name: "Venezuela" },
+  { code: "VN", name: "Vietnam" },
 
-      { code: "YE", name: "Yemen" },
+  { code: "YE", name: "Yemen" },
 
-      { code: "ZM", name: "Zambia" },
-      { code: "ZW", name: "Zimbabwe" }
-    ],
+  { code: "ZM", name: "Zambia" },
+  { code: "ZW", name: "Zimbabwe" }
+],
   });
 });
+
 
 // =====================================================
 // INIT DB AU DÉMARRAGE (table + column + sequence + setval safe)
@@ -549,7 +477,455 @@ async function initDb() {
 // ===== Health =====
 app.get("/health", (req, res) => res.send("ok"));
 
-// ... ✅ le reste de ton fichier est inchangé (signup, discord, login, /me, settings, logout, start server)
+// =====================================================
+// 1) SIGNUP START (pending en session, pas de compte encore)
+// =====================================================
+app.post("/signup/start", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ ok: false, error: "Missing fields" });
+    }
+
+    const emailKey = normalizeEmail(email);
+
+    const exists = await pool.query("SELECT id FROM users WHERE email = $1", [emailKey]);
+    if (exists.rowCount > 0) {
+      return res.status(409).json({ ok: false, error: "Email already used" });
+    }
+
+    // reset pending (propre)
+    req.session.pendingSignup = {
+      username: String(username).trim(),
+      email: emailKey,
+      password: String(password),
+      createdAt: Date.now(),
+    };
+
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// =====================================================
+// 2) DISCORD AUTH
+// =====================================================
+app.get("/auth/discord", (req, res) => {
+  const redirectUri = process.env.DISCORD_REDIRECT_URI;
+  if (!redirectUri) {
+    return res.status(500).send("Missing DISCORD_REDIRECT_URI in env.");
+  }
+
+  const scope = "identify guilds.join";
+  const state = Math.random().toString(16).slice(2);
+  req.session.discordState = state;
+
+  const url =
+    `https://discord.com/oauth2/authorize` +
+    `?client_id=${encodeURIComponent(process.env.DISCORD_CLIENT_ID)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent(scope)}` +
+    `&prompt=consent` +
+    `&state=${encodeURIComponent(state)}`;
+
+  return res.redirect(url);
+});
+
+// =====================================================
+// 3) DISCORD CALLBACK
+// - hardening: TTL pending, idempotence discord_id, anti-vol, transaction create
+// =====================================================
+app.get("/auth/discord/callback", async (req, res) => {
+  try {
+    const { code, error, state } = req.query;
+
+    if (error) return res.redirect(frontUrl("/?discord=error"));
+    if (!code) return res.status(400).send("No code returned by Discord.");
+    if (!state || state !== req.session.discordState) {
+      return res.status(400).send("Invalid state (security check failed).");
+    }
+
+    // 1) Exchange code -> token
+    const tokenResp = await fetch("https://discord.com/api/oauth2/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID,
+        client_secret: process.env.DISCORD_CLIENT_SECRET,
+        grant_type: "authorization_code",
+        code: String(code),
+        redirect_uri: process.env.DISCORD_REDIRECT_URI,
+      }),
+    });
+
+    if (!tokenResp.ok) {
+      const err = await tokenResp.text();
+      console.error("TOKEN ERROR:", err);
+      return res.redirect(frontUrl("/?discord=error"));
+    }
+
+    const tokenData = await tokenResp.json();
+    const userAccessToken = tokenData.access_token;
+
+    // 2) Get user
+    const meResp = await fetch("https://discord.com/api/users/@me", {
+      headers: { Authorization: `Bearer ${userAccessToken}` },
+    });
+
+    if (!meResp.ok) {
+      const err = await meResp.text();
+      console.error("ME ERROR:", err);
+      return res.redirect(frontUrl("/?discord=error"));
+    }
+
+    const me = await meResp.json();
+    const discordUserId = me.id;
+
+    const pending = req.session.pendingSignup;
+
+    // A) pending expiré => cleanup
+    if (pending && isPendingExpired(pending)) {
+      delete req.session.pendingSignup;
+      return res.redirect(frontUrl("/?signup=expired"));
+    }
+
+    // B) Si user déjà logged => link discord_id (avec check anti-vol)
+    if (req.session?.userId) {
+      const taken = await pool.query(
+        "SELECT id FROM users WHERE discord_id = $1 AND id <> $2 LIMIT 1",
+        [discordUserId, req.session.userId]
+      );
+
+      if (taken.rowCount > 0) {
+        return res.redirect(frontUrl("/phantomcard?discord=already_linked"));
+      }
+
+      await pool.query("UPDATE users SET discord_id = $1 WHERE id = $2", [
+        discordUserId,
+        req.session.userId,
+      ]);
+
+      // Add to guild
+      const addResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ access_token: userAccessToken }),
+        }
+      );
+
+      if (!addResp.ok) {
+        const err = await addResp.text();
+        console.error("ADD GUILD ERROR:", err);
+        return res.redirect(frontUrl("/?discord=error"));
+      }
+
+      // Add role
+      const roleResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+        }
+      );
+
+      if (!roleResp.ok) {
+        const err = await roleResp.text();
+        console.error("ADD ROLE ERROR:", err);
+        return res.redirect(frontUrl("/?discord=error"));
+      }
+
+      return res.redirect(frontUrl("/phantomcard?discord=linked"));
+    }
+
+    // C) Idempotence: si ce discord_id existe déjà -> log in ce user
+    const existingByDiscord = await pool.query(
+      "SELECT id FROM users WHERE discord_id = $1 LIMIT 1",
+      [discordUserId]
+    );
+
+    if (existingByDiscord.rowCount > 0) {
+      req.session.userId = existingByDiscord.rows[0].id;
+      delete req.session.pendingSignup;
+
+      // Add to guild
+      const addResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ access_token: userAccessToken }),
+        }
+      );
+
+      if (!addResp.ok) {
+        const err = await addResp.text();
+        console.error("ADD GUILD ERROR:", err);
+        return res.redirect(frontUrl("/?discord=error"));
+      }
+
+      // Add role
+      const roleResp = await fetch(
+        `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+        }
+      );
+
+      if (!roleResp.ok) {
+        const err = await roleResp.text();
+        console.error("ADD ROLE ERROR:", err);
+        return res.redirect(frontUrl("/?discord=error"));
+      }
+
+      return res.redirect(frontUrl("/phantomcard?discord=linked"));
+    }
+
+    // D) pending signup => create user (transaction)
+    if (pending?.email && pending?.password) {
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+
+        // Re-check email (anti race)
+        const existsEmail = await client.query(
+          "SELECT id FROM users WHERE email = $1 LIMIT 1",
+          [pending.email]
+        );
+
+        if (existsEmail.rowCount > 0) {
+          await client.query("ROLLBACK");
+          delete req.session.pendingSignup;
+          return res.redirect(frontUrl("/?signup=email_used"));
+        }
+
+        // PhantomID dans le même client (transaction-safe)
+        const r = await client.query("SELECT nextval('phantom_id_seq') AS n");
+        const n = Number(r.rows[0].n);
+        const phantomId = `PH${String(n).padStart(6, "0")}`;
+
+        const passwordHash = await bcrypt.hash(pending.password, 12);
+
+        // rating/avatar/badges: pas besoin de les insérer (DEFAULT côté DB)
+        const ins = await client.query(
+          `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING id`,
+          [phantomId, pending.username, pending.email, passwordHash, discordUserId]
+        );
+
+        await client.query("COMMIT");
+
+        req.session.userId = ins.rows[0].id;
+        delete req.session.pendingSignup;
+
+        // Add to guild
+        const addResp = await fetch(
+          `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ access_token: userAccessToken }),
+          }
+        );
+
+        if (!addResp.ok) {
+          const err = await addResp.text();
+          console.error("ADD GUILD ERROR:", err);
+          return res.redirect(frontUrl("/?discord=error"));
+        }
+
+        // Add role
+        const roleResp = await fetch(
+          `https://discord.com/api/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUserId}/roles/${process.env.DISCORD_PHANTOM_ROLE_ID}`,
+          {
+            method: "PUT",
+            headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` },
+          }
+        );
+
+        if (!roleResp.ok) {
+          const err = await roleResp.text();
+          console.error("ADD ROLE ERROR:", err);
+          return res.redirect(frontUrl("/?discord=error"));
+        }
+
+        return res.redirect(frontUrl("/phantomcard?signup=done"));
+      } catch (e) {
+        try {
+          await client.query("ROLLBACK");
+        } catch {}
+
+        const msg = String(e?.message || "");
+
+        if (msg.includes("users_discord_id_unique")) {
+          return res.redirect(frontUrl("/?discord=already_linked"));
+        }
+        if (msg.includes("users_email_key")) {
+          return res.redirect(frontUrl("/?signup=email_used"));
+        }
+
+        console.error("❌ create user tx error:", e);
+        return res.redirect(frontUrl("/?discord=error"));
+      } finally {
+        client.release();
+      }
+    }
+
+    // E) Rien à créer / lier => retour home
+    return res.redirect(frontUrl("/?discord=linked"));
+  } catch (e) {
+    console.error("❌ discord callback error:", e);
+    return res.redirect(frontUrl("/?discord=error"));
+  }
+});
+
+// =====================================================
+// 4) LOGIN
+// =====================================================
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const emailKey = normalizeEmail(email);
+    const pass = String(password || "");
+
+    if (!emailKey || !pass) {
+      return res.status(400).json({ ok: false, error: "Missing fields" });
+    }
+
+    const q = await pool.query("SELECT id, password_hash FROM users WHERE email = $1", [emailKey]);
+
+    if (q.rowCount === 0) {
+      return res.status(401).json({ ok: false, error: "Invalid login" });
+    }
+
+    const user = q.rows[0];
+    const ok = await bcrypt.compare(pass, user.password_hash);
+
+    if (!ok) {
+      return res.status(401).json({ ok: false, error: "Invalid login" });
+    }
+
+    req.session.userId = user.id;
+    return res.json({ ok: true, redirectTo: "/phantomcard" }); // URL propre
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// =====================================================
+// 5) /me (PhantomCard)
+// =====================================================
+app.get("/me", async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) {
+      return res.status(401).json({ ok: false, error: "Not logged in" });
+    }
+
+    const q = `
+      SELECT id, username, phantom_id, email, discord_id, rating,
+             avatar_url, is_premium, is_verified, is_builder,
+             country
+      FROM users
+      WHERE id = $1
+      LIMIT 1
+    `;
+    const r = await pool.query(q, [userId]);
+
+    if (r.rowCount === 0) {
+      req.session.destroy(() => {});
+      return res.status(401).json({ ok: false, error: "Session invalid" });
+    }
+
+    const u = r.rows[0];
+
+    const avatarUrl =
+      (u.avatar_url && String(u.avatar_url).trim()) || "/assets/phantomid-logo.png";
+
+    const country =
+      (u.country && String(u.country).trim().toUpperCase()) || null; // ex: "CA"
+
+    return res.json({
+      ok: true,
+      user: {
+        id: u.id,
+        username: u.username,
+        phantomId: u.phantom_id,
+        email: u.email,
+        discordId: u.discord_id || null,
+        verifiedDiscord: !!u.discord_id,
+
+        rating: u.rating || "Unrated",
+        avatarUrl,
+
+        country, // ✅ pour afficher le drapeau
+
+        badges: {
+          premium: !!u.is_premium,
+          verified: !!u.is_verified,
+          builder: !!u.is_builder,
+        },
+      },
+    });
+  } catch (e) {
+    console.error("GET /me error:", e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// =====================================================
+// SETTINGS: Update username
+// =====================================================
+app.post("/account/username", async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ ok: false, error: "Not logged in" });
+
+    const username = String(req.body?.username || "").trim();
+
+    if (username.length < 3 || username.length > 20) {
+      return res.status(400).json({ ok: false, error: "Username must be 3-20 chars" });
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      return res.status(400).json({ ok: false, error: "Only letters, numbers, underscore" });
+    }
+
+    await pool.query("UPDATE users SET username = $1 WHERE id = $2", [username, userId]);
+    return res.json({ ok: true });
+  } catch (e) {
+    const msg = String(e?.message || "").toLowerCase();
+    if (msg.includes("unique") || msg.includes("duplicate")) {
+      return res.status(409).json({ ok: false, error: "Username already taken" });
+    }
+    console.error("POST /account/username error:", e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+// =====================================================
+// 6) LOGOUT
+// =====================================================
+app.post("/logout", (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+});
+
 // ===== Start server =====
 (async () => {
   try {
