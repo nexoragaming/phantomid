@@ -595,6 +595,37 @@ app.get("/me", async (req, res) => {
 });
 
 // =====================================================
+// SETTINGS: Update username
+// =====================================================
+app.post("/account/username", async (req, res) => {
+  try {
+    const userId = req.session?.userId;
+    if (!userId) return res.status(401).json({ ok: false, error: "Not logged in" });
+
+    const username = String(req.body?.username || "").trim();
+
+    if (username.length < 3 || username.length > 20) {
+      return res.status(400).json({ ok: false, error: "Username must be 3-20 chars" });
+    }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+      return res.status(400).json({ ok: false, error: "Only letters, numbers, underscore" });
+    }
+
+    await pool.query("UPDATE users SET username = $1 WHERE id = $2", [username, userId]);
+    return res.json({ ok: true });
+  } catch (e) {
+    const msg = String(e?.message || "").toLowerCase();
+    if (msg.includes("unique") || msg.includes("duplicate")) {
+      return res.status(409).json({ ok: false, error: "Username already taken" });
+    }
+    console.error("POST /account/username error:", e);
+    return res.status(500).json({ ok: false, error: "Server error" });
+  }
+});
+
+
+
+// =====================================================
 // 6) LOGOUT
 // =====================================================
 app.post("/logout", (req, res) => {
