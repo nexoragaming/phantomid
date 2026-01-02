@@ -107,6 +107,23 @@ app.get("/creator-access", (req, res) => {
   res.sendFile("creator-access-registrer.html", { root: "public" });
 });
 
+app.get("/terms-of-service", (req, res) => {
+  res.sendFile("terms-of-service.html", { root: "public" });
+});
+
+app.get("/cookie-policy", (req, res) => {
+  res.sendFile("cookie-policy.html", { root: "public" });
+});
+
+app.get("/refund-subscription-policy", (req, res) => {
+  res.sendFile("refund-subscription-policy.html", { root: "public" });
+});
+
+app.get("/privacy-policy", (req, res) => {
+  res.sendFile("privacy-policy.html", { root: "public" });
+});
+
+
 // (Optionnel mais conseillé) : si quelqu’un tape .html, on redirige vers l’URL propre
 app.get("/*.html", (req, res) => {
   const clean = req.path.replace(/\.html$/i, "");
