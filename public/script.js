@@ -9,6 +9,13 @@ openLoginBtn.addEventListener("click", function () {
   loginOverlay.classList.add("active");
 });
 
+const footerOpenLoginBtn = document.getElementById("footer-open-login");
+
+footerOpenLoginBtn.addEventListener("click", function () {
+  loginOverlay.classList.add("active");
+});
+
+
 const closeLoginBtn = document.getElementById("close-login-overlay");
     closeLoginBtn.addEventListener("click", function () {
         loginOverlay.classList.remove("active");
@@ -40,6 +47,7 @@ loginFormBox.addEventListener("click", function (event){
 
 
 
+
 //Create Account
 const openCreateAccountBtn = document.getElementById("open-create-account-overlay");
 const createAccountOverlay = document.getElementById("create-account-overlay");
@@ -68,6 +76,11 @@ openCreateAccountOverlayHero.addEventListener("click", function () {
 const openCreateAccountOverlayCTA = document.getElementById("open-create-account-overlay-cta");
 openCreateAccountOverlayCTA.addEventListener("click", function () {
     createAccountOverlay.classList.add("active");
+});
+
+const footerOpenCreateAccountBtn = document.getElementById("footer-open-create-account");
+footerOpenCreateAccountBtn.addEventListener("click", function () {
+  createAccountOverlay.classList.add("active");
 });
 
 document.addEventListener("keydown", function (event) {
