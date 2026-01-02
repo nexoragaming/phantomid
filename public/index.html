@@ -173,28 +173,19 @@
 <footer> 
 
 <div class="footer">
-
 <div class="footer-first-line"> 
-
 <a href="/"> Home </a>
 <a id="open-create-account-overlay"> Create a PhantomID </a>
 <a href="login.html"> Log in </a>
 <a href="premium.html"> PhantomID premium </a>
 <a href=""> Contact / Support </a>
-<a href="" hidden> </a>
-<a href="" hidden> </a>
-<a href="" hidden> </a>
-
 <a href="https://nexoragaming.com" target="_blank"> NexoraGaming official website</a>
-
 <div class="social-media">
 <a href="https://discord.gg/kPTN7HkbBj" class="discord-icon" target="_blank"> <img src="https://i.imgur.com/m7PJD8d.jpeg" alt="Discord icon"> </a>
 <a href="https://www.instagram.com/nexoragaming/" class="instagram-icon" target="_blank"> <img src="https://i.imgur.com/qf2wejY.png" alt="Instagram icon"></a>
 <a href="https://www.tiktok.com/@nexoragaming.com" class="tiktok-icon" target="_blank"> <img src="https://i.imgur.com/3ma0Guu.jpeg" alt="TikTok icon"></a>
 </div>
-
 </div>
-
 <div class="legal-trust">
 <a href="/terms-of-service" target="_blank"> Terms of Service </a>
 <a href="/privacy-policy" target="_blank"> Privacy Policy </a>
@@ -206,9 +197,9 @@
 <p class="slogan-footer"> PhantomID - Your competitive identity.</p>
 <p class="security-text"> Secure accounts • Official APIs • Anti-fraud identity </p>
 </div>
-
 <p class="copyright"> <strong>© 2025 PhantomID </strong>powered by NexoraGaming - <em>All rights reserved.</em></p>
 </div>
+<script src="footer.js"></script>
 </footer>
 
 <!-- overlay -->
@@ -218,7 +209,6 @@
       <div class="close-overlay-btn" id="close-login-overlay">
    <a> Close</a>
     </div>
-
 <h1 class="login-title"> Log in to your Phantom ID </h1>
 <div class="login_form" id="login_form" name="login_form">
 <form method="post" action="" id="login-form">
@@ -240,8 +230,6 @@
 <script src="login.js"></script>
 </div>
 
-
-<div class="create-account-linking">
 <!-- Create account -->
 <div id="create-account-overlay">
 <div class="create-account-box" id="create-account-box">
@@ -249,58 +237,26 @@
    <a> Close</a>
     </div>
 <img> <!-- logo phantomID -->
-
 <div class="title-subitle-create-account">   
 <h1 class="create-account-title"> Create your PhantomID </h1>
 <p class="create-account-subtitle"> Your competitive identity starts here </p>
 </div>
-
 <div class="create-account-form-box">
 <form method="post" class="create-account-form" action="" id="create-account-form">
-
-<!-- Champ pour etre vérifié 
-<label for="first_name"> </label>
-<input id="first_name" name="first_name" type="text" placeholder="First name*" required> 
-
-<label for="last_name"> </label>
-<input id="last_name" name="last_name" type="text" placeholder="Last name*" required> 
-<label for="birthday">   </label>
-<input id="birthday" name="birthday" type="date" placeholder="Birthday*" required> 
-
-<div class="warning-box"> 
-<p class="warning"> You need to be minimum 13 years old* </p> -->
-
 <label for="username"> </label>
 <input id="username" name="username" type="text" placeholder="Username*" required> 
 <p class="username-subtitle"> *This will be your public competitive name </p>
-<!-- Pas grave si le nom en jeu est deja pris, c'est juste pour le profil -->
-
-
-
 <label for="email"> </label>
 <input id="email" name="email" type="email" placeholder="Email address*" required> 
 <label for="password"> </label>
 <input id="password" name="password" type="password" placeholder="Create a password*" required> <!-- indicateur de force du mot de passe -->
-
 <label for="confirm-password"> </label>
 <input id="confirm-password" name="confirm-password" type="password" placeholder="Confirm your password*" required> 
-
-
-
-<!-- Lié compte -->
-<!--API Epic Game-->
-<!--API Brawl Stars-->
-<!-- Sinon on pourrait essayer de faire un bouton connect Supercell ID pour lié le compte Supercell directement -->
-
-
 <div class="create-account-selector">
-
 <div class="country-selector">
   <select name="country" required id="country-selector">
   </select>
-</div> <!-- À finir -->
-
-
+</div> 
 </div>
 <div class="checkbox-create-account"> 
 <div class="privacy-checkbox">
@@ -309,41 +265,15 @@
 <div class="terms-checkbox">
 <input type="checkbox" required><p> I agree to the <a href="/terms-of-service" target="_blank">Terms of Service</a></p>
 </div>
-
 </div>
-<!-- CAPTCHA or
-Email verification mention -->
-
 <p class="reassuring"> <em> Your data is protected and never sold </em></p>
     <button type="submit" class="create-account-btn-form" id="create-phantomid-btn"> Create my PhantomID </button>
-
     <div class="already-account">
     <p class="already-account"> Already have an account? <a class="already-account-login" id="already-account-btn"> Log in </a>  </p>
 </div>
-
 </form>
-
  </div>
 </div>
-</div>
-
-<!-- Discord account link -->
-<div class="linking-overlay" id="linking-overlay">
-<div class="linking-box">
-<h1> Link your account ! </h1>
-<div class="connect-btn-box" id="discord-connect">
-<p class="connect-btn-text"> Connect Discord </p>
-<img src="https://i.imgur.com/4WVI6m7.png" class="discord-icon">
-</div>
-<div class="connected-btn-box" id="discord-connected">
-<p class="connect-btn-text"> Discord Connected </p>
-<img src="https://i.imgur.com/4WVI6m7.png" class="discord-icon"> <!-- Mettre un icone check -->
-</div>
-<div id="discord-status"></div>
-<script src="linking.js"></script>
-</div>
-</div>
-<script src="create-account.js"></script>
 </div>
 
 

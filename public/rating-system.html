@@ -155,6 +155,79 @@ PhantomID prioritizes quality, credibility, and genuine competitive recognition.
 
 </section>
 
+<!-- overlay -->
+<!-- Login overlay -->
+<div class="login-overlay" id="login-overlay">
+<div class="login-form-box" id="login-form-box">
+      <div class="close-overlay-btn" id="close-login-overlay">
+   <a> Close</a>
+    </div>
+<h1 class="login-title"> Log in to your Phantom ID </h1>
+<div class="login_form" id="login_form" name="login_form">
+<form method="post" action="" id="login-form">
+<label for="phantom_id"> </label>
+<input id="phantom_id" name="phantom_id" type="text" placeholder="Phantom ID" autocomplete="username" minlength="8" maxlength="8">  
+<label for="email"> </label>
+<input id="login-email" name="email" type="email" placeholder="Email address*" autocomplete="email" required> 
+<label for="login-password"> </label>
+<input id="login-confirm-password" name="password" type="password" placeholder="Password*" autocomplete="current-password" required> <!-- Show / Hide password  (icon d'oeil)-->
+<a href="forgot-password.html" class="forgot-password"> Forgot your password ? </a>
+<div class="remember-me-checkbox-box">
+<input type="checkbox" class="checkbox"> <p> Remember me </p>
+</div>
+<button type="submit" class="login-form-btn"> Login </button>
+<p>Don’t have an account? <a id="no-account-btn">Create one</a></p>
+</form>
+</div>
+</div>
+<script src="login.js"></script>
+</div>
+
+<!-- Create account -->
+<div id="create-account-overlay">
+<div class="create-account-box" id="create-account-box">
+    <div class="close-overlay-btn" id="close-create-account-overlay-btn">
+   <a> Close</a>
+    </div>
+<img> <!-- logo phantomID -->
+<div class="title-subitle-create-account">   
+<h1 class="create-account-title"> Create your PhantomID </h1>
+<p class="create-account-subtitle"> Your competitive identity starts here </p>
+</div>
+<div class="create-account-form-box">
+<form method="post" class="create-account-form" action="" id="create-account-form">
+<label for="username"> </label>
+<input id="username" name="username" type="text" placeholder="Username*" required> 
+<p class="username-subtitle"> *This will be your public competitive name </p>
+<label for="email"> </label>
+<input id="email" name="email" type="email" placeholder="Email address*" required> 
+<label for="password"> </label>
+<input id="password" name="password" type="password" placeholder="Create a password*" required> <!-- indicateur de force du mot de passe -->
+<label for="confirm-password"> </label>
+<input id="confirm-password" name="confirm-password" type="password" placeholder="Confirm your password*" required> 
+<div class="create-account-selector">
+<div class="country-selector">
+  <select name="country" required id="country-selector">
+  </select>
+</div> 
+</div>
+<div class="checkbox-create-account"> 
+<div class="privacy-checkbox">
+<input type="checkbox" required><p> I agree to the <a href="/privacy-policy" target="_blank">Privacy Policy</a> </p>
+</div>
+<div class="terms-checkbox">
+<input type="checkbox" required><p> I agree to the <a href="/terms-of-service" target="_blank">Terms of Service</a></p>
+</div>
+</div>
+<p class="reassuring"> <em> Your data is protected and never sold </em></p>
+    <button type="submit" class="create-account-btn-form" id="create-phantomid-btn"> Create my PhantomID </button>
+    <div class="already-account">
+    <p class="already-account"> Already have an account? <a class="already-account-login" id="already-account-btn"> Log in </a>  </p>
+</div>
+</form>
+ </div>
+</div>
+</div>
 
 <script src="script.js"></script>
 </body>
