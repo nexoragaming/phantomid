@@ -130,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (!country) {
-      alert("Please select a country.");
+      alert("Please select your country.");
       return;
     }
 
