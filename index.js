@@ -15,7 +15,7 @@ const PORT = Number(process.env.PORT) || 3000;
 app.set("trust proxy", 1);
 
 /* ✅ AJOUT SITEMAP (ne touche à rien d’autre) */
-app.use(express.static("public"));
+app.use(express.static("."));
 
 
 // ===== Middlewares =====
