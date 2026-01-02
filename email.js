@@ -5,7 +5,7 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendWelcomeEmail({ email, username, phantomId }) {
   try {
     await resend.emails.send({
-      from: "PhantomID <no-reply@phantomid.app>", // temporaire OK
+      from: "PhantomID <onboarding@resend.dev>", // temporaire OK
       to: email,
       subject: "Welcome to PhantomID",
       html: `
