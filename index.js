@@ -11,12 +11,12 @@ dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// ✅ SITEMAP
-import { SitemapStream, streamToPromise } from "sitemap";
-import { Readable } from "stream";
-
 // IMPORTANT reverse proxy (Render)
 app.set("trust proxy", 1);
+
+/* ✅ AJOUT SITEMAP (ne touche à rien d’autre) */
+app.use(express.static("public"));
+
 
 // ===== Middlewares =====
 app.use(express.json());
