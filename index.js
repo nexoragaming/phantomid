@@ -123,6 +123,10 @@ app.get("/privacy-policy", (req, res) => {
   res.sendFile("privacy-policy.html", { root: "public" });
 });
 
+app.get("/contact", (req, res) => {
+  res.sendFile("contact.html", { root: "public" });
+});
+
 
 // (Optionnel mais conseillé) : si quelqu’un tape .html, on redirige vers l’URL propre
 app.get("/*.html", (req, res) => {

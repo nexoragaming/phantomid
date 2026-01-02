@@ -1304,6 +1304,10 @@ ol {
     color: #572bde;
 }
 
+.nexora-email {
+    color: #572bde;
+    text-decoration: underline;
+}
 
 /* Premium Overlay */
 
@@ -1818,8 +1822,6 @@ ol {
 .username-edit {
     display: flex;
 }
-
-
 
 /*Overlay*/
 
