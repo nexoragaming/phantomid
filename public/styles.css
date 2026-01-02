@@ -810,13 +810,21 @@ input::placeholder {
 }
 
 .forgot-password {
+    background: none;
+    border: none;
+    color: #572bde;
     justify-self: center;
     margin-top: 2%;
     text-align: center;
     width: 275px;
-     color: #ffffff;
-    border: 1px solid white;
     text-align: center;
+}
+
+.forgot-password:hover {
+    background: none;
+    border: none;
+    color: #572bde;
+    text-decoration: underline;
 }
 
 .remember-me-checkbox-box {
