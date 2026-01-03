@@ -2460,114 +2460,89 @@ position: fixed;
 }
 
 
-/* =========================================================
-   PHANTOMCARD — MOBILE CLEAN (<=600px)
-   iPad parfait => on ne touche pas au <=1024px
-   Objectif iPhone: propre, lisible, sans chevauchement
-   À coller TOUT À LA FIN (et supprimer les anciens blocs PhantomCard mobile)
-========================================================= */
+/* =========================
+   PHANTOMCARD — MOBILE (<= 600px)
+   Objectif: même rendu que iPad (row), sans perdre les infos
+   À COLLER TOUT À LA FIN
+========================= */
 @media (max-width: 600px) {
 
-  /* La section mobile met tout en center -> on force la card en "left" */
-  .phantomcard,
-  .phantomcard *{
-    text-align: left;
-  }
-
+  /* On garde le layout "PC/iPad" (ROW) */
   .phantomcard{
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
     width: calc(100vw - 24px) !important;
-    max-width: 520px !important;
-    margin: 0 auto !important;
-
-    display: flex !important;
-    flex-wrap: wrap !important;      /* clé: on autorise 2 lignes */
-    align-items: center !important;
-
-    padding: 10px !important;
-    box-sizing: border-box !important;
-
-    overflow: hidden !important;     /* garde le border clean */
+    max-width: 900px !important; /* garde ton design */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow: hidden !important;
   }
 
-  /* Photo = colonne gauche */
-  .profil-picture{
-    flex: 0 0 112px !important;
-    width: 112px !important;
-    height: 112px !important;
-    margin: 8px 10px 8px 8px !important;
-  }
-
-  /* Centre = prend le reste de la ligne */
+  /* IMPORTANT: permettre au centre de shrink sans casser le layout */
   .phantomcard-center-section{
-    flex: 1 1 calc(100% - 132px) !important;
-    min-width: 0 !important;          /* évite les débordements */
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
   }
 
-  /* Nom + drapeau : on autorise le wrap propre (plus de chevauchement) */
+  /* Photo profil plus petite */
+  .profil-picture{
+    width: 110px !important;
+    height: 110px !important;
+    margin: 12px !important;
+  }
+
+  /* Nom + drapeau: on évite le chevauchement en forçant l’ellipsis */
   .username-box{
-    margin-top: 6px !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
+    margin-top: 12px !important;
     gap: 8px !important;
+    max-width: 100% !important;
     min-width: 0 !important;
   }
 
   .username-box p{
-    font-size: 18px !important;
-    max-width: 100% !important;
-    white-space: nowrap !important;
+    font-size: 20px !important;
+    max-width: 200px !important;     /* laisse la place au drapeau */
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    margin: 0 !important;
-  }
-
-  .flags{
-    height: 28px !important;
-    margin: 0 !important;
-    flex: 0 0 auto !important;
+    white-space: nowrap !important;
   }
 
   .user-phantomid{
-    font-size: 13px !important;
-    margin: 0 !important;
+    font-size: 14px !important;
   }
 
-  /* Badges: sur une ligne si possible, sinon wrap clean */
+  .flags{
+    height: 32px !important;
+    margin: 0 10px 0 6px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Badges: plus petits mais visibles */
   .badges{
-    display: flex !important;
-    flex-wrap: wrap !important;
+    margin: 6px 8px 20px !important;
     gap: 10px !important;
-    margin: 8px 0 0 0 !important;
     height: auto !important;
+    flex-wrap: wrap !important; /* au besoin */
   }
-  .tooltip img{ height: 32px !important; }
 
-  /* Rating = 2e ligne, aligné à droite (plus jamais sur le drapeau) */
+  .tooltip img{
+    height: 34px !important;
+  }
+
+  /* Rating: on garde le bloc à droite, plus compact */
   .rating-box{
-    order: 3 !important;
-    width: 100% !important;
-
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: 10px !important;
-
-    margin: 8px 0 0 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-
-    min-width: 0 !important;
+    margin-top: 26px !important;
+    height: 130px !important;
+    padding-right: 14px !important;  /* évite "collé au bord" */
+    box-sizing: border-box !important;
   }
 
-  .rate-icon{ height: 64px !important; margin: 0 !important; }
+  .rate-icon{
+    height: 86px !important;
+  }
+
   .user-rate{
-    font-size: 16px !important;
-    margin: 0 !important;
-    white-space: nowrap !important;
+    font-size: 18px !important;
   }
-
-  /* Petit garde-fou */
-  .badges-rates{ min-width: 0 !important; }
 }
