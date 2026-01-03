@@ -2355,17 +2355,29 @@ position: fixed;
 
   /* tighten */
   .profil-picture{ margin: 14px !important; }
-  .username-box{ margin-top: 10px !important; gap: 8px !important; }
+  .username-box{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
 
-  /* ✅ PhantomID : couvre class + id, et force l'application */
-  .phantomcard .user-phantomid,
-  .phantomcard #user-phantomid{
-    display: block !important;
-    margin-top: -6px !important;
-    margin-bottom: 6px !important;
-    position: static !important;
-    top: auto !important;
-  }
+/* PhantomID : on neutralise TOUT ce qui peut l’éloigner */
+.phantomcard .user-phantomid,
+.phantomcard #user-phantomid{
+  position: static !important;     /* <- kill absolute/relative weird */
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+
+  transform: none !important;
+  margin: 2px 0 0 0 !important;    /* ajuste ici si tu veux + ou - proche */
+  padding: 0 !important;
+
+  display: block !important;
+  width: auto !important;
+}
 
   .badges{
     margin: 8px 10px 16px 10px !important;
