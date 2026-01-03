@@ -820,6 +820,7 @@ input::placeholder {
     text-align: center;
     width: 275px;
     text-align: center;
+    margin-bottom: 2%;
 }
 
 .forgot-password:hover {
