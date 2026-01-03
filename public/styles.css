@@ -2451,3 +2451,72 @@ position: fixed;
   /* Les titres sur mobile prennent trop de place : on les centre */
   .username-box { justify-content: center !important; }
 }
+
+/* =========================
+   PHANTOMCARD FIX (iPad + iPhone)
+   (à coller TOUT À LA FIN)
+========================= */
+
+/* --- iPad / Tablette : corriger chevauchement rate + drapeau --- */
+@media (max-width: 1024px) {
+  /* La carte reste PC-like, juste un peu shrink */
+  .phantomcard{
+    transform: scale(0.92) !important;
+    transform-origin: top center !important;
+    overflow: hidden;
+  }
+
+  /* Le "Unrated" / rate: on l'éloigne du bord droit */
+  .user-rate{
+    padding-right: 18px !important;
+    margin-right: 10px !important;
+  }
+
+  /* Drapeau: on s'assure qu'il ne se fait pas chevaucher */
+  .flags{
+    margin-right: 18px !important;
+  }
+
+  /* Si ton texte de nom est long, éviter qu'il pousse trop à droite */
+  .username-box p{
+    max-width: 420px !important;
+  }
+}
+
+/* --- iPhone : carte plus grande + plus de chevauchement --- */
+@media (max-width: 600px) {
+
+  /* IMPORTANT : on évite le margin-bottom négatif (ça chevauche) */
+  .phantomcard{
+    margin-bottom: 0 !important;
+    transform-origin: top center !important;
+  }
+
+  /* On augmente la taille visuelle de la carte */
+  .phantomcard{
+    transform: scale(0.62) !important;   /* <- plus grand que 0.46 */
+  }
+
+  /* Comme la carte est "scale", elle garde sa hauteur non-scalée.
+     On réserve de l'espace DANS .bg pour que la section en dessous
+     ne remonte pas dessus. */
+  .bg{
+    padding-bottom: 420px !important; /* ajuste si besoin: 360 à 520 */
+  }
+
+  /* Optionnel: si tu veux que la carte reste bien centrée */
+  .phantomcard{
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  /* Le rate et le drapeau aussi sur mobile: petit dégagement */
+  .user-rate{
+    padding-right: 14px !important;
+    margin-right: 8px !important;
+  }
+
+  .flags{
+    margin-right: 12px !important;
+  }
+}
