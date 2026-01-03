@@ -2357,7 +2357,14 @@ position: fixed;
 
   /* tighten */
   .profil-picture{ margin: 14px !important; }
-  .username-box{ margin-top: 6px !important; gap: 4px !important; }
+  .username-box{ margin-top: 10px !important; gap: 8px !important; }
+ .user-phantomid{
+  display: block !important;        /* ✅ force un bloc => margins appliqués */
+  margin-top: -6px !important;      /* ✅ rapproche vers le username */
+  margin-bottom: 6px !important;    /* ✅ garde même distance avant les badges */
+  position: static !important;      /* ✅ enlève l'effet “inutile” du relative */
+  top: auto !important;
+}
 
 
   .badges{
