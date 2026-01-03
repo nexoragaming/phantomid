@@ -2329,68 +2329,23 @@ position: fixed;
 
   /* ===== PhantomCard MOBILE: design PC via zoom (propre) ===== */
 
-  .upgrade-edit{
-    margin-left: 0 !important;
+ .phantomcard {
+    width: 900px;                 /* largeur PC exacte */
+    max-width: none;
+    margin: 0 auto;
+
+    transform: scale(0.42);       /* 🔑 ajuste ici si besoin (0.40 → 0.48) */
+    transform-origin: top center;
+
+    display: inline-block;        /* évite les bugs de layout */
+  }
+
+  /* Centre le bloc au-dessus (edit / upgrade) */
+  .upgrade-edit {
     justify-content: center !important;
-    flex-wrap: wrap !important;
+    margin-left: 0 !important;
   }
-
-  .phantomcard{
-    width: 900px !important;
-    max-width: none !important;
-    margin: 0 auto !important;
-    flex-direction: row !important;
-    overflow: hidden !important;
-    zoom: 0.42 !important;
-  }
-
-  @supports not (zoom: 1) {
-    .phantomcard{
-      zoom: 1 !important;
-      transform: scale(0.42) !important;
-      transform-origin: top center !important;
-      display: inline-block !important;
-    }
-  }
-
-  /* tighten */
-  .profil-picture{ margin: 14px !important; }
-  .username-box{ margin-top: 10px !important; gap: 8px !important; }
-
-  /* ✅ FIX réel : c'est .main-card qui pousse le PhantomID vers le bas */
-  .phantomcard .main-card{
-    margin-top: 10px !important;
-    margin-bottom: 6px !important;
-    height: auto !important;
-  }
-
-  /* ✅ PhantomID : spacing clean (sans hacks inutiles) */
-  .phantomcard .user-phantomid,
-  .phantomcard #user-phantomid{
-    display: block !important;
-    margin-top: 0px !important;
-    margin-bottom: 8px !important;
-    position: static !important;
-    top: auto !important;
-  }
-
-  .badges{
-    margin: 8px 10px 16px 10px !important;
-    gap: 12px !important;
-    height: auto !important;
-  }
-  .tooltip img{ height: 44px !important; }
-
-  .rating-box{
-    margin-top: 18px !important;
-    height: 150px !important;
-    padding-right: 14px !important;
-    box-sizing: border-box !important;
-  }
-  .rate-icon{ height: 105px !important; }
-  .user-rate{ font-size: 22px !important; }
-
-  .phantomcard-center-section{ margin-top: 0 !important; }
+}
 
   /* Player info blocks */
   .player-info{
