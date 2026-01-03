@@ -2358,7 +2358,10 @@ position: fixed;
   /* tighten */
   .profil-picture{ margin: 14px !important; }
   .username-box{ margin-top: 10px !important; gap: 8px !important; }
-  .user-phantomid{ margin-top: 2px !important; }
+  .user-phantomid{   
+    margin-top: 0 !important;
+  line-height: 1.2 !important; 
+}
 
   .badges{
     margin: 8px 10px 16px 10px !important;
