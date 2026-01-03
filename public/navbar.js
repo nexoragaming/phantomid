@@ -53,3 +53,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const nav = document.querySelector(".nav-user, .nav-guest");
+
+  if (!nav) return;
+
+  nav.addEventListener("click", (e) => {
+    // détecte clic sur le hamburger (zone ::after)
+    const navRect = nav.getBoundingClientRect();
+    const clickX = e.clientX - navRect.left;
+
+    // zone droite = hamburger
+    if (clickX > navRect.width - 60) {
+      nav.classList.toggle("nav-open");
+    }
+  });
+});

@@ -2142,6 +2142,90 @@ position: fixed;
   .setting-info{ gap: 80px; justify-content: center; }
 }
 
+/* =========================
+   NAVBAR HAMBURGER ≤ 1024px
+   (logo à droite + menu burger)
+========================= */
+@media (max-width: 1024px) {
+
+  nav{
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+  }
+
+  .nav-user,
+  .nav-guest{
+    width: min(92vw, 820px);
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px;
+    position: relative;
+  }
+
+  /* Logo à droite */
+  .nav-user .logo,
+  .nav-guest .logo{
+    margin-left: auto !important;
+    order: 2;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Cache les liens (desktop nav) */
+  .nav-user > a:not(#nav-logout),
+  .nav-guest > a{
+    display: none !important;
+  }
+
+  /* Hamburger icon */
+  .nav-user::after,
+  .nav-guest::after{
+    content: "☰";
+    font-size: 28px;
+    color: white;
+    cursor: pointer;
+    order: 3;
+    padding: 6px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* =========================
+   MENU OUVERT (≤1024px)
+========================= */
+@media (max-width: 1024px) {
+
+  .nav-user.nav-open,
+  .nav-guest.nav-open{
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 16px !important;
+    gap: 14px;
+  }
+
+  .nav-user.nav-open > a,
+  .nav-guest.nav-open > a{
+    display: flex !important;
+    width: 100%;
+    padding: 10px 0;
+    font-size: 18px;
+  }
+
+  .nav-user.nav-open .logo,
+  .nav-guest.nav-open .logo{
+    order: -1;
+    margin-bottom: 12px;
+  }
+}
+
+
+
 
 @media (max-width: 600px) {
 
