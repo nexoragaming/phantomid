@@ -2461,106 +2461,113 @@ position: fixed;
 
 
 /* =========================================================
-   PHANTOMCARD — MOBILE FIX (<=600px)
-   Objectif: rendu comme iPad (row PC-like) + infos visibles
-   À coller TOUT À LA FIN
+   PHANTOMCARD — MOBILE CLEAN (<=600px)
+   iPad parfait => on ne touche pas au <=1024px
+   Objectif iPhone: propre, lisible, sans chevauchement
+   À coller TOUT À LA FIN (et supprimer les anciens blocs PhantomCard mobile)
 ========================================================= */
 @media (max-width: 600px) {
 
-  /* La carte doit pouvoir shrink en flex (sinon ça déborde et ça se fait couper) */
+  /* La section mobile met tout en center -> on force la card en "left" */
+  .phantomcard,
+  .phantomcard *{
+    text-align: left;
+  }
+
   .phantomcard{
     width: calc(100vw - 24px) !important;
     max-width: 520px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    margin: 0 auto !important;
 
     display: flex !important;
-    flex-direction: row !important;
+    flex-wrap: wrap !important;      /* clé: on autorise 2 lignes */
     align-items: center !important;
 
-    /* IMPORTANT: on garde hidden mais on empêche le débordement
-       en autorisant les colonnes à shrink (min-width:0 plus bas) */
-    overflow: hidden !important;
+    padding: 10px !important;
     box-sizing: border-box !important;
-    padding-right: 10px !important; /* petit buffer à droite */
+
+    overflow: hidden !important;     /* garde le border clean */
   }
 
-  /* Autoriser les colonnes internes à rétrécir (clé du fix) */
-  .phantomcard-center-section,
-  .username-box,
-  .rating-box,
-  .badges,
-  .badges-rates{
+  /* Photo = colonne gauche */
+  .profil-picture{
+    flex: 0 0 112px !important;
+    width: 112px !important;
+    height: 112px !important;
+    margin: 8px 10px 8px 8px !important;
+  }
+
+  /* Centre = prend le reste de la ligne */
+  .phantomcard-center-section{
+    flex: 1 1 calc(100% - 132px) !important;
+    min-width: 0 !important;          /* évite les débordements */
+  }
+
+  /* Nom + drapeau : on autorise le wrap propre (plus de chevauchement) */
+  .username-box{
+    margin-top: 6px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
     min-width: 0 !important;
   }
 
-  /* Photo un poil plus petite pour libérer de la place */
-  .profil-picture{
-    width: 115px !important;
-    height: 115px !important;
-    margin: 12px !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* Centre: on compacte un peu pour laisser respirer le rating */
-  .phantomcard-center-section{
-    flex: 1 1 auto !important;
-  }
-
-  .username-box{
-    margin-top: 12px !important;
-    gap: 8px !important;
-    align-items: center !important;
-  }
-
-  /* Texte username: plus petit + largeur contrôlée pour ne pas pousser le drapeau */
   .username-box p{
-    font-size: 17px !important;
-    max-width: 170px !important;   /* libère de la place à droite */
+    font-size: 18px !important;
+    max-width: 100% !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    margin: 0 !important;
+  }
+
+  .flags{
+    height: 28px !important;
+    margin: 0 !important;
+    flex: 0 0 auto !important;
   }
 
   .user-phantomid{
     font-size: 13px !important;
+    margin: 0 !important;
   }
 
-  /* Drapeau plus petit + marge safe */
-  .flags{
-    height: 28px !important;
-    margin: 0 8px 0 6px !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* Badges: plus compacts */
+  /* Badges: sur une ligne si possible, sinon wrap clean */
   .badges{
-    gap: 8px !important;
-    margin: 8px !important;
-    margin-bottom: 14px !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin: 8px 0 0 0 !important;
     height: auto !important;
-    flex-wrap: nowrap !important; /* reste sur une ligne comme iPad */
   }
-  .tooltip img{
-    height: 30px !important;
-  }
+  .tooltip img{ height: 32px !important; }
 
-  /* Rating: on force le shrink + on le garde visible */
+  /* Rating = 2e ligne, aligné à droite (plus jamais sur le drapeau) */
   .rating-box{
-    flex: 0 0 auto !important;
-    margin-top: 18px !important;
-    height: 118px !important;
-    padding-right: 10px !important;
-    box-sizing: border-box !important;
-    justify-content: center !important;
+    order: 3 !important;
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    margin: 8px 0 0 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+
+    min-width: 0 !important;
   }
 
-  .rate-icon{
-    height: 76px !important;
-  }
-
+  .rate-icon{ height: 64px !important; margin: 0 !important; }
   .user-rate{
     font-size: 16px !important;
+    margin: 0 !important;
     white-space: nowrap !important;
   }
+
+  /* Petit garde-fou */
+  .badges-rates{ min-width: 0 !important; }
 }
