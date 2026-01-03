@@ -2143,8 +2143,6 @@ position: fixed;
 }
 
 
-/* ---------- MOBILE (<= 600px) ---------- */
-/* ✅ 1 seul bloc mobile, plus aucun doublon PhantomCard */
 @media (max-width: 600px) {
 
   html, body { overflow-x: hidden; }
@@ -2358,14 +2356,16 @@ position: fixed;
   /* tighten */
   .profil-picture{ margin: 14px !important; }
   .username-box{ margin-top: 10px !important; gap: 8px !important; }
- .user-phantomid{
-  display: block !important;        /* ✅ force un bloc => margins appliqués */
-  margin-top: -6px !important;      /* ✅ rapproche vers le username */
-  margin-bottom: 6px !important;    /* ✅ garde même distance avant les badges */
-  position: static !important;      /* ✅ enlève l'effet “inutile” du relative */
-  top: auto !important;
-}
 
+  /* ✅ PhantomID : couvre class + id, et force l'application */
+  .phantomcard .user-phantomid,
+  .phantomcard #user-phantomid{
+    display: block !important;
+    margin-top: -6px !important;
+    margin-bottom: 6px !important;
+    position: static !important;
+    top: auto !important;
+  }
 
   .badges{
     margin: 8px 10px 16px 10px !important;
