@@ -55,34 +55,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 //Nav hamburger
-document.addEventListener("DOMContentLoaded", () => {
-  const nav = document.querySelector(".nav-user") || document.querySelector(".nav-guest");
+// ===== Mobile / Tablet hamburger (<=1024px) =====
+(() => {
+  const nav = document.getElementById("nav-user") || document.getElementById("nav-guest");
   if (!nav) return;
 
-  // évite d’en créer 2 si tu reload/append
-  if (!nav.querySelector(".nav-toggle")) {
-    const btn = document.createElement("button");
-    btn.className = "nav-toggle";
-    btn.type = "button";
-    btn.setAttribute("aria-label", "Open menu");
-    btn.innerHTML = "<span>☰</span>";
-    nav.appendChild(btn);
+  // évite doublon si navbar.js est chargé 2 fois
+  if (nav.querySelector(".nav-toggle")) return;
 
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      nav.classList.toggle("nav-open");
-      btn.innerHTML = nav.classList.contains("nav-open")
-        ? "<span>✕</span>"
-        : "<span>☰</span>";
-    });
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "nav-toggle";
+  btn.setAttribute("aria-label", "Open menu");
+  btn.innerHTML = "<span>☰</span>";
 
-    // optionnel: clic dehors ferme
-    document.addEventListener("click", (e) => {
-      if (!nav.contains(e.target)) {
-        nav.classList.remove("nav-open");
-        btn.innerHTML = "<span>☰</span>";
-      }
-    });
-  }
-});
+  nav.appendChild(btn);
+
+  const closeMenu = () => nav.classList.remove("nav-open");
+
+  btn.addEventListener("click", () => {
+    nav.classList.toggle("nav-open");
+  });
+
+  // ferme le menu quand on clique un lien
+  nav.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", closeMenu);
+  });
+
+  // si on repasse en desktop, on ferme
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 1024) closeMenu();
+  });
+})();
