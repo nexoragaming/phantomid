@@ -1959,25 +1959,43 @@ position: fixed;
 }
 
 /* =========================
-   AJUSTEMENT MOBILE / TABLET (CENTER + MARGES)
-   (à coller à la fin)
+   AJUSTEMENT MOBILE / TABLET — CLEAN FINAL
+   (remplace TOUT ton bloc d’ajustement actuel par celui-ci)
+   Objectif: tout centré + marges, .bg full width, cartes réduites,
+             PhantomCard PC-like (row) SANS scale/transform.
 ========================= */
 
-/* --- Tablette (<= 1024px) --- */
+/* ---------- TABLETTE (<= 1024px) ---------- */
 @media (max-width: 1024px) {
 
-  /* Base: tout centré + marges internes */
+  /* Base */
   body { font-size: 18px; }
   header { padding: 10px 14px; }
-  section { padding-left: 16px; padding-right: 16px; box-sizing: border-box; }
 
-  /* IMPORTANT: pas de marge/padding pour .bg (galaxie full width) */
-  .bg { width: 100%; padding-left: 0 !important; padding-right: 0 !important; }
+  /* Marges globales (sauf .bg) */
+  section{
+    padding-left: 16px;
+    padding-right: 16px;
+    box-sizing: border-box;
+  }
 
-  /* Navbar: plus compact + centré */
-  nav { margin: 0; height: auto; display: grid; justify-content: center; }
+  /* IMPORTANT: .bg full width */
+  .bg{
+    width: 100%;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Nav */
+  nav{
+    margin: 0;
+    height: auto;
+    display: grid;
+    justify-content: center;
+  }
+
   .nav-guest,
-  .nav-user {
+  .nav-user{
     width: min(92vw, 820px);
     height: auto;
     flex-wrap: wrap;
@@ -1988,10 +2006,10 @@ position: fixed;
     padding: 10px 14px;
   }
 
-  nav a { padding: 12px 12px; }
+  nav a{ padding: 12px 12px; }
 
-  /* Hero buttons: enlever padding 500px + centrer */
-  .btn-hero {
+  /* Hero */
+  .btn-hero{
     padding-left: 0;
     padding-right: 0;
     padding-top: 26px;
@@ -2002,91 +2020,148 @@ position: fixed;
     gap: 12px;
   }
 
-  .btn-create-account { width: min(460px, 92vw); font-size: 20px; height: 48px; }
+  .btn-create-account{
+    width: min(460px, 92vw);
+    font-size: 20px;
+    height: 48px;
+  }
 
-  /* "What is" subtitle: moins large + centré */
-  .what-is-phantomid { justify-content: center; }
-  .what-is-phantomid-subtitle {
+  /* Text blocks */
+  .what-is-phantomid{ justify-content: center; }
+  .what-is-phantomid-subtitle{
     margin-left: 8%;
     margin-right: 8%;
     text-align: center;
   }
 
-  /* Avantages: cartes plus petites + wrap */
+  /* Cards: avantages */
   .top,
-  .bottom {
+  .bottom{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 14px;
   }
 
-  .advantages-card {
+  .advantages-card{
     width: min(92vw, 640px);
     height: auto;
     padding: 12px;
     align-items: center;
   }
-  .advantages-card img { height: 135px; margin: 10px; }
-  .advantages-card p { font-size: 28px; text-align: left; }
-  .advantages-card ul { font-size: 15px; }
+  .advantages-card img{ height: 135px; margin: 10px; }
+  .advantages-card p{ font-size: 28px; text-align: left; }
+  .advantages-card ul{ font-size: 15px; }
 
-  /* How it works: cartes plus petites */
-  .how-it-works { justify-content: center; }
-  .how-it-works-card-box {
+  /* How it works */
+  .how-it-works{ justify-content: center; }
+  .how-it-works-card-box{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 14px;
   }
-  .how-it-works-card {
+  .how-it-works-card{
     width: min(92vw, 560px);
     padding: 14px;
   }
-  .how-it-works-card-box img { height: 150px; margin-right: 0; }
+  .how-it-works-card-box img{ height: 150px; margin-right: 0; }
 
-  /* Why Phantom: cartes plus petites + wrap */
+  /* Why Phantom */
   .why-phantom-card-box-top,
-  .why-phantom-card-box-bottom {
+  .why-phantom-card-box-bottom{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 14px;
   }
-  .why-phantom-card { width: min(92vw, 460px); height: auto; padding: 16px; }
+  .why-phantom-card{
+    width: min(92vw, 460px);
+    height: auto;
+    padding: 16px;
+  }
 
   /* CTA */
-  .cta { padding-left: 16px; padding-right: 16px; }
-  .cta-btn { width: min(460px, 92vw); height: 48px; font-size: 20px; }
+  .cta{ padding-left: 16px; padding-right: 16px; }
+  .cta-btn{
+    width: min(460px, 92vw);
+    height: 48px;
+    font-size: 20px;
+  }
 
-  /* Overlays: plus petits */
+  /* Overlays */
   .create-account-box,
   .login-form-box,
   .linking-box,
-  .setting-box {
+  .setting-box{
     width: min(92vw, 460px);
   }
 
-  /* PhantomCard: réduit + centré (tablette) */
-  .phantomcard {
-    width: min(92vw, 820px);
-    margin-left: auto;
-    margin-right: auto;
+  /* -------- PhantomCard (TABLET): PC-like, pas de scale -------- */
+  .upgrade-edit{
+    margin-left: 0 !important;
+    justify-content: center !important;
   }
-  .upgrade-edit { margin-left: 0; justify-content: center; }
-  .player-info { justify-content: center; gap: 60px; }
-  .setting-info { gap: 80px; justify-content: center; }
+
+  .phantomcard{
+    width: calc(100vw - 40px) !important;
+    max-width: 900px !important; /* garde ton “PC” */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow: hidden !important;  /* évite le clip hors bord */
+  }
+
+  /* Réduire juste ce qu’il faut pour éviter chevauchement à droite */
+  .profil-picture{
+    width: 170px !important;
+    height: 170px !important;
+    margin: 16px !important;
+  }
+
+  .username-box p{
+    font-size: 28px !important;
+    max-width: 360px !important; /* laisse place au drapeau */
+  }
+
+  .flags{
+    height: 46px !important;
+    margin: 0 12px 0 8px !important;
+  }
+
+  .badges{
+    gap: 14px !important;
+    margin: 8px !important;
+    margin-bottom: 38px !important;
+    height: auto !important;
+  }
+
+  .tooltip img{ height: 44px !important; }
+
+  .rating-box{
+    margin-top: 44px !important;
+    height: 160px !important;
+    padding-right: 14px !important;   /* empêche rate collé au bord */
+    box-sizing: border-box !important;
+  }
+  .rate-icon{ height: 115px !important; }
+  .user-rate{ font-size: 22px !important; }
+
+  .player-info{ gap: 160px !important; }
+
+  /* Setting */
+  .setting-info{ gap: 80px; justify-content: center; }
 }
 
 
-/* --- Mobile (<= 600px) --- */
+/* ---------- MOBILE (<= 600px) ---------- */
 @media (max-width: 600px) {
 
-  /* Base: tout centré + marges (sauf .bg) */
-  body { font-size: 16px; }
-  header { padding: 10px 12px; }
+  /* Base */
+  body{ font-size: 16px; }
+  header{ padding: 10px 12px; }
 
-  section {
+  /* Marges globales (sauf .bg) */
+  section{
     padding-left: 14px;
     padding-right: 14px;
     box-sizing: border-box;
@@ -2095,15 +2170,15 @@ position: fixed;
     text-align: center;
   }
 
-  /* IMPORTANT: pas de marge/padding pour .bg (galaxie full width) */
-  .bg {
+  /* IMPORTANT: .bg full width */
+  .bg{
+    width: 100%;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    width: 100%;
   }
 
-  /* Navbar: centré + wrap + compact */
-  nav {
+  /* Nav */
+  nav{
     margin: 0;
     height: auto;
     display: grid;
@@ -2112,7 +2187,7 @@ position: fixed;
   }
 
   .nav-guest,
-  .nav-user {
+  .nav-user{
     width: calc(100vw - 28px);
     height: auto;
     flex-wrap: wrap;
@@ -2125,14 +2200,13 @@ position: fixed;
     text-align: center;
   }
 
-  nav a { padding: 12px 10px; }
+  nav a{ padding: 12px 10px; }
 
-  /* Titres / texte: centrés */
-  .heading-white { line-height: 38px; text-align: center; }
-  .hero p { text-align: center; padding-left: 10px; padding-right: 10px; }
+  /* Hero */
+  .heading-white{ line-height: 38px; text-align: center; }
+  .hero p{ text-align: center; padding-left: 10px; padding-right: 10px; }
 
-  /* Hero buttons: 1 colonne, centrés */
-  .btn-hero {
+  .btn-hero{
     padding-left: 0;
     padding-right: 0;
     padding-top: 18px;
@@ -2143,31 +2217,31 @@ position: fixed;
     gap: 10px;
   }
 
-  .btn-create-account {
+  .btn-create-account{
     width: calc(100vw - 44px);
     max-width: 360px;
     font-size: 18px;
     height: 46px;
   }
 
-  .btn-login {
+  .btn-login{
     width: calc(100vw - 44px);
     max-width: 220px;
     height: 40px;
   }
 
-  /* What is subtitle: plus serré */
-  .what-is-phantomid { justify-content: center; }
-  .what-is-phantomid-title { text-align: center; }
-  .what-is-phantomid-subtitle {
+  /* Text blocks */
+  .what-is-phantomid{ justify-content: center; }
+  .what-is-phantomid-title{ text-align: center; }
+  .what-is-phantomid-subtitle{
     margin-left: 8px;
     margin-right: 8px;
     text-align: center;
   }
 
-  /* Avantages: cartes plus petites + colonne */
+  /* Cards: avantages */
   .top,
-  .bottom {
+  .bottom{
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -2175,7 +2249,7 @@ position: fixed;
     margin: 0;
   }
 
-  .advantages-card {
+  .advantages-card{
     width: calc(100vw - 40px);
     max-width: 360px;
     height: auto;
@@ -2183,47 +2257,33 @@ position: fixed;
     gap: 10px;
     margin: 0;
   }
+  .advantages-card img{ height: 95px; margin: 8px; }
+  .advantages-card p{ font-size: 22px; text-align: left; }
+  .advantages-card ul{ font-size: 13px; margin-right: 0; }
 
-  .advantages-card img {
-    height: 95px;
-    margin: 8px;
-  }
-
-  .advantages-card p {
-    font-size: 22px;
-    text-align: left;
-  }
-
-  .advantages-card ul {
-    font-size: 13px;
-    margin-right: 0;
-  }
-
-  /* How it works: cartes plus petites + 1 colonne */
-  .how-it-works { margin: 0; }
-  .how-it-works-card-box {
+  /* How it works */
+  .how-it-works{ margin: 0; }
+  .how-it-works-card-box{
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 12px;
   }
-
-  .how-it-works-card {
+  .how-it-works-card{
     width: calc(100vw - 40px);
     max-width: 360px;
     padding: 12px;
   }
+  .number-image{ justify-content: center; gap: 10px; }
+  .how-it-works-card-box img{ height: 110px; margin-right: 0; }
 
-  .number-image { justify-content: center; gap: 10px; }
-  .how-it-works-card-box img { height: 110px; margin-right: 0; }
-
-  /* Why Phantom: cartes plus petites + 1 colonne */
-  .why-phantom { justify-content: center; }
+  /* Why Phantom */
+  .why-phantom{ justify-content: center; }
   .why-phantom-title,
-  .why-phantom-subtitle { text-align: center; }
+  .why-phantom-subtitle{ text-align: center; }
 
   .why-phantom-card-box-top,
-  .why-phantom-card-box-bottom {
+  .why-phantom-card-box-bottom{
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -2231,18 +2291,17 @@ position: fixed;
     margin: 0;
   }
 
-  .why-phantom-card {
+  .why-phantom-card{
     width: calc(100vw - 40px);
     max-width: 340px;
     height: auto;
     padding: 14px;
   }
+  .why-phantom-card img{ height: 105px; }
 
-  .why-phantom-card img { height: 105px; }
-
-  /* CTA: plus petit + centré */
-  .cta { margin: 0; }
-  .cta-btn {
+  /* CTA */
+  .cta{ margin: 0; }
+  .cta-btn{
     width: calc(100vw - 44px);
     max-width: 360px;
     height: 46px;
@@ -2251,37 +2310,35 @@ position: fixed;
     margin-right: auto;
   }
 
-  /* Footer: empiler + centrer */
+  /* Footer */
   .footer,
-  footer { text-align: center; }
+  footer{ text-align: center; }
 
   .footer-first-line,
   .legal-trust,
-  .footer-last-line {
+  .footer-last-line{
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 10px;
   }
+  .social-media{ justify-content: center; }
 
-  .social-media { justify-content: center; }
-
-  /* Overlays: plus petits + centrés */
+  /* Overlays */
   .create-account-box,
   .login-form-box,
   .linking-box,
-  .setting-box {
+  .setting-box{
     width: calc(100vw - 34px);
     max-width: 380px;
     justify-self: center;
   }
 
   .create-account-box,
-  .login-form-box { height: auto; padding: 14px; }
+  .login-form-box{ height: auto; padding: 14px; }
 
-  /* Discord connect: éviter overflow + centré */
   #discord-connect,
-  #discord-connected.active {
+  #discord-connected.active{
     width: calc(100vw - 64px);
     max-width: 360px;
     padding: 12px;
@@ -2289,313 +2346,23 @@ position: fixed;
     justify-content: center;
     align-items: center;
   }
+  .connect-btn-text{ font-size: 18px; }
 
-  .connect-btn-text { font-size: 18px; }
-
-  /* PhantomCard: réduit + centré + empilé */
-  .upgrade-edit {
-    margin-left: 0;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .phantomcard {
-    width: calc(100vw - 28px);
-    max-width: 380px;
-    margin-left: auto;
-    margin-right: auto;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .profil-picture {
-    height: 140px;
-    width: 140px;
-    margin: 14px;
-  }
-
-  .username-box { justify-content: center; }
-  .username-box p {
-    font-size: 22px;
-    max-width: 85vw;
-    text-align: center;
-  }
-
-  .badges {
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    height: auto;
-    margin: 10px;
-    margin-bottom: 14px;
-  }
-
-  .tooltip img { height: 44px; }
-
-  .rating-box { margin-top: 10px; height: auto; }
-  .rate-icon { height: 95px; }
-
-  .player-info {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .achievements-line-1,
-  .stats-line-1 {
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .achievements {
-    width: 105px;
-    height: 105px;
-    padding: 12px;
-  }
-  .achievements-icon { height: 60px; }
-
-  .stats,
-  .team,
-  .games {
-    width: calc(100vw - 90px);
-    max-width: 280px;
-    height: auto;
-    padding: 12px;
-    justify-content: center;
-    text-align: left;
-  }
-
-  /* Settings: tout centré + empilé */
-  .setting-info {
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .user-data { text-align: center; }
-
-  /* Close overlay button: pas de margin-left forcé */
-  .close-overlay-btn { margin-left: auto; }
-}
-
-/* =========================
-   PHANTOMCARD — garder le design PC sur mobile/tablette
-   (à coller TOUT À LA FIN)
-========================= */
-
-/* Tablette (ex: iPad) : on garde le layout PC, juste un peu plus petit */
-@media (max-width: 1024px) {
-  .phantomcard {
-    /* On garde ton layout PC */
-    flex-direction: row !important;
-    width: 900px !important;             /* ton width PC */
-    max-width: calc(100vw - 40px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    /* On "shrink" sans casser les proportions */
-    transform: scale(0.90);
-    transform-origin: top center;
-
-    /* Evite que le scaling crée du scroll horizontal */
-    overflow: hidden;
-  }
-
-  /* Le bloc au-dessus de la card (edit/upgrade) reste centré */
-  .upgrade-edit {
+  /* -------- PhantomCard (MOBILE): PC-like, row, pas de scale -------- */
+  .upgrade-edit{
     margin-left: 0 !important;
     justify-content: center !important;
+    flex-wrap: wrap !important;
   }
 
-  /* Le gros gap PC casse en tablette -> on le réduit */
-  .player-info {
-    gap: 120px !important;
-  }
-}
-
-/* Mobile : on garde EXACTEMENT le design PC, mais on scale plus fort */
-@media (max-width: 600px) {
-  .phantomcard {
-    flex-direction: row !important;
-    width: 900px !important;             /* ton width PC */
-    max-width: calc(100vw - 24px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-
-    /* scale pour iPhone (414px) -> ~0.44-0.48 selon tes marges */
-    transform: scale(0.46);
-    transform-origin: top center;
-    overflow: hidden;
-  }
-
-  /* IMPORTANT: le scale réduit visuellement, mais le bloc prend encore sa hauteur "non-scalée".
-     On compense en retirant l'espace en dessous */
-  .phantomcard {
-    margin-bottom: -220px; /* ajuste si besoin (entre -180 et -260 selon ton rendu) */
-  }
-
-  .upgrade-edit {
-    margin-left: 0 !important;
-    justify-content: center !important;
-    flex-wrap: wrap;
-  }
-
-  /* Réduire les espacements qui prennent trop de place */
-  .player-info { gap: 80px !important; }
-
-  /* Les titres sur mobile prennent trop de place : on les centre */
-  .username-box { justify-content: center !important; }
-}
-
-/* =========================
-   PHANTOMCARD FIX (iPad + iPhone)
-   (à coller TOUT À LA FIN)
-========================= */
-
-/* --- iPad / Tablette : corriger chevauchement rate + drapeau --- */
-@media (max-width: 1024px) {
-  /* La carte reste PC-like, juste un peu shrink */
-  .phantomcard{
-    transform: scale(0.92) !important;
-    transform-origin: top center !important;
-    overflow: hidden;
-  }
-
-  /* Le "Unrated" / rate: on l'éloigne du bord droit */
-  .user-rate{
-    padding-right: 18px !important;
-    margin-right: 10px !important;
-  }
-
-  /* Drapeau: on s'assure qu'il ne se fait pas chevaucher */
-  .flags{
-    margin-right: 18px !important;
-  }
-
-  /* Si ton texte de nom est long, éviter qu'il pousse trop à droite */
-  .username-box p{
-    max-width: 420px !important;
-  }
-}
-
-/* --- iPhone : carte plus grande + plus de chevauchement --- */
-@media (max-width: 600px) {
-
-  /* IMPORTANT : on évite le margin-bottom négatif (ça chevauche) */
-  .phantomcard{
-    margin-bottom: 0 !important;
-    transform-origin: top center !important;
-  }
-
-  /* On augmente la taille visuelle de la carte */
-  .phantomcard{
-    transform: scale(0.62) !important;   /* <- plus grand que 0.46 */
-  }
-
-  /* Comme la carte est "scale", elle garde sa hauteur non-scalée.
-     On réserve de l'espace DANS .bg pour que la section en dessous
-     ne remonte pas dessus. */
-  .bg{
-    padding-bottom: 420px !important; /* ajuste si besoin: 360 à 520 */
-  }
-
-  /* Optionnel: si tu veux que la carte reste bien centrée */
-  .phantomcard{
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-
-  /* Le rate et le drapeau aussi sur mobile: petit dégagement */
-  .user-rate{
-    padding-right: 14px !important;
-    margin-right: 8px !important;
-  }
-
-  .flags{
-    margin-right: 12px !important;
-  }
-}
-
-/* =========================
-   PHANTOMCARD — FIX iPad + iPhone (SANS transform/scale)
-   Garde le layout PC (row), mais réduit les éléments pour fitter.
-   À COLLER TOUT À LA FIN du CSS
-========================= */
-
-/* --- iPad / Tablette (<= 1024px) --- */
-@media (max-width: 1024px) {
-
-  /* La carte devient "responsive" mais garde le design PC */
-  .phantomcard{
-    width: calc(100vw - 40px) !important;
-    max-width: 900px !important;      /* ton PC */
-    margin-left: auto !important;
-    margin-right: auto !important;
-    overflow: hidden;                 /* évite que ça dépasse */
-  }
-
-  /* Réductions proportionnelles pour éviter le clip à droite */
-  .profil-picture{
-    width: 170px !important;
-    height: 170px !important;
-    margin: 16px !important;
-  }
-
-  .username-box p{
-    font-size: 28px !important;
-    max-width: 360px !important;      /* laisse de la place au drapeau */
-  }
-
-  .flags{
-    height: 46px !important;
-    margin: 0 12px 0 8px !important;
-  }
-
-  .badges{
-    gap: 14px !important;
-    margin: 8px !important;
-    margin-bottom: 38px !important;
-  }
-
-  .tooltip img{ height: 44px !important; }
-
-  /* Le rating (icône + texte) un peu plus petit + un peu plus à gauche */
-  .rating-box{
-    margin-top: 44px !important;
-    height: 160px !important;
-    padding-right: 14px !important;   /* empêche le "rate" de coller le bord */
-    box-sizing: border-box !important;
-  }
-
-  .rate-icon{ height: 115px !important; }
-  .user-rate{ font-size: 22px !important; }
-
-  /* Le gros gap PC fait “étirer” et peut créer des collisions visuelles */
-  .player-info{ gap: 160px !important; }
-}
-
-
-/* --- Mobile (<= 600px) --- */
-@media (max-width: 600px) {
-
-  /* IMPORTANT: pas de padding-bottom “hack” sur .bg */
-  .bg{ padding-bottom: 0 !important; }
-
-  /* La carte reste en row (PC-like) mais fit l’écran */
   .phantomcard{
     width: calc(100vw - 24px) !important;
-    max-width: 520px !important;      /* limite pour gros mobiles */
+    max-width: 520px !important;
     margin-left: auto !important;
     margin-right: auto !important;
     overflow: hidden !important;
   }
 
-  /* Réduire tout ce qui fait “trop PC” */
   .profil-picture{
     width: 120px !important;
     height: 120px !important;
@@ -2609,7 +2376,7 @@ position: fixed;
 
   .username-box p{
     font-size: 18px !important;
-    max-width: 210px !important;      /* garde le drapeau sans chevauchement */
+    max-width: 210px !important;
     text-shadow: 0 0 12px white !important;
   }
 
@@ -2621,6 +2388,9 @@ position: fixed;
   }
 
   .badges{
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
     gap: 10px !important;
     margin: 8px !important;
     margin-bottom: 18px !important;
@@ -2632,14 +2402,60 @@ position: fixed;
   .rating-box{
     margin-top: 22px !important;
     height: 120px !important;
-    padding-right: 12px !important;   /* évite bord droit */
+    padding-right: 12px !important;
     box-sizing: border-box !important;
   }
 
   .rate-icon{ height: 78px !important; }
   .user-rate{ font-size: 18px !important; }
 
-  /* Si un de tes blocs internes pousse trop, on réduit un peu */
   .badges-rates{ gap: 8px !important; }
+
+  /* Player info blocks (si tu les affiches sous la carte) */
+  .player-info{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .achievements-line-1,
+  .stats-line-1{
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .achievements{
+    width: 105px;
+    height: 105px;
+    padding: 12px;
+  }
+  .achievements-icon{ height: 60px; }
+
+  .stats,
+  .team,
+  .games{
+    width: calc(100vw - 90px);
+    max-width: 280px;
+    height: auto;
+    padding: 12px;
+    justify-content: center;
+    text-align: left;
+  }
+
+  /* Setting */
+  .setting-info{
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .user-data{ text-align: center; }
+
+  .close-overlay-btn{ margin-left: auto; }
 }
+
 
