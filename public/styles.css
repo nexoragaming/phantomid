@@ -2460,3 +2460,107 @@ position: fixed;
 }
 
 
+/* =========================================================
+   PHANTOMCARD — MOBILE FIX (<=600px)
+   Objectif: rendu comme iPad (row PC-like) + infos visibles
+   À coller TOUT À LA FIN
+========================================================= */
+@media (max-width: 600px) {
+
+  /* La carte doit pouvoir shrink en flex (sinon ça déborde et ça se fait couper) */
+  .phantomcard{
+    width: calc(100vw - 24px) !important;
+    max-width: 520px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+
+    /* IMPORTANT: on garde hidden mais on empêche le débordement
+       en autorisant les colonnes à shrink (min-width:0 plus bas) */
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    padding-right: 10px !important; /* petit buffer à droite */
+  }
+
+  /* Autoriser les colonnes internes à rétrécir (clé du fix) */
+  .phantomcard-center-section,
+  .username-box,
+  .rating-box,
+  .badges,
+  .badges-rates{
+    min-width: 0 !important;
+  }
+
+  /* Photo un poil plus petite pour libérer de la place */
+  .profil-picture{
+    width: 115px !important;
+    height: 115px !important;
+    margin: 12px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Centre: on compacte un peu pour laisser respirer le rating */
+  .phantomcard-center-section{
+    flex: 1 1 auto !important;
+  }
+
+  .username-box{
+    margin-top: 12px !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  /* Texte username: plus petit + largeur contrôlée pour ne pas pousser le drapeau */
+  .username-box p{
+    font-size: 17px !important;
+    max-width: 170px !important;   /* libère de la place à droite */
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .user-phantomid{
+    font-size: 13px !important;
+  }
+
+  /* Drapeau plus petit + marge safe */
+  .flags{
+    height: 28px !important;
+    margin: 0 8px 0 6px !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* Badges: plus compacts */
+  .badges{
+    gap: 8px !important;
+    margin: 8px !important;
+    margin-bottom: 14px !important;
+    height: auto !important;
+    flex-wrap: nowrap !important; /* reste sur une ligne comme iPad */
+  }
+  .tooltip img{
+    height: 30px !important;
+  }
+
+  /* Rating: on force le shrink + on le garde visible */
+  .rating-box{
+    flex: 0 0 auto !important;
+    margin-top: 18px !important;
+    height: 118px !important;
+    padding-right: 10px !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+  }
+
+  .rate-icon{
+    height: 76px !important;
+  }
+
+  .user-rate{
+    font-size: 16px !important;
+    white-space: nowrap !important;
+  }
+}
