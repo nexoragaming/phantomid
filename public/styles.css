@@ -1958,4 +1958,427 @@ position: fixed;
     color: white;
 }
 
-/*Adaptation mobile*/
+/* =========================
+   AJUSTEMENT MOBILE / TABLET
+   (à coller à la fin)
+========================= */
+
+/* --- Tablette (<= 1024px) --- */
+@media (max-width: 1024px) {
+
+  /* Navbar: enlever les largeurs fixes */
+  .nav-guest,
+  .nav-user {
+    width: min(92vw, 900px);
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 10px;
+    column-gap: 10px;
+    padding: 10px 14px;
+  }
+
+  nav {
+    margin-left: 16px;
+    margin-right: 16px;
+    height: auto;
+  }
+
+  nav a {
+    padding: 14px 14px;
+  }
+
+  /* Hero buttons: enlever le padding 500px */
+  .btn-hero {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 28px;
+    padding-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .btn-create-account {
+    width: min(520px, 92vw);
+    font-size: 22px;
+    height: 48px;
+  }
+
+  /* Texte "What is" : réduire margins % trop grandes */
+  .what-is-phantomid-subtitle {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+
+  /* Cartes avantages: passer de 2 lignes en flex à wrap */
+  .top,
+  .bottom {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .advantages-card {
+    width: min(92vw, 720px);
+    height: auto;
+    padding: 14px;
+    align-items: center;
+  }
+
+  .advantages-card img {
+    height: 150px;
+    margin: 12px;
+  }
+
+  .advantages-card p {
+    font-size: 30px;
+  }
+
+  .advantages-card ul {
+    font-size: 16px;
+  }
+
+  /* How it works: 3 cartes -> wrap */
+  .how-it-works-card-box {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .how-it-works-card {
+    width: min(92vw, 640px);
+  }
+
+  .how-it-works-card-box img {
+    margin-right: 0;
+  }
+
+  /* Why Phantom: 2x2 -> wrap */
+  .why-phantom-card-box-top,
+  .why-phantom-card-box-bottom {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .why-phantom-card {
+    width: min(92vw, 520px);
+    height: auto;
+  }
+
+  /* CTA */
+  .cta-btn {
+    width: min(520px, 92vw);
+    height: 48px;
+  }
+
+  /* Overlays (login/create): éviter débordement */
+  .create-account-box,
+  .login-form-box,
+  .linking-box,
+  .setting-box {
+    width: min(92vw, 520px);
+  }
+
+  /* PhantomCard: éviter largeur fixe */
+  .phantomcard {
+    width: min(92vw, 900px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .upgrade-edit {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .player-info {
+    gap: 80px; /* réduit le gap énorme sur tablette */
+  }
+
+  .setting-info {
+    gap: 90px; /* réduire le gap 250px */
+  }
+}
+
+
+/* --- Mobile (<= 600px) --- */
+@media (max-width: 600px) {
+
+  body {
+    font-size: 16px; /* évite l’effet "trop gros" */
+  }
+
+  section {
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+
+  header {
+    padding: 10px 12px;
+  }
+
+  /* Navbar: full width, wrap, plus compact */
+  .nav-guest,
+  .nav-user {
+    width: calc(100vw - 24px);
+    margin-left: auto;
+    margin-right: auto;
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 8px;
+    column-gap: 8px;
+    padding: 10px 10px;
+    border-radius: 22px;
+  }
+
+  nav {
+    margin-left: 12px;
+    margin-right: 12px;
+    height: auto;
+  }
+
+  nav a {
+    padding: 12px 10px;
+  }
+
+  /* Titre / hero : garder centre, réduire tailles */
+  .heading-white {
+    line-height: 40px;
+  }
+
+  .hero p {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Hero buttons: 1 colonne */
+  .btn-hero {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 22px;
+    padding-bottom: 12px;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn-create-account {
+    width: calc(100vw - 36px);
+    max-width: 520px;
+    font-size: 20px;
+    height: 50px;
+  }
+
+  .btn-login {
+    width: calc(100vw - 36px);
+    max-width: 260px;
+    height: 42px;
+  }
+
+  /* What is subtitle: enlever margins % trop fortes */
+  .what-is-phantomid-subtitle {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  /* Avantages: cartes en colonne */
+  .top,
+  .bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+  }
+
+  .advantages-card {
+    width: calc(100vw - 28px);
+    max-width: 520px;
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .advantages-card img {
+    height: 120px;
+    margin: 10px;
+  }
+
+  .advantages-card p {
+    font-size: 26px;
+  }
+
+  .advantages-card ul {
+    font-size: 15px;
+  }
+
+  /* How it works: 1 colonne */
+  .how-it-works-card-box {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .how-it-works-card {
+    width: calc(100vw - 28px);
+    max-width: 520px;
+    padding: 14px;
+  }
+
+  .number-image {
+    gap: 14px;
+  }
+
+  .how-it-works-card-box img {
+    height: 140px;
+    margin-right: 0;
+  }
+
+  /* Why Phantom: 1 colonne */
+  .why-phantom-card-box-top,
+  .why-phantom-card-box-bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+  }
+
+  .why-phantom-card {
+    width: calc(100vw - 28px);
+    max-width: 520px;
+    height: auto;
+    padding: 16px;
+  }
+
+  /* CTA */
+  .cta-btn {
+    width: calc(100vw - 36px);
+    max-width: 520px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  /* Footer: empiler les lignes */
+  .footer-first-line,
+  .legal-trust,
+  .footer-last-line {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .social-media {
+    justify-content: center;
+  }
+
+  /* Overlays: fit écran */
+  .create-account-box,
+  .login-form-box,
+  .linking-box,
+  .setting-box {
+    width: calc(100vw - 28px);
+    max-width: 520px;
+  }
+
+  .create-account-box {
+    height: auto;
+  }
+
+  .login-form-box {
+    height: auto;
+  }
+
+  .linking-box {
+    width: calc(100vw - 28px);
+    max-width: 520px;
+  }
+
+  /* Discord connect button: éviter overflow */
+  #discord-connect,
+  #discord-connected.active {
+    width: calc(100vw - 56px);
+    max-width: 520px;
+    padding: 14px;
+    height: auto;
+    align-items: center;
+  }
+
+  .connect-btn-text {
+    font-size: 20px;
+  }
+
+  /* PhantomCard: mobile-friendly */
+  .upgrade-edit {
+    margin-left: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .phantomcard {
+    width: calc(100vw - 24px);
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column; /* empiler */
+    align-items: center;
+  }
+
+  .profil-picture {
+    height: 160px;
+    width: 160px;
+    margin: 16px;
+  }
+
+  .username-box p {
+    font-size: 26px;
+    max-width: 90vw;
+    text-align: center;
+  }
+
+  .badges {
+    justify-content: center;
+    flex-wrap: wrap;
+    height: auto;
+    margin-bottom: 16px;
+  }
+
+  .rating-box {
+    margin-top: 16px;
+    height: auto;
+  }
+
+  .rate-icon {
+    height: 110px;
+  }
+
+  .player-info {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .achievements-line-1,
+  .stats-line-1 {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .stats,
+  .team,
+  .games {
+    width: calc(100vw - 70px);
+    max-width: 320px;
+  }
+
+  /* Settings: réduire le gap énorme */
+  .setting-info {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    text-align: center;
+  }
+
+  .user-data {
+    text-align: center;
+  }
+
+  /* Close overlay button: éviter margin-left 70% trop agressif */
+  .close-overlay-btn {
+    margin-left: auto;
+  }
+}
