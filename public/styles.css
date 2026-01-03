@@ -1959,35 +1959,34 @@ position: fixed;
     color: white;
 }
 
+
 /* =========================
-   AJUSTEMENT MOBILE / TABLET — CLEAN FINAL
-   (remplace TOUT ton bloc d’ajustement actuel par celui-ci)
-   Objectif: tout centré + marges, .bg full width, cartes réduites,
-             PhantomCard PC-like (row) SANS scale/transform.
+   AJUSTEMENT MOBILE / TABLET — CLEAN (FINAL)
+   - TABLETTE: INCHANGÉ (ton bloc actuel)
+   - MOBILE: clean + PhantomCard = design PC via zoom (1 seule source)
+   À COLLER À LA FIN
 ========================= */
 
+
 /* ---------- TABLETTE (<= 1024px) ---------- */
+/* ✅ NE TOUCHE PAS: bloc identique à ton code */
 @media (max-width: 1024px) {
 
-  /* Base */
   body { font-size: 18px; }
   header { padding: 10px 14px; }
 
-  /* Marges globales (sauf .bg) */
   section{
     padding-left: 16px;
     padding-right: 16px;
     box-sizing: border-box;
   }
 
-  /* IMPORTANT: .bg full width */
   .bg{
     width: 100%;
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  /* Nav */
   nav{
     margin: 0;
     height: auto;
@@ -2009,7 +2008,6 @@ position: fixed;
 
   nav a{ padding: 12px 12px; }
 
-  /* Hero */
   .btn-hero{
     padding-left: 0;
     padding-right: 0;
@@ -2027,7 +2025,6 @@ position: fixed;
     height: 48px;
   }
 
-  /* Text blocks */
   .what-is-phantomid{ justify-content: center; }
   .what-is-phantomid-subtitle{
     margin-left: 8%;
@@ -2035,7 +2032,6 @@ position: fixed;
     text-align: center;
   }
 
-  /* Cards: avantages */
   .top,
   .bottom{
     flex-wrap: wrap;
@@ -2054,7 +2050,6 @@ position: fixed;
   .advantages-card p{ font-size: 28px; text-align: left; }
   .advantages-card ul{ font-size: 15px; }
 
-  /* How it works */
   .how-it-works{ justify-content: center; }
   .how-it-works-card-box{
     flex-wrap: wrap;
@@ -2068,7 +2063,6 @@ position: fixed;
   }
   .how-it-works-card-box img{ height: 150px; margin-right: 0; }
 
-  /* Why Phantom */
   .why-phantom-card-box-top,
   .why-phantom-card-box-bottom{
     flex-wrap: wrap;
@@ -2082,7 +2076,6 @@ position: fixed;
     padding: 16px;
   }
 
-  /* CTA */
   .cta{ padding-left: 16px; padding-right: 16px; }
   .cta-btn{
     width: min(460px, 92vw);
@@ -2090,7 +2083,6 @@ position: fixed;
     font-size: 20px;
   }
 
-  /* Overlays */
   .create-account-box,
   .login-form-box,
   .linking-box,
@@ -2098,7 +2090,6 @@ position: fixed;
     width: min(92vw, 460px);
   }
 
-  /* -------- PhantomCard (TABLET): PC-like, pas de scale -------- */
   .upgrade-edit{
     margin-left: 0 !important;
     justify-content: center !important;
@@ -2106,13 +2097,12 @@ position: fixed;
 
   .phantomcard{
     width: calc(100vw - 40px) !important;
-    max-width: 900px !important; /* garde ton “PC” */
+    max-width: 900px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    overflow: hidden !important;  /* évite le clip hors bord */
+    overflow: hidden !important;
   }
 
-  /* Réduire juste ce qu’il faut pour éviter chevauchement à droite */
   .profil-picture{
     width: 170px !important;
     height: 170px !important;
@@ -2121,7 +2111,7 @@ position: fixed;
 
   .username-box p{
     font-size: 28px !important;
-    max-width: 360px !important; /* laisse place au drapeau */
+    max-width: 360px !important;
   }
 
   .flags{
@@ -2141,7 +2131,7 @@ position: fixed;
   .rating-box{
     margin-top: 44px !important;
     height: 160px !important;
-    padding-right: 14px !important;   /* empêche rate collé au bord */
+    padding-right: 14px !important;
     box-sizing: border-box !important;
   }
   .rate-icon{ height: 115px !important; }
@@ -2149,19 +2139,19 @@ position: fixed;
 
   .player-info{ gap: 160px !important; }
 
-  /* Setting */
   .setting-info{ gap: 80px; justify-content: center; }
 }
 
 
 /* ---------- MOBILE (<= 600px) ---------- */
+/* ✅ 1 seul bloc mobile, plus aucun doublon PhantomCard */
 @media (max-width: 600px) {
 
-  /* Base */
+  html, body { overflow-x: hidden; }
+
   body{ font-size: 16px; }
   header{ padding: 10px 12px; }
 
-  /* Marges globales (sauf .bg) */
   section{
     padding-left: 14px;
     padding-right: 14px;
@@ -2171,14 +2161,12 @@ position: fixed;
     text-align: center;
   }
 
-  /* IMPORTANT: .bg full width */
   .bg{
     width: 100%;
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  /* Nav */
   nav{
     margin: 0;
     height: auto;
@@ -2203,7 +2191,6 @@ position: fixed;
 
   nav a{ padding: 12px 10px; }
 
-  /* Hero */
   .heading-white{ line-height: 38px; text-align: center; }
   .hero p{ text-align: center; padding-left: 10px; padding-right: 10px; }
 
@@ -2231,7 +2218,6 @@ position: fixed;
     height: 40px;
   }
 
-  /* Text blocks */
   .what-is-phantomid{ justify-content: center; }
   .what-is-phantomid-title{ text-align: center; }
   .what-is-phantomid-subtitle{
@@ -2240,7 +2226,6 @@ position: fixed;
     text-align: center;
   }
 
-  /* Cards: avantages */
   .top,
   .bottom{
     flex-direction: column;
@@ -2262,7 +2247,6 @@ position: fixed;
   .advantages-card p{ font-size: 22px; text-align: left; }
   .advantages-card ul{ font-size: 13px; margin-right: 0; }
 
-  /* How it works */
   .how-it-works{ margin: 0; }
   .how-it-works-card-box{
     flex-direction: column;
@@ -2278,7 +2262,6 @@ position: fixed;
   .number-image{ justify-content: center; gap: 10px; }
   .how-it-works-card-box img{ height: 110px; margin-right: 0; }
 
-  /* Why Phantom */
   .why-phantom{ justify-content: center; }
   .why-phantom-title,
   .why-phantom-subtitle{ text-align: center; }
@@ -2300,7 +2283,6 @@ position: fixed;
   }
   .why-phantom-card img{ height: 105px; }
 
-  /* CTA */
   .cta{ margin: 0; }
   .cta-btn{
     width: calc(100vw - 44px);
@@ -2311,7 +2293,6 @@ position: fixed;
     margin-right: auto;
   }
 
-  /* Footer */
   .footer,
   footer{ text-align: center; }
 
@@ -2325,7 +2306,6 @@ position: fixed;
   }
   .social-media{ justify-content: center; }
 
-  /* Overlays */
   .create-account-box,
   .login-form-box,
   .linking-box,
@@ -2349,7 +2329,8 @@ position: fixed;
   }
   .connect-btn-text{ font-size: 18px; }
 
-  /* -------- PhantomCard (MOBILE): PC-like, row, pas de scale -------- */
+  /* ===== PhantomCard MOBILE: design PC via zoom (propre) ===== */
+
   .upgrade-edit{
     margin-left: 0 !important;
     justify-content: center !important;
@@ -2357,62 +2338,47 @@ position: fixed;
   }
 
   .phantomcard{
-    width: calc(100vw - 24px) !important;
-    max-width: 520px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    width: 900px !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    flex-direction: row !important;
     overflow: hidden !important;
+    zoom: 0.42 !important;
   }
 
-  .profil-picture{
-    width: 120px !important;
-    height: 120px !important;
-    margin: 12px !important;
+  @supports not (zoom: 1) {
+    .phantomcard{
+      zoom: 1 !important;
+      transform: scale(0.42) !important;
+      transform-origin: top center !important;
+      display: inline-block !important;
+    }
   }
 
-  .username-box{
-    margin-top: 12px !important;
-    gap: 8px !important;
-  }
-
-  .username-box p{
-    font-size: 18px !important;
-    max-width: 210px !important;
-    text-shadow: 0 0 12px white !important;
-  }
-
-  .user-phantomid{ font-size: 14px !important; }
-
-  .flags{
-    height: 30px !important;
-    margin: 0 10px 0 6px !important;
-  }
+  /* tighten */
+  .profil-picture{ margin: 14px !important; }
+  .username-box{ margin-top: 10px !important; gap: 8px !important; }
+  .user-phantomid{ margin-top: 2px !important; }
 
   .badges{
-    justify-content: center !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
-    margin: 8px !important;
-    margin-bottom: 18px !important;
+    margin: 8px 10px 16px 10px !important;
+    gap: 12px !important;
     height: auto !important;
   }
-
-  .tooltip img{ height: 34px !important; }
+  .tooltip img{ height: 44px !important; }
 
   .rating-box{
-    margin-top: 22px !important;
-    height: 120px !important;
-    padding-right: 12px !important;
+    margin-top: 18px !important;
+    height: 150px !important;
+    padding-right: 14px !important;
     box-sizing: border-box !important;
   }
+  .rate-icon{ height: 105px !important; }
+  .user-rate{ font-size: 22px !important; }
 
-  .rate-icon{ height: 78px !important; }
-  .user-rate{ font-size: 18px !important; }
+  .phantomcard-center-section{ margin-top: 0 !important; }
 
-  .badges-rates{ gap: 8px !important; }
-
-  /* Player info blocks (si tu les affiches sous la carte) */
+  /* Player info blocks */
   .player-info{
     flex-direction: column;
     align-items: center;
@@ -2446,7 +2412,6 @@ position: fixed;
     text-align: left;
   }
 
-  /* Setting */
   .setting-info{
     flex-direction: column;
     gap: 10px;
@@ -2457,100 +2422,4 @@ position: fixed;
   .user-data{ text-align: center; }
 
   .close-overlay-btn{ margin-left: auto; }
-}
-
-
-/* =========================
-   PHANTOMCARD — MOBILE = EXACT DESIGN PC (propre)
-   - iPad reste inchangé
-   - iPhone/<=600px: on garde le layout PC et on le "réduit" avec zoom
-   À COLLER TOUT À LA FIN
-========================= */
-
-@media (max-width: 600px) {
-
-  /* Empêche un scroll horizontal si quelque chose dépasse */
-  html, body { overflow-x: hidden; }
-
-  /* IMPORTANT: on garde le design PC (row), mais on le réduit proprement */
-  .phantomcard{
-    width: 900px !important;        /* largeur PC */
-    max-width: none !important;
-    margin: 0 auto !important;
-    flex-direction: row !important; /* layout PC */
-    overflow: hidden !important;
-
-    /* Le "vrai" fix mobile */
-    zoom: 0.42;                     /* iPhone SE (375px) -> ajuste 0.40 à 0.46 au besoin */
-  }
-
-  /* Fallback si un navigateur ne supporte pas zoom */
-  @supports not (zoom: 1) {
-    .phantomcard{
-      transform: scale(0.42);
-      transform-origin: top center;
-      display: inline-block;        /* limite les effets de transform */
-    }
-  }
-
-  /* Le bloc au-dessus reste centré */
-  .upgrade-edit{
-    margin-left: 0 !important;
-    justify-content: center !important;
-    flex-wrap: wrap !important;
-  }
-}
-
-/* =========================
-   PHANTOMCARD — MOBILE TIGHT (iPhone)
-   Objectif: même design PC, mais plus compact (photo + infos collées)
-   À COLLER TOUT À LA FIN
-========================= */
-@media (max-width: 600px) {
-
-  /* Taille visuelle de la carte (plus grande qu’avant) */
-  .phantomcard{
-    width: 900px !important;     /* garde ton design PC */
-    zoom: 0.48 !important;       /* ajuste 0.46–0.52 selon ton goût */
-    margin: 0 auto !important;
-  }
-
-  /* Rapprocher la photo du reste */
-  .profil-picture{
-    margin: 14px !important;
-  }
-
-  /* Rapprocher le nom / phantomid */
-  .username-box{
-    margin-top: 10px !important;
-    gap: 8px !important;
-  }
-  .user-phantomid{
-    margin-top: 2px !important;
-  }
-
-  /* Rapprocher les badges (le PC a un énorme margin-bottom) */
-  .badges{
-    margin: 8px 10px 16px 10px !important;  /* top right bottom left */
-    gap: 14px !important;
-    height: auto !important;
-  }
-  .tooltip img{
-    height: 46px !important;                /* un poil plus lisible */
-  }
-
-  /* Le rating est trop “décalé” sur PC -> on le remonte */
-  .rating-box{
-    margin-top: 18px !important;            /* au lieu de 60px */
-    height: 150px !important;
-    padding-right: 14px !important;
-    box-sizing: border-box !important;
-  }
-  .rate-icon{ height: 105px !important; }
-  .user-rate{ font-size: 22px !important; }
-
-  /* Optionnel: le bloc central colle mieux */
-  .phantomcard-center-section{
-    margin-top: 0 !important;
-  }
 }
