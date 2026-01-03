@@ -2382,3 +2382,72 @@ position: fixed;
   /* Close overlay button: pas de margin-left forcé */
   .close-overlay-btn { margin-left: auto; }
 }
+
+/* =========================
+   PHANTOMCARD — garder le design PC sur mobile/tablette
+   (à coller TOUT À LA FIN)
+========================= */
+
+/* Tablette (ex: iPad) : on garde le layout PC, juste un peu plus petit */
+@media (max-width: 1024px) {
+  .phantomcard {
+    /* On garde ton layout PC */
+    flex-direction: row !important;
+    width: 900px !important;             /* ton width PC */
+    max-width: calc(100vw - 40px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    /* On "shrink" sans casser les proportions */
+    transform: scale(0.90);
+    transform-origin: top center;
+
+    /* Evite que le scaling crée du scroll horizontal */
+    overflow: hidden;
+  }
+
+  /* Le bloc au-dessus de la card (edit/upgrade) reste centré */
+  .upgrade-edit {
+    margin-left: 0 !important;
+    justify-content: center !important;
+  }
+
+  /* Le gros gap PC casse en tablette -> on le réduit */
+  .player-info {
+    gap: 120px !important;
+  }
+}
+
+/* Mobile : on garde EXACTEMENT le design PC, mais on scale plus fort */
+@media (max-width: 600px) {
+  .phantomcard {
+    flex-direction: row !important;
+    width: 900px !important;             /* ton width PC */
+    max-width: calc(100vw - 24px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+
+    /* scale pour iPhone (414px) -> ~0.44-0.48 selon tes marges */
+    transform: scale(0.46);
+    transform-origin: top center;
+    overflow: hidden;
+  }
+
+  /* IMPORTANT: le scale réduit visuellement, mais le bloc prend encore sa hauteur "non-scalée".
+     On compense en retirant l'espace en dessous */
+  .phantomcard {
+    margin-bottom: -220px; /* ajuste si besoin (entre -180 et -260 selon ton rendu) */
+  }
+
+  .upgrade-edit {
+    margin-left: 0 !important;
+    justify-content: center !important;
+    flex-wrap: wrap;
+  }
+
+  /* Réduire les espacements qui prennent trop de place */
+  .player-info { gap: 80px !important; }
+
+  /* Les titres sur mobile prennent trop de place : on les centre */
+  .username-box { justify-content: center !important; }
+}
