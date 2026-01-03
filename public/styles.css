@@ -1959,351 +1959,340 @@ position: fixed;
 }
 
 /* =========================
-   AJUSTEMENT MOBILE / TABLET
+   AJUSTEMENT MOBILE / TABLET (CENTER + MARGES)
    (à coller à la fin)
 ========================= */
 
 /* --- Tablette (<= 1024px) --- */
 @media (max-width: 1024px) {
 
-  /* Navbar: enlever les largeurs fixes */
+  /* Base: tout centré + marges internes */
+  body { font-size: 18px; }
+  header { padding: 10px 14px; }
+  section { padding-left: 16px; padding-right: 16px; box-sizing: border-box; }
+
+  /* IMPORTANT: pas de marge/padding pour .bg (galaxie full width) */
+  .bg { width: 100%; padding-left: 0 !important; padding-right: 0 !important; }
+
+  /* Navbar: plus compact + centré */
+  nav { margin: 0; height: auto; display: grid; justify-content: center; }
   .nav-guest,
   .nav-user {
-    width: min(92vw, 900px);
+    width: min(92vw, 820px);
     height: auto;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     row-gap: 10px;
     column-gap: 10px;
     padding: 10px 14px;
   }
 
-  nav {
-    margin-left: 16px;
-    margin-right: 16px;
-    height: auto;
-  }
+  nav a { padding: 12px 12px; }
 
-  nav a {
-    padding: 14px 14px;
-  }
-
-  /* Hero buttons: enlever le padding 500px */
+  /* Hero buttons: enlever padding 500px + centrer */
   .btn-hero {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 28px;
+    padding-top: 26px;
     padding-bottom: 14px;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     gap: 12px;
   }
 
-  .btn-create-account {
-    width: min(520px, 92vw);
-    font-size: 22px;
-    height: 48px;
-  }
+  .btn-create-account { width: min(460px, 92vw); font-size: 20px; height: 48px; }
 
-  /* Texte "What is" : réduire margins % trop grandes */
+  /* "What is" subtitle: moins large + centré */
+  .what-is-phantomid { justify-content: center; }
   .what-is-phantomid-subtitle {
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 8%;
+    margin-right: 8%;
+    text-align: center;
   }
 
-  /* Cartes avantages: passer de 2 lignes en flex à wrap */
+  /* Avantages: cartes plus petites + wrap */
   .top,
   .bottom {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px;
+    align-items: center;
+    gap: 14px;
   }
 
   .advantages-card {
-    width: min(92vw, 720px);
+    width: min(92vw, 640px);
     height: auto;
-    padding: 14px;
+    padding: 12px;
     align-items: center;
   }
+  .advantages-card img { height: 135px; margin: 10px; }
+  .advantages-card p { font-size: 28px; text-align: left; }
+  .advantages-card ul { font-size: 15px; }
 
-  .advantages-card img {
-    height: 150px;
-    margin: 12px;
-  }
-
-  .advantages-card p {
-    font-size: 30px;
-  }
-
-  .advantages-card ul {
-    font-size: 16px;
-  }
-
-  /* How it works: 3 cartes -> wrap */
+  /* How it works: cartes plus petites */
+  .how-it-works { justify-content: center; }
   .how-it-works-card-box {
     flex-wrap: wrap;
-    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
   }
-
   .how-it-works-card {
-    width: min(92vw, 640px);
+    width: min(92vw, 560px);
+    padding: 14px;
   }
+  .how-it-works-card-box img { height: 150px; margin-right: 0; }
 
-  .how-it-works-card-box img {
-    margin-right: 0;
-  }
-
-  /* Why Phantom: 2x2 -> wrap */
+  /* Why Phantom: cartes plus petites + wrap */
   .why-phantom-card-box-top,
   .why-phantom-card-box-bottom {
     flex-wrap: wrap;
-    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
   }
-
-  .why-phantom-card {
-    width: min(92vw, 520px);
-    height: auto;
-  }
+  .why-phantom-card { width: min(92vw, 460px); height: auto; padding: 16px; }
 
   /* CTA */
-  .cta-btn {
-    width: min(520px, 92vw);
-    height: 48px;
-  }
+  .cta { padding-left: 16px; padding-right: 16px; }
+  .cta-btn { width: min(460px, 92vw); height: 48px; font-size: 20px; }
 
-  /* Overlays (login/create): éviter débordement */
+  /* Overlays: plus petits */
   .create-account-box,
   .login-form-box,
   .linking-box,
   .setting-box {
-    width: min(92vw, 520px);
+    width: min(92vw, 460px);
   }
 
-  /* PhantomCard: éviter largeur fixe */
+  /* PhantomCard: réduit + centré (tablette) */
   .phantomcard {
-    width: min(92vw, 900px);
+    width: min(92vw, 820px);
     margin-left: auto;
     margin-right: auto;
   }
-
-  .upgrade-edit {
-    margin-left: 0;
-    justify-content: center;
-  }
-
-  .player-info {
-    gap: 80px; /* réduit le gap énorme sur tablette */
-  }
-
-  .setting-info {
-    gap: 90px; /* réduire le gap 250px */
-  }
+  .upgrade-edit { margin-left: 0; justify-content: center; }
+  .player-info { justify-content: center; gap: 60px; }
+  .setting-info { gap: 80px; justify-content: center; }
 }
 
 
 /* --- Mobile (<= 600px) --- */
 @media (max-width: 600px) {
 
-  body {
-    font-size: 16px; /* évite l’effet "trop gros" */
-  }
+  /* Base: tout centré + marges (sauf .bg) */
+  body { font-size: 16px; }
+  header { padding: 10px 12px; }
 
   section {
-    margin-top: 18px;
-    margin-bottom: 18px;
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+    display: grid;
+    justify-content: center;
+    text-align: center;
   }
 
-  header {
-    padding: 10px 12px;
+  /* IMPORTANT: pas de marge/padding pour .bg (galaxie full width) */
+  .bg {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100%;
   }
 
-  /* Navbar: full width, wrap, plus compact */
+  /* Navbar: centré + wrap + compact */
+  nav {
+    margin: 0;
+    height: auto;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+  }
+
   .nav-guest,
   .nav-user {
-    width: calc(100vw - 24px);
-    margin-left: auto;
-    margin-right: auto;
+    width: calc(100vw - 28px);
     height: auto;
     flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     row-gap: 8px;
     column-gap: 8px;
     padding: 10px 10px;
     border-radius: 22px;
+    text-align: center;
   }
 
-  nav {
-    margin-left: 12px;
-    margin-right: 12px;
-    height: auto;
-  }
+  nav a { padding: 12px 10px; }
 
-  nav a {
-    padding: 12px 10px;
-  }
+  /* Titres / texte: centrés */
+  .heading-white { line-height: 38px; text-align: center; }
+  .hero p { text-align: center; padding-left: 10px; padding-right: 10px; }
 
-  /* Titre / hero : garder centre, réduire tailles */
-  .heading-white {
-    line-height: 40px;
-  }
-
-  .hero p {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  /* Hero buttons: 1 colonne */
+  /* Hero buttons: 1 colonne, centrés */
   .btn-hero {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 22px;
+    padding-top: 18px;
     padding-bottom: 12px;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 10px;
   }
 
   .btn-create-account {
-    width: calc(100vw - 36px);
-    max-width: 520px;
-    font-size: 20px;
-    height: 50px;
+    width: calc(100vw - 44px);
+    max-width: 360px;
+    font-size: 18px;
+    height: 46px;
   }
 
   .btn-login {
-    width: calc(100vw - 36px);
-    max-width: 260px;
-    height: 42px;
+    width: calc(100vw - 44px);
+    max-width: 220px;
+    height: 40px;
   }
 
-  /* What is subtitle: enlever margins % trop fortes */
+  /* What is subtitle: plus serré */
+  .what-is-phantomid { justify-content: center; }
+  .what-is-phantomid-title { text-align: center; }
   .what-is-phantomid-subtitle {
-    margin-left: 12px;
-    margin-right: 12px;
+    margin-left: 8px;
+    margin-right: 8px;
+    text-align: center;
   }
 
-  /* Avantages: cartes en colonne */
+  /* Avantages: cartes plus petites + colonne */
   .top,
   .bottom {
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    justify-content: center;
+    gap: 12px;
     margin: 0;
   }
 
   .advantages-card {
-    width: calc(100vw - 28px);
-    max-width: 520px;
+    width: calc(100vw - 40px);
+    max-width: 360px;
     height: auto;
-    padding: 12px;
-    gap: 12px;
+    padding: 10px;
+    gap: 10px;
+    margin: 0;
   }
 
   .advantages-card img {
-    height: 120px;
-    margin: 10px;
+    height: 95px;
+    margin: 8px;
   }
 
   .advantages-card p {
-    font-size: 26px;
+    font-size: 22px;
+    text-align: left;
   }
 
   .advantages-card ul {
-    font-size: 15px;
-  }
-
-  /* How it works: 1 colonne */
-  .how-it-works-card-box {
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .how-it-works-card {
-    width: calc(100vw - 28px);
-    max-width: 520px;
-    padding: 14px;
-  }
-
-  .number-image {
-    gap: 14px;
-  }
-
-  .how-it-works-card-box img {
-    height: 140px;
+    font-size: 13px;
     margin-right: 0;
   }
 
-  /* Why Phantom: 1 colonne */
+  /* How it works: cartes plus petites + 1 colonne */
+  .how-it-works { margin: 0; }
+  .how-it-works-card-box {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .how-it-works-card {
+    width: calc(100vw - 40px);
+    max-width: 360px;
+    padding: 12px;
+  }
+
+  .number-image { justify-content: center; gap: 10px; }
+  .how-it-works-card-box img { height: 110px; margin-right: 0; }
+
+  /* Why Phantom: cartes plus petites + 1 colonne */
+  .why-phantom { justify-content: center; }
+  .why-phantom-title,
+  .why-phantom-subtitle { text-align: center; }
+
   .why-phantom-card-box-top,
   .why-phantom-card-box-bottom {
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    justify-content: center;
+    gap: 12px;
     margin: 0;
   }
 
   .why-phantom-card {
-    width: calc(100vw - 28px);
-    max-width: 520px;
+    width: calc(100vw - 40px);
+    max-width: 340px;
     height: auto;
-    padding: 16px;
+    padding: 14px;
   }
 
-  /* CTA */
+  .why-phantom-card img { height: 105px; }
+
+  /* CTA: plus petit + centré */
+  .cta { margin: 0; }
   .cta-btn {
-    width: calc(100vw - 36px);
-    max-width: 520px;
-    height: 50px;
-    font-size: 20px;
+    width: calc(100vw - 44px);
+    max-width: 360px;
+    height: 46px;
+    font-size: 18px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  /* Footer: empiler les lignes */
+  /* Footer: empiler + centrer */
+  .footer,
+  footer { text-align: center; }
+
   .footer-first-line,
   .legal-trust,
   .footer-last-line {
     flex-direction: column;
-    gap: 12px;
-  }
-
-  .social-media {
     justify-content: center;
+    align-items: center;
+    gap: 10px;
   }
 
-  /* Overlays: fit écran */
+  .social-media { justify-content: center; }
+
+  /* Overlays: plus petits + centrés */
   .create-account-box,
   .login-form-box,
   .linking-box,
   .setting-box {
-    width: calc(100vw - 28px);
-    max-width: 520px;
+    width: calc(100vw - 34px);
+    max-width: 380px;
+    justify-self: center;
   }
 
-  .create-account-box {
-    height: auto;
-  }
+  .create-account-box,
+  .login-form-box { height: auto; padding: 14px; }
 
-  .login-form-box {
-    height: auto;
-  }
-
-  .linking-box {
-    width: calc(100vw - 28px);
-    max-width: 520px;
-  }
-
-  /* Discord connect button: éviter overflow */
+  /* Discord connect: éviter overflow + centré */
   #discord-connect,
   #discord-connected.active {
-    width: calc(100vw - 56px);
-    max-width: 520px;
-    padding: 14px;
+    width: calc(100vw - 64px);
+    max-width: 360px;
+    padding: 12px;
     height: auto;
+    justify-content: center;
     align-items: center;
   }
 
-  .connect-btn-text {
-    font-size: 20px;
-  }
+  .connect-btn-text { font-size: 18px; }
 
-  /* PhantomCard: mobile-friendly */
+  /* PhantomCard: réduit + centré + empilé */
   .upgrade-edit {
     margin-left: 0;
     justify-content: center;
@@ -2311,74 +2300,85 @@ position: fixed;
   }
 
   .phantomcard {
-    width: calc(100vw - 24px);
-    max-width: 520px;
+    width: calc(100vw - 28px);
+    max-width: 380px;
     margin-left: auto;
     margin-right: auto;
-    flex-direction: column; /* empiler */
+    flex-direction: column;
     align-items: center;
   }
 
   .profil-picture {
-    height: 160px;
-    width: 160px;
-    margin: 16px;
+    height: 140px;
+    width: 140px;
+    margin: 14px;
   }
 
+  .username-box { justify-content: center; }
   .username-box p {
-    font-size: 26px;
-    max-width: 90vw;
+    font-size: 22px;
+    max-width: 85vw;
     text-align: center;
   }
 
   .badges {
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     height: auto;
-    margin-bottom: 16px;
+    margin: 10px;
+    margin-bottom: 14px;
   }
 
-  .rating-box {
-    margin-top: 16px;
-    height: auto;
-  }
+  .tooltip img { height: 44px; }
 
-  .rate-icon {
-    height: 110px;
-  }
+  .rating-box { margin-top: 10px; height: auto; }
+  .rate-icon { height: 95px; }
 
   .player-info {
     flex-direction: column;
-    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
   }
 
   .achievements-line-1,
   .stats-line-1 {
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+    gap: 10px;
   }
+
+  .achievements {
+    width: 105px;
+    height: 105px;
+    padding: 12px;
+  }
+  .achievements-icon { height: 60px; }
 
   .stats,
   .team,
   .games {
-    width: calc(100vw - 70px);
-    max-width: 320px;
+    width: calc(100vw - 90px);
+    max-width: 280px;
+    height: auto;
+    padding: 12px;
+    justify-content: center;
+    text-align: left;
   }
 
-  /* Settings: réduire le gap énorme */
+  /* Settings: tout centré + empilé */
   .setting-info {
     flex-direction: column;
     gap: 10px;
     align-items: center;
+    justify-content: center;
     text-align: center;
   }
 
-  .user-data {
-    text-align: center;
-  }
+  .user-data { text-align: center; }
 
-  /* Close overlay button: éviter margin-left 70% trop agressif */
-  .close-overlay-btn {
-    margin-left: auto;
-  }
+  /* Close overlay button: pas de margin-left forcé */
+  .close-overlay-btn { margin-left: auto; }
 }
