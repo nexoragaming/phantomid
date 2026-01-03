@@ -2500,3 +2500,57 @@ position: fixed;
     flex-wrap: wrap !important;
   }
 }
+
+/* =========================
+   PHANTOMCARD — MOBILE TIGHT (iPhone)
+   Objectif: même design PC, mais plus compact (photo + infos collées)
+   À COLLER TOUT À LA FIN
+========================= */
+@media (max-width: 600px) {
+
+  /* Taille visuelle de la carte (plus grande qu’avant) */
+  .phantomcard{
+    width: 900px !important;     /* garde ton design PC */
+    zoom: 0.48 !important;       /* ajuste 0.46–0.52 selon ton goût */
+    margin: 0 auto !important;
+  }
+
+  /* Rapprocher la photo du reste */
+  .profil-picture{
+    margin: 14px !important;
+  }
+
+  /* Rapprocher le nom / phantomid */
+  .username-box{
+    margin-top: 10px !important;
+    gap: 8px !important;
+  }
+  .user-phantomid{
+    margin-top: 2px !important;
+  }
+
+  /* Rapprocher les badges (le PC a un énorme margin-bottom) */
+  .badges{
+    margin: 8px 10px 16px 10px !important;  /* top right bottom left */
+    gap: 14px !important;
+    height: auto !important;
+  }
+  .tooltip img{
+    height: 46px !important;                /* un poil plus lisible */
+  }
+
+  /* Le rating est trop “décalé” sur PC -> on le remonte */
+  .rating-box{
+    margin-top: 18px !important;            /* au lieu de 60px */
+    height: 150px !important;
+    padding-right: 14px !important;
+    box-sizing: border-box !important;
+  }
+  .rate-icon{ height: 105px !important; }
+  .user-rate{ font-size: 22px !important; }
+
+  /* Optionnel: le bloc central colle mieux */
+  .phantomcard-center-section{
+    margin-top: 0 !important;
+  }
+}
