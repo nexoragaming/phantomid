@@ -2520,3 +2520,126 @@ position: fixed;
     margin-right: 12px !important;
   }
 }
+
+/* =========================
+   PHANTOMCARD — FIX iPad + iPhone (SANS transform/scale)
+   Garde le layout PC (row), mais réduit les éléments pour fitter.
+   À COLLER TOUT À LA FIN du CSS
+========================= */
+
+/* --- iPad / Tablette (<= 1024px) --- */
+@media (max-width: 1024px) {
+
+  /* La carte devient "responsive" mais garde le design PC */
+  .phantomcard{
+    width: calc(100vw - 40px) !important;
+    max-width: 900px !important;      /* ton PC */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow: hidden;                 /* évite que ça dépasse */
+  }
+
+  /* Réductions proportionnelles pour éviter le clip à droite */
+  .profil-picture{
+    width: 170px !important;
+    height: 170px !important;
+    margin: 16px !important;
+  }
+
+  .username-box p{
+    font-size: 28px !important;
+    max-width: 360px !important;      /* laisse de la place au drapeau */
+  }
+
+  .flags{
+    height: 46px !important;
+    margin: 0 12px 0 8px !important;
+  }
+
+  .badges{
+    gap: 14px !important;
+    margin: 8px !important;
+    margin-bottom: 38px !important;
+  }
+
+  .tooltip img{ height: 44px !important; }
+
+  /* Le rating (icône + texte) un peu plus petit + un peu plus à gauche */
+  .rating-box{
+    margin-top: 44px !important;
+    height: 160px !important;
+    padding-right: 14px !important;   /* empêche le "rate" de coller le bord */
+    box-sizing: border-box !important;
+  }
+
+  .rate-icon{ height: 115px !important; }
+  .user-rate{ font-size: 22px !important; }
+
+  /* Le gros gap PC fait “étirer” et peut créer des collisions visuelles */
+  .player-info{ gap: 160px !important; }
+}
+
+
+/* --- Mobile (<= 600px) --- */
+@media (max-width: 600px) {
+
+  /* IMPORTANT: pas de padding-bottom “hack” sur .bg */
+  .bg{ padding-bottom: 0 !important; }
+
+  /* La carte reste en row (PC-like) mais fit l’écran */
+  .phantomcard{
+    width: calc(100vw - 24px) !important;
+    max-width: 520px !important;      /* limite pour gros mobiles */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    overflow: hidden !important;
+  }
+
+  /* Réduire tout ce qui fait “trop PC” */
+  .profil-picture{
+    width: 120px !important;
+    height: 120px !important;
+    margin: 12px !important;
+  }
+
+  .username-box{
+    margin-top: 12px !important;
+    gap: 8px !important;
+  }
+
+  .username-box p{
+    font-size: 18px !important;
+    max-width: 210px !important;      /* garde le drapeau sans chevauchement */
+    text-shadow: 0 0 12px white !important;
+  }
+
+  .user-phantomid{ font-size: 14px !important; }
+
+  .flags{
+    height: 30px !important;
+    margin: 0 10px 0 6px !important;
+  }
+
+  .badges{
+    gap: 10px !important;
+    margin: 8px !important;
+    margin-bottom: 18px !important;
+    height: auto !important;
+  }
+
+  .tooltip img{ height: 34px !important; }
+
+  .rating-box{
+    margin-top: 22px !important;
+    height: 120px !important;
+    padding-right: 12px !important;   /* évite bord droit */
+    box-sizing: border-box !important;
+  }
+
+  .rate-icon{ height: 78px !important; }
+  .user-rate{ font-size: 18px !important; }
+
+  /* Si un de tes blocs internes pousse trop, on réduit un peu */
+  .badges-rates{ gap: 8px !important; }
+}
+
