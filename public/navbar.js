@@ -54,19 +54,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+//Nav hamburger
 document.addEventListener("DOMContentLoaded", () => {
-  const nav = document.querySelector(".nav-user, .nav-guest");
-
+  const nav = document.querySelector(".nav-user") || document.querySelector(".nav-guest");
   if (!nav) return;
 
-  nav.addEventListener("click", (e) => {
-    // détecte clic sur le hamburger (zone ::after)
-    const navRect = nav.getBoundingClientRect();
-    const clickX = e.clientX - navRect.left;
+  // évite d’en créer 2 si tu reload/append
+  if (!nav.querySelector(".nav-toggle")) {
+    const btn = document.createElement("button");
+    btn.className = "nav-toggle";
+    btn.type = "button";
+    btn.setAttribute("aria-label", "Open menu");
+    btn.innerHTML = "<span>☰</span>";
+    nav.appendChild(btn);
 
-    // zone droite = hamburger
-    if (clickX > navRect.width - 60) {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       nav.classList.toggle("nav-open");
-    }
-  });
+      btn.innerHTML = nav.classList.contains("nav-open")
+        ? "<span>✕</span>"
+        : "<span>☰</span>";
+    });
+
+    // optionnel: clic dehors ferme
+    document.addEventListener("click", (e) => {
+      if (!nav.contains(e.target)) {
+        nav.classList.remove("nav-open");
+        btn.innerHTML = "<span>☰</span>";
+      }
+    });
+  }
 });

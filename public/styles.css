@@ -2142,87 +2142,74 @@ position: fixed;
   .setting-info{ gap: 80px; justify-content: center; }
 }
 
-/* =========================
-   NAVBAR HAMBURGER ≤ 1024px
-   (logo à droite + menu burger)
-========================= */
-@media (max-width: 1024px) {
+@media (max-width: 1024px){
 
-  nav{
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-  }
-
-  .nav-user,
-  .nav-guest{
+  /* barre top: logo à gauche, hamburger à droite */
+  .nav-user, .nav-guest{
     width: min(92vw, 820px);
     display: flex !important;
-    flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 12px;
-    position: relative;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;      /* ✅ empêche l’effet “2 barres” */
+    gap: 10px;
+    padding: 10px 14px;
   }
 
-  /* Logo à droite */
-  .nav-user .logo,
-  .nav-guest .logo{
-    margin-left: auto !important;
-    order: 2;
-    display: flex;
-    align-items: center;
-  }
-
-  /* Cache les liens (desktop nav) */
-  .nav-user > a:not(#nav-logout),
+  /* on cache tous les liens par défaut (sinon wrap = “2 navbars”) */
+  .nav-user > a,
   .nav-guest > a{
     display: none !important;
   }
 
-  /* Hamburger icon */
-  .nav-user::after,
-  .nav-guest::after{
-    content: "☰";
-    font-size: 28px;
-    color: white;
-    cursor: pointer;
-    order: 3;
-    padding: 6px 12px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* on garde le logo visible */
+  .nav-user .logo,
+  .nav-guest .logo{
+    display: block !important;
   }
-}
 
-/* =========================
-   MENU OUVERT (≤1024px)
-========================= */
-@media (max-width: 1024px) {
+  /* le bouton hamburger (injecté en JS) */
+  .nav-toggle{
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.35);
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
 
+  .nav-toggle span{
+    font-size: 22px;
+    line-height: 1;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  /* état ouvert */
   .nav-user.nav-open,
   .nav-guest.nav-open{
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    padding: 16px !important;
-    gap: 14px;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
   }
 
+  /* quand c’est ouvert, on ré-affiche les liens en colonne */
   .nav-user.nav-open > a,
   .nav-guest.nav-open > a{
-    display: flex !important;
+    display: block !important;
     width: 100%;
     padding: 10px 0;
-    font-size: 18px;
+    text-align: left;
   }
 
+  /* le logo reste en haut */
   .nav-user.nav-open .logo,
   .nav-guest.nav-open .logo{
-    order: -1;
-    margin-bottom: 12px;
+    width: auto;
   }
 }
+
 
 
 
