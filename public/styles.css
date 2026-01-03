@@ -2461,88 +2461,42 @@ position: fixed;
 
 
 /* =========================
-   PHANTOMCARD — MOBILE (<= 600px)
-   Objectif: même rendu que iPad (row), sans perdre les infos
+   PHANTOMCARD — MOBILE = EXACT DESIGN PC (propre)
+   - iPad reste inchangé
+   - iPhone/<=600px: on garde le layout PC et on le "réduit" avec zoom
    À COLLER TOUT À LA FIN
 ========================= */
+
 @media (max-width: 600px) {
 
-  /* On garde le layout "PC/iPad" (ROW) */
+  /* Empêche un scroll horizontal si quelque chose dépasse */
+  html, body { overflow-x: hidden; }
+
+  /* IMPORTANT: on garde le design PC (row), mais on le réduit proprement */
   .phantomcard{
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    width: calc(100vw - 24px) !important;
-    max-width: 900px !important; /* garde ton design */
-    margin-left: auto !important;
-    margin-right: auto !important;
+    width: 900px !important;        /* largeur PC */
+    max-width: none !important;
+    margin: 0 auto !important;
+    flex-direction: row !important; /* layout PC */
     overflow: hidden !important;
+
+    /* Le "vrai" fix mobile */
+    zoom: 0.42;                     /* iPhone SE (375px) -> ajuste 0.40 à 0.46 au besoin */
   }
 
-  /* IMPORTANT: permettre au centre de shrink sans casser le layout */
-  .phantomcard-center-section{
-    min-width: 0 !important;
-    flex: 1 1 auto !important;
+  /* Fallback si un navigateur ne supporte pas zoom */
+  @supports not (zoom: 1) {
+    .phantomcard{
+      transform: scale(0.42);
+      transform-origin: top center;
+      display: inline-block;        /* limite les effets de transform */
+    }
   }
 
-  /* Photo profil plus petite */
-  .profil-picture{
-    width: 110px !important;
-    height: 110px !important;
-    margin: 12px !important;
-  }
-
-  /* Nom + drapeau: on évite le chevauchement en forçant l’ellipsis */
-  .username-box{
-    margin-top: 12px !important;
-    gap: 8px !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .username-box p{
-    font-size: 20px !important;
-    max-width: 200px !important;     /* laisse la place au drapeau */
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-  }
-
-  .user-phantomid{
-    font-size: 14px !important;
-  }
-
-  .flags{
-    height: 32px !important;
-    margin: 0 10px 0 6px !important;
-    flex: 0 0 auto !important;
-  }
-
-  /* Badges: plus petits mais visibles */
-  .badges{
-    margin: 6px 8px 20px !important;
-    gap: 10px !important;
-    height: auto !important;
-    flex-wrap: wrap !important; /* au besoin */
-  }
-
-  .tooltip img{
-    height: 34px !important;
-  }
-
-  /* Rating: on garde le bloc à droite, plus compact */
-  .rating-box{
-    margin-top: 26px !important;
-    height: 130px !important;
-    padding-right: 14px !important;  /* évite "collé au bord" */
-    box-sizing: border-box !important;
-  }
-
-  .rate-icon{
-    height: 86px !important;
-  }
-
-  .user-rate{
-    font-size: 18px !important;
+  /* Le bloc au-dessus reste centré */
+  .upgrade-edit{
+    margin-left: 0 !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
   }
 }
