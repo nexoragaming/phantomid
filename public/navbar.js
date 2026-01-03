@@ -54,36 +54,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-//Nav hamburger
-// ===== Mobile / Tablet hamburger (<=1024px) =====
-(() => {
-  const nav = document.getElementById("nav-user") || document.getElementById("nav-guest");
-  if (!nav) return;
 
-  // évite doublon si navbar.js est chargé 2 fois
-  if (nav.querySelector(".nav-toggle")) return;
-
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "nav-toggle";
-  btn.setAttribute("aria-label", "Open menu");
-  btn.innerHTML = "<span>☰</span>";
-
-  nav.appendChild(btn);
-
-  const closeMenu = () => nav.classList.remove("nav-open");
-
-  btn.addEventListener("click", () => {
-    nav.classList.toggle("nav-open");
-  });
-
-  // ferme le menu quand on clique un lien
-  nav.querySelectorAll("a").forEach(a => {
-    a.addEventListener("click", closeMenu);
-  });
-
-  // si on repasse en desktop, on ferme
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 1024) closeMenu();
-  });
-})();

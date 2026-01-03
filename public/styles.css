@@ -1968,14 +1968,8 @@ position: fixed;
 ========================= */
 
 
-/* ===== NAV TOGGLE (par défaut: caché sur desktop) ===== */
-.nav-toggle{
-  display: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-/* ---------- TABLETTE + HAMBURGER (<= 1024px) ---------- */
+/* ---------- TABLETTE (<= 1024px) ---------- */
+/* ✅ NE TOUCHE PAS: bloc identique à ton code */
 @media (max-width: 1024px) {
 
   body { font-size: 18px; }
@@ -2000,72 +1994,19 @@ position: fixed;
     justify-content: center;
   }
 
-  /* ✅ NAVBAR: mode hamburger */
   .nav-guest,
   .nav-user{
     width: min(92vw, 820px);
     height: auto;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-wrap: nowrap !important;   /* ✅ empêche l'effet “2 barres” */
-    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    row-gap: 10px;
+    column-gap: 10px;
     padding: 10px 14px;
   }
 
-  /* liens cachés quand fermé */
-  .nav-user > a,
-  .nav-guest > a{
-    display: none !important;
-  }
-
-  /* logo reste visible */
-  .nav-user .logo,
-  .nav-guest .logo{
-    display: block !important;
-  }
-
-  /* bouton hamburger (injecté par navbar.js) */
-  .nav-toggle{
-    display: grid !important;
-    place-items: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(0,0,0,0.35);
-    cursor: pointer;
-    flex: 0 0 auto;
-  }
-
-  .nav-toggle span{
-    font-size: 22px;
-    line-height: 1;
-    color: white;
-    transform: translateY(-1px);
-    user-select: none;
-  }
-
-  /* état ouvert */
-  .nav-user.nav-open,
-  .nav-guest.nav-open{
-    flex-wrap: wrap !important;
-    justify-content: flex-start !important;
-    row-gap: 10px;
-  }
-
-  /* quand ouvert, ré-afficher les liens */
-  .nav-user.nav-open > a,
-  .nav-guest.nav-open > a{
-    display: block !important;
-    width: 100%;
-    padding: 10px 0 !important;
-    text-align: left;
-  }
-
-  nav a{ padding: 12px 12px; } /* ton réglage existant */
-
-  /* ===== le reste = ton bloc tablette inchangé ===== */
+  nav a{ padding: 12px 12px; }
 
   .btn-hero{
     padding-left: 0;
@@ -2200,9 +2141,6 @@ position: fixed;
 
   .setting-info{ gap: 80px; justify-content: center; }
 }
-
-
-
 
 
 @media (max-width: 600px) {
