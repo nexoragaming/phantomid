@@ -29,7 +29,7 @@ nav {
     margin-left: 3%;
 }
 
-
+#mobileTopnav { display: none; }
 
 
 .nav-guest {
@@ -601,7 +601,8 @@ footer img {
     font-size: x-large;
     border: 3px  solid #572bde;
     border-radius: 5px;
-    margin: 2%,
+    margin: 2%;
+    background-color: white;
 }
 
 
@@ -765,7 +766,8 @@ input::placeholder {
     font-size: x-large;
     border: 3px  solid #572bde;
     border-radius: 5px;
-    margin: 2%,
+    margin: 2%;
+    background-color: white;
 }
 
 
