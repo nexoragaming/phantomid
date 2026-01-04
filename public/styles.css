@@ -731,6 +731,7 @@ input::placeholder {
     border-radius: 5px;
      font-size: 15px;
      width: 170px;
+     background-color: white;
 }
 
 .create-account-selector option {
@@ -2005,6 +2006,8 @@ position: fixed;
 /* Style the navigation menu */
 #mobileTopnav {
     display: block;
+     width: min(92vw, 820px);
+    margin: 0 auto;
 }
 .topnav {
   overflow: hidden;
