@@ -3,12 +3,14 @@
 .topnav {
   overflow: hidden;
   position: relative;
+  border-radius: 5px;
 }
 
 /* Hide the links inside the navigation menu (except for logo/home) */
 .topnav #Links {
   display: none;
   background-color: #000;
+  border-radius: 5px;
 }
 
 /* Style navigation menu links */
@@ -27,6 +29,7 @@
   position: absolute;
   right: 0;
   top: 0;
+  border-radius: 5px;
 }
 
 /* Add a grey background color on mouse-over */
@@ -37,10 +40,12 @@
 
 /* Style the active link (or home/logo) */
 .active {
-  background: none;
+background-color: #000;
   color: white;
+  border-radius: 5px;
 }
 
 .logo {
-    height: 100px;
+    height: 40px;
+    margin: 0;  
 }

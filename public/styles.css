@@ -1967,6 +1967,68 @@ position: fixed;
    À COLLER À LA FIN
 ========================= */
 
+/* Mobile topnav hidden by default (desktop) */
+#mobileTopnav { display: none; }
+
+/* Topnav layout */
+.topnav {
+  overflow: hidden;
+  position: relative;
+  border-radius: 5px;
+}
+
+/* Bar: logo + hamburger */
+.topnav .navbar-box{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #000;
+  border-radius: 5px;
+}
+
+/* Links container */
+.topnav .mobile-links{
+  display: none;              /* fermé par défaut */
+  background-color: #000;
+  border-radius: 5px;
+  margin-top: 8px;
+}
+
+/* Nav links */
+.topnav a{
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  display: block;
+}
+
+/* Hamburger button (better than <a href="javascript:void(0)">) */
+.topnav .icon{
+  background: black;
+  border: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  border-radius: 5px;
+  color: white;
+}
+
+#mobileHamburger:hover{
+  background-color: white;
+  color: #572bde;
+}
+
+.active{
+  background-color: #000;
+  color: white;
+  border-radius: 5px;
+}
+
+.logo{
+  height: 40px;
+  margin: 0;
+}
+
 
 /* ---------- TABLETTE (<= 1024px) ---------- */
 /* ✅ NE TOUCHE PAS: bloc identique à ton code */
@@ -1994,19 +2056,22 @@ position: fixed;
     justify-content: center;
   }
 
-  .nav-guest,
-  .nav-user{
-    width: min(92vw, 820px);
-    height: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 10px;
-    column-gap: 10px;
-    padding: 10px 14px;
+
+
+  /* Cache le nav desktop existant */
+  nav .nav-guest,
+  nav .nav-user {
+    display: none !important;
   }
 
-  nav a{ padding: 12px 12px; }
+  /* Affiche la nouvelle navbar mobile */
+  #mobileTopnav {
+    display: block;
+    width: min(92vw, 820px);
+    margin: 0 auto;
+  }
+
+
 
   .btn-hero{
     padding-left: 0;
@@ -2173,21 +2238,6 @@ position: fixed;
     align-items: center;
   }
 
-  .nav-guest,
-  .nav-user{
-    width: calc(100vw - 28px);
-    height: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 8px;
-    column-gap: 8px;
-    padding: 10px 10px;
-    border-radius: 22px;
-    text-align: center;
-  }
-
-  nav a{ padding: 12px 10px; }
 
   .heading-white{ line-height: 38px; text-align: center; }
   .hero p{ text-align: center; padding-left: 10px; padding-right: 10px; }

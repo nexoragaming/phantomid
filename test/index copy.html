@@ -21,17 +21,29 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!-- Top Navigation Menu -->
 <div class="topnav">
-  <a href="#home" class="active"><img src="https://i.imgur.com/TNidOH7.png" class="logo"></a>
-  <!-- Navigation links (hidden by default) -->
-  <div id="Links">
-    <a href="#news">News</a>
-    <a href="#contact">Contact</a>
-    <a href="#about">About</a>
-  </div>
-  <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
+  <div class="navbar-box">
+  <a href="/" class="active"><img src="https://i.imgur.com/BVwaA2k.png" class="logo"></a> 
   <a href="javascript:void(0);" class="icon" onclick="myFunction()" id="hamburger">
     <i class="fa fa-bars"></i>
   </a>
+</div>
+  <!-- Navigation links (hidden by default) -->
+  <div class="user-link" id="Links">
+   <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>
+            <a href="/rating-system"> Rating system </a>
+            <a href="/phantomcard"> My PhantomCard </a>
+            <a id="nav-logout"> Log out </a>
+  </div>
+
+  <div class="guest-link" id="links">
+    <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>  <!-- Si deja connecté, Creator dashboard -->   
+            <a href="/rating-system"> Rating system </a>
+            <a id="open-create-account-overlay">Create a PhantomID</a>
+            <a id="open-login-overlay">Log in</a>
+          </div>
+  <!-- "Hamburger menu" / "Bar icon" to toggle the navigation links -->
 <script src="test.js"></script>
 </div>
 

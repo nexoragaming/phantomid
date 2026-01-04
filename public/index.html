@@ -56,6 +56,40 @@
             <a id="nav-logout"> Log out </a>
         </div>
 
+        <!-- Font Awesome (hamburger icon) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- Mobile Navbar (<=1024px) -->
+<div class="topnav" id="mobileTopnav">
+  <div class="navbar-box">
+    <a href="/" class="active">
+      <img src="https://i.imgur.com/BVwaA2k.png" class="logo" alt="PhantomID">
+    </a>
+
+    <button class="icon" id="mobileHamburger" aria-label="Open menu" aria-expanded="false" type="button">
+      <i class="fa fa-bars"></i>
+    </button>
+  </div>
+
+  <!-- USER links -->
+  <div class="mobile-links user-link" id="mobileUserLinks">
+    <a href="/tournaments">Tournaments</a>
+    <a href="/creator-access">Creator access</a>
+    <a href="/rating-system">Rating system</a>
+    <a href="/phantomcard">My PhantomCard</a>
+    <a id="nav-logout">Log out</a>
+  </div>
+
+  <!-- GUEST links -->
+  <div class="mobile-links guest-link" id="mobileGuestLinks">
+    <a href="/tournaments">Tournaments</a>
+    <a href="/creator-access">Creator access</a>
+    <a href="/rating-system">Rating system</a>
+    <a id="open-create-account-overlay">Create a PhantomID</a>
+    <a id="open-login-overlay">Log in</a>
+  </div>
+</div>
+
 
 <script src="navbar.js"></script>
     <!-- Faire sytème pour rechercher la PhantomCard de quelqu'un -->
