@@ -2003,6 +2003,9 @@ position: fixed;
 
 
 /* Style the navigation menu */
+#mobileTopnav {
+    display: block;
+}
 .topnav {
   overflow: hidden;
   position: relative;
