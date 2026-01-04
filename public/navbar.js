@@ -12,14 +12,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navUser = document.getElementById("nav-user");
   const logoutBtn = document.getElementById("nav-logout");
 
+  // ✅ AJOUT: références mobile (tes IDs actuels)
+  const mobileUser = document.getElementById("user-link");
+  const mobileGuest = document.getElementById("guest-link");
+
   function showGuest() {
     if (navGuest) navGuest.style.display = "";
     if (navUser) navUser.style.display = "none";
+
+    // ✅ AJOUT: mobile
+    if (mobileGuest) mobileGuest.style.display = "";
+    if (mobileUser) mobileUser.style.display = "none";
   }
 
   function showUser() {
     if (navGuest) navGuest.style.display = "none";
     if (navUser) navUser.style.display = "";
+
+    // ✅ AJOUT: mobile
+    if (mobileGuest) mobileGuest.style.display = "none";
+    if (mobileUser) mobileUser.style.display = "";
   }
 
   // 1) Check session
