@@ -1998,11 +1998,11 @@ position: fixed;
 
 
 .nav-guest {
-    display: flex;
+    display: none;
 }
 
 .nav-user {
-    display: flex;
+    display: none;
 }
 
 /* Style the navigation menu */
