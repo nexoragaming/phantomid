@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navGuest = document.getElementById("nav-guest");
   const navUser = document.getElementById("nav-user");
   const logoutBtn = document.getElementById("nav-logout");
+  const mobileLogoutBtn = document.getElementById("mobile-nav-logout");
 
   // ✅ AJOUT: références mobile (tes IDs actuels)
   const mobileUser = document.getElementById("user-link");
@@ -64,8 +65,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.href = "/";
     });
   }
-});
 
+  // 2) Mobile Logout
+  if (mobileLogoutBtn) {
+    mobileLogoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+
+      try {
+        await fetch("/logout", { method: "POST", credentials: "include" });
+      } catch (err) {
+        console.error("Logout error:", err);
+      }
+
+      showGuest();
+      window.location.href = "/";
+    });
+  }
+
+});
 
 function myFunction() {
   var x = document.getElementById("Links");
