@@ -73,15 +73,7 @@ alreadyAccountBtn.addEventListener("click", function () {
 });
 
 
-const openCreateAccountOverlayHero = document.getElementById("open-create-account-overlay-hero");
-openCreateAccountOverlayHero.addEventListener("click", function () {
-    createAccountOverlay.classList.add("active");
-});
 
-const openCreateAccountOverlayCTA = document.getElementById("open-create-account-overlay-cta");
-openCreateAccountOverlayCTA.addEventListener("click", function () {
-    createAccountOverlay.classList.add("active");
-});
 
 const footerOpenCreateAccountBtn = document.getElementById("footer-open-create-account");
 footerOpenCreateAccountBtn.addEventListener("click", function () {
@@ -111,3 +103,13 @@ const createAccountBox = document.getElementById("create-account-box");
 createAccountBox.addEventListener("click", function (event){
     event.stopPropagation("create-account-box")
 })
+
+const openCreateAccountOverlayHero = document.getElementById("open-create-account-overlay-hero");
+openCreateAccountOverlayHero.addEventListener("click", function () {
+    createAccountOverlay.classList.add("active");
+});
+
+const openCreateAccountOverlayCTA = document.getElementById("open-create-account-overlay-cta");
+openCreateAccountOverlayCTA.addEventListener("click", function () {
+    createAccountOverlay.classList.add("active");
+});
