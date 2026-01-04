@@ -2010,6 +2010,7 @@ position: fixed;
     display: block;
      width: min(92vw, 820px);
     margin: 0 auto;
+      border: 1px solid #dbdbdb4d;
 }
 .topnav {
   overflow: hidden;
@@ -2022,6 +2023,7 @@ position: fixed;
   display: none;
   background-color: #000;
   border-radius: 5px;
+    border: 1px solid #dbdbdb4d;
 }
 
 /* Style navigation menu links */
