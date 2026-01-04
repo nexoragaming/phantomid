@@ -2157,27 +2157,7 @@ position: fixed;
     padding-right: 0 !important;
   }
 
-  nav{
-    margin: 0;
-    height: auto;
-    display: grid;
-    justify-content: center;
-    align-items: center;
-  }
 
-  .nav-guest,
-  .nav-user{
-    width: calc(100vw - 28px);
-    height: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 8px;
-    column-gap: 8px;
-    padding: 10px 10px;
-    border-radius: 22px;
-    text-align: center;
-  }
 
   nav a{ padding: 12px 10px; }
 
