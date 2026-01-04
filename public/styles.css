@@ -29,7 +29,9 @@ nav {
     margin-left: 3%;
 }
 
-
+.topnav {
+    display: none;
+}
 
 
 .nav-guest {
@@ -1994,17 +1996,61 @@ position: fixed;
     justify-content: center;
   }
 
-  .nav-guest,
-  .nav-user{
-    width: min(92vw, 820px);
-    height: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 10px;
-    column-gap: 10px;
-    padding: 10px 14px;
-  }
+
+.nav-guest {
+    display: flex;
+}
+
+.nav-user {
+    display: flex;
+}
+
+/* Style the navigation menu */
+.topnav {
+    display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hide the links inside the navigation menu (except for logo/home) */
+.topnav #Links {
+  display: none;
+  background-color: #000;
+}
+
+/* Style navigation menu links */
+.topnav a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  display: block;
+}
+
+/* Style the hamburger menu */
+.topnav a.icon {
+  background: black;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+/* Add a grey background color on mouse-over */
+#hamburger:hover {
+  background-color: white;
+  color: #572bde;
+}
+
+/* Style the active link (or home/logo) */
+.active {
+  background: none;
+  color: white;
+}
+
+.logo {
+    height: 100px;
+}
 
   nav a{ padding: 12px 12px; }
 
