@@ -1993,17 +1993,9 @@ position: fixed;
     display: grid;
     justify-content: center;
   }
-
-  .nav-guest,
-  .nav-user{
-    width: min(92vw, 820px);
-    height: auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    row-gap: 10px;
-    column-gap: 10px;
-    padding: 10px 14px;
+ nav .nav-guest,
+  nav .nav-user {
+    display: none !important;
   }
 
   nav a{ padding: 12px 12px; }
