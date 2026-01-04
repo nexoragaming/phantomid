@@ -1995,12 +1995,64 @@ position: fixed;
     display: grid;
     justify-content: center;
   }
+
  nav .nav-guest,
   nav .nav-user {
     display: none !important;
   }
 
-  nav a{ padding: 12px 12px; }
+
+/* Style the navigation menu */
+.topnav {
+  overflow: hidden;
+  position: relative;
+  border-radius: 5px;
+}
+
+/* Hide the links inside the navigation menu (except for logo/home) */
+.topnav #Links {
+  display: none;
+  background-color: #000;
+  border-radius: 5px;
+}
+
+/* Style navigation menu links */
+.topnav a {
+  color: white;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  display: block;
+}
+
+/* Style the hamburger menu */
+.topnav a.icon {
+  background: black;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border-radius: 5px;
+}
+
+/* Add a grey background color on mouse-over */
+#hamburger:hover {
+  background-color: white;
+  color: #572bde;
+}
+
+/* Style the active link (or home/logo) */
+.active {
+background-color: #000;
+  color: white;
+  border-radius: 5px;
+}
+
+.logo {
+    height: 40px;
+    margin: 0;  
+}
+
 
   .btn-hero{
     padding-left: 0;
