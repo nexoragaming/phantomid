@@ -597,6 +597,7 @@ footer img {
 }
 
 .create-account-form input {
+    color: #572bde;
     justify-self: center;
     font-size: x-large;
     border: 3px  solid #572bde;
@@ -763,6 +764,7 @@ input::placeholder {
 }
 
 .login_form input {
+     color: #572bde;
     justify-self: center;
     font-size: x-large;
     border: 3px  solid #572bde;
