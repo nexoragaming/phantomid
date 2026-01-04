@@ -91,7 +91,7 @@ footerOpenCreateAccountBtn.addEventListener("click", function () {
 const mobileOpenCreateAccountOverlay = document.getElementById("mobile-open-create-account-overlay");
 
 mobileOpenCreateAccountOverlay.addEventListener("click", function () {
-  loginOverlay.classList.add("active");
+  createAccountOverlay.classList.add("active");
 })
 
 document.addEventListener("keydown", function (event) {
