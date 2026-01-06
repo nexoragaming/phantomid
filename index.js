@@ -388,6 +388,12 @@ async function initDb() {
     );
   `);
 
+  // ✅ AJOUT: colonne country (safe) + backfill (ne touche à rien d'autre)
+  await pool.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS country VARCHAR(2);
+  `);
+
   // 1b) si table existait AVANT username -> ajouter colonne safe
   await pool.query(`
     ALTER TABLE users
@@ -507,7 +513,8 @@ app.get("/health", (req, res) => res.send("ok"));
 // =====================================================
 app.post("/signup/start", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    // ✅ FIX PAYS: on récupère "country" sans toucher au reste
+    const { username, email, password, country } = req.body;
 
     if (!username || !email || !password) {
       return res.status(400).json({ ok: false, error: "Missing fields" });
@@ -520,11 +527,18 @@ app.post("/signup/start", async (req, res) => {
       return res.status(409).json({ ok: false, error: "Email already used" });
     }
 
+    // ✅ FIX PAYS: normalize ISO2 (ou null)
+    const countryCode =
+      country && String(country).trim()
+        ? String(country).trim().toUpperCase()
+        : null;
+
     // reset pending (propre)
     req.session.pendingSignup = {
       username: String(username).trim(),
       email: emailKey,
       password: String(password),
+      country: countryCode, // ✅ FIX PAYS: on le garde en session
       createdAt: Date.now(),
     };
 
@@ -743,12 +757,12 @@ app.get("/auth/discord/callback", async (req, res) => {
 
         const passwordHash = await bcrypt.hash(pending.password, 12);
 
-        // rating/avatar/badges: pas besoin de les insérer (DEFAULT côté DB)
+        // ✅ FIX PAYS: on insère "country" (defaults rating/avatar/badges inchangés)
         const ins = await client.query(
-          `INSERT INTO users (phantom_id, username, email, password_hash, discord_id)
-           VALUES ($1, $2, $3, $4, $5)
+          `INSERT INTO users (phantom_id, username, email, password_hash, discord_id, country)
+           VALUES ($1, $2, $3, $4, $5, $6)
            RETURNING id`,
-          [phantomId, pending.username, pending.email, passwordHash, discordUserId]
+          [phantomId, pending.username, pending.email, passwordHash, discordUserId, pending.country || null]
         );
 
         await client.query("COMMIT");
