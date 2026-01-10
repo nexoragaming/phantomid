@@ -7,14 +7,36 @@
 </head>
 <body>
 
+<style>
+  .create-form-box {
+    justify-self: center;
+    justify-content: center;
+    border: 3px solid white;
+    padding: 20px;
+  }
+
+  .create-form-box label {
+    color: #572bde;
+  }
+
+  .create-form-btn {
+    background-color: #572bde;
+    color: white;
+    border: 1px solid white;
+    width: 200px;
+    justify-self: center;
+  }
+</style>
+
+<div class="create-form-box">
 <h1>Create a tournament</h1>
 
 <form id="create-form" style="display:grid; gap:10px; max-width:520px;">
   <input name="name" placeholder="Tournament name" required />
-  <input name="organizer" placeholder="Organizer (ex: Chaz)" required />
+  <input name="organizer" placeholder="Organizer username" required />
 
   <select name="game" required>
-    <option value="">Game</option>
+    <option value="" disabled selected>Game</option>
     <option>Fortnite</option>
     <option>Valorant</option>
     <option>CS2</option>
@@ -22,7 +44,7 @@
   </select>
 
   <select name="region" required>
-    <option value="">Region</option>
+    <option value="" disabled selected>Region</option>
     <option>NA</option>
     <option>EU</option>
     <option>LATAM</option>
@@ -31,6 +53,7 @@
   </select>
 
   <select name="format">
+    <option value="" disabled selected>Format</option>
     <option>Solo</option>
     <option>Duo</option>
     <option>Trio</option>
@@ -46,17 +69,26 @@
   </select>
 
   <label>
-    Start date/time:
+    Tournament start:
     <input type="datetime-local" name="startAt" required />
   </label>
 
+ <label> <!-- Ne change rien a date, a retoucher -->
+    Registration start:
+    <input type="datetime-local" name="inscriptionStartAt" required />
+  </label>
+
+  <label>
+    Maximum player:
   <input type="number" name="maxSlots" value="32" min="2" />
+</label>
 
   <input name="bannerUrl" placeholder="Banner URL (optional)" />
 
-  <button type="submit">Create</button>
+  <button type="submit" class="create-form-btn">Create</button>
   <p id="msg" style="margin:0;"></p>
 </form>
+</div>
 
 <p><a href="/tournaments-final-version.html">Go to tournaments page</a></p>
 
