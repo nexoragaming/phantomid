@@ -65,4 +65,3 @@ gameSelect.addEventListener("change", loadTournaments);
 regionSelect.addEventListener("change", loadTournaments);
 
 loadTournaments();
-
