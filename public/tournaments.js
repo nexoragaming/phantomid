@@ -4,6 +4,9 @@ const searchInput = document.getElementById("tournament-search");
 const gameSelect = document.getElementById("tournament-game");
 const regionSelect = document.getElementById("tournament-region");
 
+// local joined cache (temp)
+const joinedTournaments = new Set();
+
 const containers = {
   upcoming: document.getElementById("list-upcoming"),
   open: document.getElementById("list-open"),
@@ -57,6 +60,16 @@ function makeAction(label, className, slug) {
   return el;
 }
 
+function makeJoinedAction() {
+  const el = makeAction("Joined", "action-joined");
+  el.style.background = "#2ecc71";
+  el.style.color = "white";
+  el.style.cursor = "default";
+  el.style.borderColor = "#2ecc71";
+  el.style.pointerEvents = "none";
+  return el;
+}
+
 // --------------------
 // Render
 // --------------------
@@ -73,6 +86,7 @@ function renderTournament(t, status) {
   node.querySelector(".tournament-info").textContent =
     `${t.region || ""} • ${formatDate(t.startDate)} • ${t.format || ""}`;
 
+  // meta
   const meta = node.querySelector(".tournament-meta");
   if (status === "open") {
     meta.textContent = `${t.currentSlots ?? 0}/${t.maxSlots ?? 0} players`;
@@ -82,6 +96,7 @@ function renderTournament(t, status) {
     meta.textContent = "";
   }
 
+  // actions container
   const actionsBox = node.querySelector(".tournaments-button");
 
   // Actions selon status
@@ -91,7 +106,13 @@ function renderTournament(t, status) {
   }
 
   if (status === "open") {
-    actionsBox.appendChild(makeAction("Join now", "action-join", t.slug));
+    // ✅ si déjà join -> Joined (vert)
+    if (joinedTournaments.has(t.slug)) {
+      actionsBox.appendChild(makeJoinedAction());
+    } else {
+      actionsBox.appendChild(makeAction("Join now", "action-join", t.slug));
+    }
+
     actionsBox.appendChild(makeAction("More info", "action-info", t.slug));
   }
 
@@ -128,7 +149,6 @@ async function loadTournaments() {
 
     clearAll();
 
-    // ordre stable
     ["upcoming", "open", "live", "finished"].forEach((status) => {
       const list = data?.[status] || [];
       list.forEach((t) => renderTournament(t, status));
@@ -167,7 +187,10 @@ document.addEventListener("click", async (e) => {
       return;
     }
 
-    // refresh
+    // ✅ mark as joined (MVP)
+    joinedTournaments.add(slug);
+
+    // refresh UI + compteur
     await loadTournaments();
   } catch (err) {
     console.error("join error:", err);
