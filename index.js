@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import pg from "pg";
 import connectPgSimple from "connect-pg-simple";
 import bcrypt from "bcrypt";
+import createTournamentRouter from "./tournament.js";
 
 dotenv.config();
 
@@ -76,6 +77,12 @@ app.use(
     },
   })
 );
+
+// ================================
+// ✅ TOURNAMENTS API
+// ================================
+app.use("/api/tournaments", createTournamentRouter(pool));
+
 
 // =====================================================
 // Static files

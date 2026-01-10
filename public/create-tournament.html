@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Tournament</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<h1>Create a tournament</h1>
+
+<form id="create-form" style="display:grid; gap:10px; max-width:520px;">
+  <input name="name" placeholder="Tournament name" required />
+  <input name="organizer" placeholder="Organizer (ex: Chaz)" required />
+
+  <select name="game" required>
+    <option value="">Game</option>
+    <option>Fortnite</option>
+    <option>Valorant</option>
+    <option>CS2</option>
+    <option>League of Legends</option>
+  </select>
+
+  <select name="region" required>
+    <option value="">Region</option>
+    <option>NA</option>
+    <option>EU</option>
+    <option>LATAM</option>
+    <option>ASIA</option>
+    <option>GLOBAL</option>
+  </select>
+
+  <select name="format">
+    <option>Solo</option>
+    <option>Duo</option>
+    <option>Trio</option>
+    <option>Squad</option>
+    <option>5v5</option>
+  </select>
+
+  <select name="status">
+    <option value="upcoming">Upcoming</option>
+    <option value="open" selected>Open</option>
+    <option value="live">Live</option>
+    <option value="finished">Finished</option>
+  </select>
+
+  <label>
+    Start date/time:
+    <input type="datetime-local" name="startAt" required />
+  </label>
+
+  <input type="number" name="maxSlots" value="32" min="2" />
+
+  <input name="bannerUrl" placeholder="Banner URL (optional)" />
+
+  <button type="submit">Create</button>
+  <p id="msg" style="margin:0;"></p>
+</form>
+
+<p><a href="/tournaments-final-version.html">Go to tournaments page</a></p>
+
+<script src="/create-tournament.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<h2>Tournois à venir </h2>
+<div class="section-box"> 
+
+   <div class="tournaments-box"> 
+    <div class="tournaments-image-box">
+    <img src="" alt="" id="tournaments-image"> 
+    </div>
+    <div class="tournaments-box-middle"> 
+    <h3 id="tournaments-name">Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo<!-- La région (ex: EU, NA, LATAM,) • La date du début du tournoi • Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    <p id="tournament-capacity"> Capacity: 128 players </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> Préinscription <br>(Premium only) </button>
+    <button> Plus d'information </button>
+   </div> 
+</div>
+
+    <div class="tournaments-box">
+         <img src="" alt="" id="tournaments-image"> 
+    
+    <div class="tournaments-box-middle">
+    <h3 id="tournaments-name"> Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer">By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo <!-- La région (ex: EU, NA, LATAM,) - La date du début du tournoi - Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    <p id="tournament-capacity"> Capacity: 128 players<!-- Notre de joueur ou d'équipes en enregistrer sur le nombre de place (ex: 54/100 teams, 86/128 players) --> </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> Préinscription <br>(Premium only)  </button>
+    <button> Plus d'information </button>
+</div>
+   </div> 
+    </div>
+
+
+<h2>Tournois à inscriptions ouvertes </h2>
+<div class="section-box">
+   <div class="tournaments-box"> 
+    <div class="tournaments-image-box">
+    <img src="" alt="" id="tournaments-image"> 
+    </div>
+    <div class="tournaments-box-middle"> 
+    <h3 id="tournaments-name">Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo<!-- La région (ex: EU, NA, LATAM,) • La date du début du tournoi • Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    <p id="number-of-players-in"> 86/128 players <!-- Notre de joueur ou d'équipes en enregistrer sur le nombre de place (ex: 54/100 teams, 86/128 players) --> </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> S'inscrire maintenant </button>
+    <button> Plus d'information </button>
+   </div> 
+</div>
+
+    <div class="tournaments-box">
+         <img src="" alt="" id="tournaments-image"> 
+    
+    <div class="tournaments-box-middle">
+    <h3 id="tournaments-name"> Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer">By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo <!-- La région (ex: EU, NA, LATAM,) - La date du début du tournoi - Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    <p id="number-of-players-in"> 86/128 players <!-- Notre de joueur ou d'équipes en enregistrer sur le nombre de place (ex: 54/100 teams, 86/128 players) --> </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> S'inscrire maintenant </button>
+    <button> Plus d'information </button>
+</div>
+   </div> 
+    </div>
+</div>
+
+<h2>Tournois en cours </h2><!-- traduire en anglais -->
+<div class="section-box">
+   <div class="tournaments-box"> 
+    <div class="tournaments-image-box">
+    <img src="" alt="" id="tournaments-image"> 
+    </div>
+    <div class="tournaments-box-middle"> 
+    <h3 id="tournaments-name">Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo<!-- La région (ex: EU, NA, LATAM,) • La date du début du tournoi • Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> Voir le bracket </button>
+    <button> Stats du tournoi </button>
+   </div> 
+</div>
+
+    <div class="tournaments-box">
+         <img src="" alt="" id="tournaments-image"> 
+    
+    <div class="tournaments-box-middle">
+    <h3 id="tournaments-name"> Fortnite PhantomCard</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo <!-- La région (ex: EU, NA, LATAM,) - La date du début du tournoi - Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    </div>
+    <div class="tournaments-button"> 
+    <button> Voir le bracket </button>
+    <button> Stats du tournoi </button>
+</div>
+   </div> 
+    </div>
+  </div>
+<!-- faire des box des tournois avec bannière, photo de profil, nom, par quel createur, quel cote requise pour le tournoi, bouton inscription -->
+<!-- mettre toute les box cote à cote (display: flex) -->
+<!-- on pourrait faire que toute les box sont coté a cote et faut appuyer sur une fleche pour faire bouger car pas assé de place sur la page (galerie) -->
+
+<h2> Tournois terminés </h2>
+<div class="section-box">
+
+   <div class="tournaments-box"> 
+    <div class="tournaments-image-box">
+    <img src="" alt="" id="tournaments-image"> 
+    </div>
+    <div class="tournaments-box-middle"> 
+    <h3 id="tournaments-name">Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo<!-- La région (ex: EU, NA, LATAM,) • La date du début du tournoi • Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    </div>
+
+    <div class="tournaments-winner-box">
+    <img src="" alt="" class="winner-pfp"> <!-- Photo de profil du gagnant du tournoi -->
+    <div class="winner-line"> <p class="winner-username"> <!-- Pseudo du gagnant --> </p> <img src="" class="trophie-icon"> <p class=""> <!-- #1 ou champion --> </p> </div>
+    <div class="tournaments-button"> 
+    <button> Voir les résultats </button>
+    </div>
+   </div> 
+</div>
+
+
+      <div class="tournaments-box"> 
+    <div class="tournaments-image-box">
+    <img src="" alt="" id="tournaments-image"> 
+    </div>
+    <div class="tournaments-box-middle"> 
+    <h3 id="tournaments-name">Fortnite PhantomCup</h3>
+    <p id="tournaments-organizer"> By: Chaz</p>
+    <p id="tournaments-info"> NA • 6 Jan 2025 • Solo<!-- La région (ex: EU, NA, LATAM,) • La date du début du tournoi • Le format des équipes (ex: Solo, Duo, Trio) --> </p>
+    </div>
+
+    <div class="tournaments-winner-box">
+    <img src="" alt="" class="winner-pfp"> <!-- Photo de profil du gagnant du tournoi -->
+    <div class="winner-line"> <p class="winner-username"> <!-- Pseudo du gagnant --> </p> <img src="" class="trophie-icon"> <p class=""> <!-- #1 ou champion --> </p> </div>
+    <div class="tournaments-button"> 
+    <button> Voir les résultats </button>
+    </div>
+   </div> 
+</div>
+
+    </div>
+
+
+<!-- traduire en anglais -->
+
+
+

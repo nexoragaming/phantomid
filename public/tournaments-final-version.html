@@ -8,38 +8,124 @@
 <body>
 
 <header> 
+<nav>
+     <div class="nav-guest" id="nav-guest">
+            <div class="logo">
+            <a class="logo" href="/" id="logo"> <img class="logo" src="/assets/logo-phantom-id-tom-et-texte-nexora-color.png" alt="PhantomID logo"> </a>
+            </div>
+            <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>  <!-- Si deja connecté, Creator dashboard -->   
+            <a href="/rating-system"> Rating system </a>
+            <a id="open-create-account-overlay">Create a PhantomID</a>
+            <a id="open-login-overlay">Log in</a>
+        </div>
 
-    <!-- Navbar par défault -->
+        <div class="nav-user" id="nav-user">
+            <div class="logo">
+            <a class="logo" href="/" id="logo"> <img class="logo" src="/assets/logo-phantom-id-tom-et-texte-nexora-color.png" alt="PhantomID logo"> </a>
+            </div>
+            <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>
+            <a href="/rating-system"> Rating system </a>
+            <a href="/phantomcard"> My PhantomCard </a>
+            <a id="nav-logout"> Log out </a>
+        </div>
 
-</header>
-
-<section> 
-Tournoi en cours: <!-- traduire en anglais -->
-
-<!-- faire des box des tournois avec bannière, photo de profil, nom, par quel createur, quel cote requise pour le tournoi, bouton inscription -->
-<!-- mettre toute les box cote à cote (display: flex) -->
-<!-- on pourrait faire que toute les box sont coté a cote et faut appuyer sur une fleche pour faire bouger car pas assé de place sur la page (galerie) -->
-
-
-
-<div class="opening-phantomid-tournament"> 
-    <img href="" alt=""> <!-- Bannière -->    
-    <img href="" alt=""> <!-- Logo (photo de profil) -->
-    <p> By: <strong> Charlo (The PhantomID developer) </strong> </p>
-    <a class="" href="inscription"> Register for the tournament </a> <!-- Bouton inscription -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="topnav" id="mobileTopnav">
+  <div class="navbar-box">
+  <a href="/" class="active"><img src="https://i.imgur.com/BVwaA2k.png" class="logo"></a> 
+  <a href="javascript:void(0);" class="icon" onclick="myFunction()" id="hamburger">
+    <i class="fa fa-bars"></i>
+  </a>
+</div>
+   <div id="Links">
+  <div class="user-link" id="user-link">
+   <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>
+            <a href="/rating-system"> Rating system </a>
+            <a href="/phantomcard"> My PhantomCard </a>
+            <a id="mobile-nav-logout"> Log out </a>
+  </div>
+  <div class="guest-link" id="guest-link">
+    <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>  
+            <a href="/rating-system"> Rating system </a>
+            <a id="mobile-open-create-account-overlay">Create a PhantomID</a>
+            <a id="mobile-open-login-overlay">Log in</a>
+          </div>
+        </div>
 </div>
 
+<script src="navbar.js"></script>
+</nav>
+</header>
 
-Tournoi à venir: <!-- traduire en anglais -->
+<style> 
+  #tournaments-pages {margin-left:210px; margin-right: 210px;} 
+  .section-box {display: flex; gap: 200px; justify-content: center;} 
+  .tournaments-box {display: flex; border: 3px solid #d1d1d1d1; border-radius: 5px; padding: 5px; gap: 100px; width: 630px;} 
+  .tournaments-name {margin: 0;} .ètournaments-organizer {margin: 0;} 
+  .tournaments-box-middle {display: grid;} 
+  .tournaments-button {display: grid; gap:20px;} 
+  </style>
+
+<section id="tournaments-pages"> 
 
 
+  <h1>PhantomID Tournaments</h1>
 
+  <!-- Filtres -->
+  <div class="tournaments-filters">
+    <input id="tournament-search" placeholder="Search tournament">
+    <select id="tournament-game">
+      <option value="">All games</option>
+      <option value="Fortnite">Fortnite</option>
+      <option value="Valorant">Valorant</option>
+      <option value="CS2">CS2</option>
+    </select>
 
+    <select id="tournament-region">
+      <option value="">All regions</option>
+      <option value="NA">NA</option>
+      <option value="EU">EU</option>
+      <option value="LATAM">LATAM</option>
+      <option value="ASIA">ASIA</option>
+    </select>
+  </div>
 
+  <!-- Sections -->
+  <h2>Upcoming</h2>
+  <div id="list-upcoming" class="section-box"></div>
 
+  <h2>Open for registration</h2>
+  <div id="list-open" class="section-box"></div>
+
+  <h2>Live</h2>
+  <div id="list-live" class="section-box"></div>
+
+  <h2>Finished</h2>
+  <div id="list-finished" class="section-box"></div>
 
 </section>
 
+<!-- Template carte tournoi -->
+<template id="tournament-card-template">
+  <div class="tournaments-box">
+    <img class="tournament-image" src="" alt="">
+
+    <div class="tournaments-box-middle">
+      <h3 class="tournament-name"></h3>
+      <p class="tournament-organizer"></p>
+      <p class="tournament-info"></p>
+      <p class="tournament-meta"></p>
+    </div>
+
+    <div class="tournaments-button"></div>
+  </div>
+</template>
+
+<script src="/tournaments.js"></script>
 
 
 </body>
