@@ -5,7 +5,9 @@ const VALID_STATUSES = new Set(["upcoming", "open", "live", "finished"]);
 export default function createTournamentRouter(pool) {
   const router = express.Router();
 
-  // GET /api/tournaments?search=&game=&region=&status=
+  // =====================================================
+  // GET /api/tournaments
+  // =====================================================
   router.get("/", async (req, res) => {
     try {
       const { search = "", game = "", region = "", status = "" } = req.query;
@@ -89,7 +91,9 @@ export default function createTournamentRouter(pool) {
     }
   });
 
-  // POST /api/tournaments
+  // =====================================================
+  // POST /api/tournaments (create)
+  // =====================================================
   router.post("/", async (req, res) => {
     try {
       const {
@@ -106,18 +110,18 @@ export default function createTournamentRouter(pool) {
 
       if (!name || !organizer || !game || !region || !startAt) {
         return res.status(400).json({
-          error: "Missing required fields: name, organizer, game, region, startAt.",
+          error: "Missing required fields",
         });
       }
 
       const normalizedStatus = String(status).toLowerCase();
       if (!VALID_STATUSES.has(normalizedStatus)) {
-        return res.status(400).json({ error: "Invalid status (upcoming|open|live|finished)." });
+        return res.status(400).json({ error: "Invalid status" });
       }
 
       const maxSlotsInt = Number(maxSlots);
-      if (!Number.isInteger(maxSlotsInt) || maxSlotsInt < 2 || maxSlotsInt > 2048) {
-        return res.status(400).json({ error: "maxSlots must be an integer between 2 and 2048." });
+      if (!Number.isInteger(maxSlotsInt) || maxSlotsInt < 2) {
+        return res.status(400).json({ error: "Invalid maxSlots" });
       }
 
       const baseSlug = String(name)
@@ -154,13 +158,77 @@ export default function createTournamentRouter(pool) {
       return res.status(201).json({ ok: true, tournament: rows[0] });
     } catch (err) {
       console.error("POST /api/tournaments error:", err);
-      if (err?.code === "23505") {
-        return res.status(409).json({ error: "Tournament already exists (unique constraint)." });
-      }
       return res.status(500).json({ error: "Server error creating tournament." });
+    }
+  });
+
+  // =====================================================
+  // POST /api/tournaments/:slug/join  ✅ STABLE MVP
+  // =====================================================
+  router.post("/:slug/join", async (req, res) => {
+    try {
+      const userId = req.session?.userId;
+      if (!userId) {
+        return res.status(401).json({ ok: false, error: "Not logged in" });
+      }
+
+      const slug = String(req.params.slug || "").trim();
+
+      const tRes = await pool.query(
+        `SELECT id, status, max_slots
+         FROM tournaments
+         WHERE slug = $1
+         LIMIT 1`,
+        [slug]
+      );
+
+      if (tRes.rowCount === 0) {
+        return res.status(404).json({ ok: false, error: "Tournament not found" });
+      }
+
+      const t = tRes.rows[0];
+
+      if (t.status !== "open") {
+        return res.status(400).json({ ok: false, error: "Tournament is not open" });
+      }
+
+      const countRes = await pool.query(
+        `SELECT COUNT(*)::int AS n
+         FROM tournament_participants
+         WHERE tournament_id = $1`,
+        [t.id]
+      );
+
+      if (countRes.rows[0].n >= t.max_slots) {
+        return res.status(400).json({ ok: false, error: "Tournament is full" });
+      }
+
+      const ins = await pool.query(
+        `INSERT INTO tournament_participants (tournament_id, user_id)
+         VALUES ($1, $2)
+         ON CONFLICT (tournament_id, user_id) DO NOTHING
+         RETURNING id`,
+        [t.id, userId]
+      );
+
+      const after = await pool.query(
+        `SELECT COUNT(*)::int AS n
+         FROM tournament_participants
+         WHERE tournament_id = $1`,
+        [t.id]
+      );
+
+      return res.json({
+        ok: true,
+        joined: ins.rowCount > 0,
+        currentSlots: after.rows[0].n,
+        maxSlots: t.max_slots,
+      });
+    } catch (err) {
+      console.error("POST /api/tournaments/:slug/join error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
     }
   });
 
   return router;
 }
-
