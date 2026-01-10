@@ -230,5 +230,70 @@ export default function createTournamentRouter(pool) {
     }
   });
 
+  // =====================================================
+  // GET /api/tournaments/:slug/participants ✅ LISTE DES JOUEURS
+  // =====================================================
+  router.get("/:slug/participants", async (req, res) => {
+    try {
+      const slug = String(req.params.slug || "").trim();
+      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
+
+      const tRes = await pool.query(
+        `SELECT id, name, slug, max_slots
+         FROM tournaments
+         WHERE slug = $1
+         LIMIT 1`,
+        [slug]
+      );
+
+      if (tRes.rowCount === 0) {
+        return res.status(404).json({ ok: false, error: "Tournament not found" });
+      }
+
+      const t = tRes.rows[0];
+
+      const pRes = await pool.query(
+        `
+        SELECT
+          u.id,
+          u.username,
+          u.phantom_id,
+          u.country,
+          u.rating,
+          u.avatar_url,
+          p.joined_at
+        FROM tournament_participants p
+        JOIN users u ON u.id = p.user_id
+        WHERE p.tournament_id = $1
+        ORDER BY p.joined_at ASC
+        `,
+        [t.id]
+      );
+
+      return res.json({
+        ok: true,
+        tournament: {
+          id: t.id,
+          name: t.name,
+          slug: t.slug,
+          maxSlots: t.max_slots,
+          currentSlots: pRes.rowCount,
+        },
+        participants: pRes.rows.map((r) => ({
+          id: r.id,
+          username: r.username,
+          phantomId: r.phantom_id,
+          country: r.country,
+          rating: r.rating,
+          avatarUrl: r.avatar_url,
+          joinedAt: r.joined_at,
+        })),
+      });
+    } catch (err) {
+      console.error("GET /api/tournaments/:slug/participants error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
+    }
+  });
+
   return router;
 }
