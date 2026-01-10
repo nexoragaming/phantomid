@@ -1,3 +1,5 @@
+// public/tournaments.js
+
 const searchInput = document.getElementById("tournament-search");
 const gameSelect = document.getElementById("tournament-game");
 const regionSelect = document.getElementById("tournament-region");
@@ -11,28 +13,9 @@ const containers = {
 
 const template = document.getElementById("tournament-card-template");
 
-// ===============
-// Fetch + render
-// ===============
-async function loadTournaments() {
-  const params = new URLSearchParams();
-  if (searchInput.value) params.set("search", searchInput.value);
-  if (gameSelect.value) params.set("game", gameSelect.value);
-  if (regionSelect.value) params.set("region", regionSelect.value);
-
-  const res = await fetch(`/api/tournaments?${params.toString()}`);
-  const data = await res.json();
-
-  // clear sections
-  Object.values(containers).forEach((c) => (c.innerHTML = ""));
-
-  // render in each section
-  for (const status of ["upcoming", "open", "live", "finished"]) {
-    const list = data[status] || [];
-    list.forEach((t) => renderTournament(t, status));
-  }
-}
-
+// --------------------
+// Helpers
+// --------------------
 function formatDate(iso) {
   try {
     return new Date(iso).toLocaleDateString("en-US", {
@@ -45,15 +28,38 @@ function formatDate(iso) {
   }
 }
 
+function clearAll() {
+  Object.values(containers).forEach((c) => {
+    if (c) c.innerHTML = "";
+  });
+}
+
+// ✅ PAS de <button>: action = <div> cliquable
 function makeAction(label, className, slug) {
-  // ✅ PAS un <button> — un div cliquable
   const el = document.createElement("div");
+
   el.className = `tournament-action ${className}`;
   el.textContent = label;
-  if (slug) el.dataset.slug = slug;
+
+  if (slug) el.setAttribute("data-slug", slug);
+
+  // Styles inline pour être sûr que ton CSS ne cache pas le texte
+  el.style.border = "2px solid #d1d1d1d1";
+  el.style.borderRadius = "6px";
+  el.style.padding = "10px";
+  el.style.textAlign = "center";
+  el.style.cursor = "pointer";
+  el.style.userSelect = "none";
+  el.style.color = "white";
+  el.style.background = "transparent";
+  el.style.minWidth = "90px";
+
   return el;
 }
 
+// --------------------
+// Render
+// --------------------
 function renderTournament(t, status) {
   const node = template.content.cloneNode(true);
 
@@ -63,6 +69,7 @@ function renderTournament(t, status) {
 
   node.querySelector(".tournament-name").textContent = t.name || "Tournament";
   node.querySelector(".tournament-organizer").textContent = `By: ${t.organizer || "Unknown"}`;
+
   node.querySelector(".tournament-info").textContent =
     `${t.region || ""} • ${formatDate(t.startDate)} • ${t.format || ""}`;
 
@@ -72,14 +79,14 @@ function renderTournament(t, status) {
   } else if (status === "upcoming") {
     meta.textContent = `Capacity: ${t.maxSlots ?? 0} players`;
   } else {
-    meta.textContent = ""; // live/finished: tu peux mettre autre chose plus tard
+    meta.textContent = "";
   }
 
   const actionsBox = node.querySelector(".tournaments-button");
 
-  // ✅ Actions selon status (sans <button>)
+  // Actions selon status
   if (status === "upcoming") {
-    actionsBox.appendChild(makeAction("Pre-register (Premium)", "action-preregister", t.slug));
+    actionsBox.appendChild(makeAction("Pre-register", "action-preregister", t.slug));
     actionsBox.appendChild(makeAction("More info", "action-info", t.slug));
   }
 
@@ -97,21 +104,55 @@ function renderTournament(t, status) {
     actionsBox.appendChild(makeAction("View results", "action-results", t.slug));
   }
 
-  containers[status].appendChild(node);
+  const container = containers[status];
+  if (container) container.appendChild(node);
 }
 
-// =======================
-// Event delegation actions
-// =======================
+// --------------------
+// Fetch + load
+// --------------------
+async function loadTournaments() {
+  const params = new URLSearchParams();
+
+  const search = (searchInput?.value || "").trim();
+  const game = (gameSelect?.value || "").trim();
+  const region = (regionSelect?.value || "").trim();
+
+  if (search) params.set("search", search);
+  if (game) params.set("game", game);
+  if (region) params.set("region", region);
+
+  try {
+    const res = await fetch(`/api/tournaments?${params.toString()}`);
+    const data = await res.json();
+
+    clearAll();
+
+    // ordre stable
+    ["upcoming", "open", "live", "finished"].forEach((status) => {
+      const list = data?.[status] || [];
+      list.forEach((t) => renderTournament(t, status));
+    });
+  } catch (err) {
+    console.error("loadTournaments error:", err);
+    clearAll();
+  }
+}
+
+// --------------------
+// Click actions (Join)
+// --------------------
 document.addEventListener("click", async (e) => {
   const joinEl = e.target.closest(".action-join");
   if (!joinEl) return;
 
-  const slug = joinEl.dataset.slug;
-  if (!slug) return;
+  const slug = joinEl.getAttribute("data-slug");
+  if (!slug) {
+    alert("Missing tournament slug");
+    return;
+  }
 
-  // UI feedback
-  const old = joinEl.textContent;
+  const oldText = joinEl.textContent;
   joinEl.textContent = "Joining...";
   joinEl.style.pointerEvents = "none";
 
@@ -121,27 +162,27 @@ document.addEventListener("click", async (e) => {
 
     if (!res.ok) {
       alert(data?.error || "Unable to join tournament");
-      joinEl.textContent = old;
+      joinEl.textContent = oldText;
       joinEl.style.pointerEvents = "auto";
       return;
     }
 
-    // refresh list to update counter
+    // refresh
     await loadTournaments();
   } catch (err) {
-    console.error(err);
+    console.error("join error:", err);
     alert("Network error");
-    joinEl.textContent = old;
+    joinEl.textContent = oldText;
     joinEl.style.pointerEvents = "auto";
   }
 });
 
-// ===============
-// Filter listeners
-// ===============
-searchInput.addEventListener("input", loadTournaments);
-gameSelect.addEventListener("change", loadTournaments);
-regionSelect.addEventListener("change", loadTournaments);
+// --------------------
+// Filters
+// --------------------
+if (searchInput) searchInput.addEventListener("input", loadTournaments);
+if (gameSelect) gameSelect.addEventListener("change", loadTournaments);
+if (regionSelect) regionSelect.addEventListener("change", loadTournaments);
 
-// first load
+// First load
 loadTournaments();
