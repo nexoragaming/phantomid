@@ -63,7 +63,6 @@
 
 <style> 
   #tournaments-pages {margin-left:210px; margin-right: 210px;} 
-  .section-box {display: flex; gap: 200px; justify-content: center;} 
   .tournaments-box {display: flex; border: 3px solid #d1d1d1d1; border-radius: 5px; padding: 5px; gap: 100px; width: 630px;} 
   .tournament-name {margin: 0;} .tournament-organizer {margin: 0;} 
   .tournaments-box-middle {display: grid;} 
@@ -79,53 +78,58 @@
 
 .tournament-action:hover{
   opacity: 0.85;
-  /* === Slider container === */
-.tournaments-slider {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
-/* === Zone scrollable === */
-.slider-track {
-  display: flex;
-  gap: 40px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  padding: 10px 0;
-  scrollbar-width: none; /* Firefox */
+/* slider wrapper */
+.tournaments-slider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
 }
 
-.slider-track::-webkit-scrollbar {
-  display: none; /* Chrome */
+/* track scrollable */
+.slider-track{
+  display:flex;
+  gap:24px;
+  overflow-x:auto;
+  scroll-behavior:smooth;
+  padding:12px 0;
+
+  /* IMPORTANT: pas de wrap + pas centré */
+  justify-content:flex-start;
+  flex-wrap:nowrap;
+
+  /* cache scrollbar */
+  scrollbar-width:none;
+}
+.slider-track::-webkit-scrollbar{ display:none; }
+
+/* cards width stable */
+.tournaments-box{
+  flex:0 0 360px;   /* ajuste si tu veux plus large */
 }
 
-/* === Cards === */
-.tournaments-box {
-  flex: 0 0 340px; /* largeur fixe */
+/* arrows */
+.slider-arrow{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:2px solid #d1d1d1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+
+  color:white;
+  font-size:34px;
+  line-height:1;
+}
+.slider-arrow:hover{
+  background:#ffffff22;
 }
 
-/* === Arrows === */
-.slider-arrow {
-  background: none;
-  border: 2px solid #d1d1d1;
-  color: white;
-  font-size: 32px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.slider-arrow:hover {
-  background: #ffffff22;
-}
-
-}
 
   </style>
 
@@ -158,12 +162,14 @@
   <div id="list-upcoming" class="section-box"></div>
 
   <h2>Open for registration</h2>
+<h2>Open for registration</h2>
+
 <div class="tournaments-slider">
-  <button class="slider-arrow left" data-target="list-open">‹</button>
+  <div class="slider-arrow left" data-target="list-open">‹</div>
 
   <div id="list-open" class="section-box slider-track"></div>
 
-  <button class="slider-arrow right" data-target="list-open">›</button>
+  <div class="slider-arrow right" data-target="list-open">›</div>
 </div>
 
 
