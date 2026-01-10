@@ -66,29 +66,3 @@ regionSelect.addEventListener("change", loadTournaments);
 
 loadTournaments();
 
-const joinBtn = document.createElement("button");
-joinBtn.textContent = "Join now";
-
-joinBtn.addEventListener("click", async () => {
-  try {
-    const res = await fetch(`/api/tournaments/${t.slug}/join`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data?.error || "Join failed");
-      return;
-    }
-
-    // refresh la page (simple MVP)
-    await loadTournaments();
-  } catch (e) {
-    console.error(e);
-    alert("Network error");
-  }
-});
-
-buttons.appendChild(joinBtn);
