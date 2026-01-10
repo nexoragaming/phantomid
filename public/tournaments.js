@@ -209,3 +209,23 @@ if (regionSelect) regionSelect.addEventListener("change", loadTournaments);
 
 // First load
 loadTournaments();
+
+// ====================
+// Slider arrows logic
+// ====================
+document.addEventListener("click", (e) => {
+  const arrow = e.target.closest(".slider-arrow");
+  if (!arrow) return;
+
+  const targetId = arrow.getAttribute("data-target");
+  const track = document.getElementById(targetId);
+  if (!track) return;
+
+  const direction = arrow.classList.contains("left") ? -1 : 1;
+  const scrollAmount = 380; // largeur card + gap
+
+  track.scrollBy({
+    left: scrollAmount * direction,
+    behavior: "smooth",
+  });
+});

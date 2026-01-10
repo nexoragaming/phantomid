@@ -79,6 +79,52 @@
 
 .tournament-action:hover{
   opacity: 0.85;
+  /* === Slider container === */
+.tournaments-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* === Zone scrollable === */
+.slider-track {
+  display: flex;
+  gap: 40px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 0;
+  scrollbar-width: none; /* Firefox */
+}
+
+.slider-track::-webkit-scrollbar {
+  display: none; /* Chrome */
+}
+
+/* === Cards === */
+.tournaments-box {
+  flex: 0 0 340px; /* largeur fixe */
+}
+
+/* === Arrows === */
+.slider-arrow {
+  background: none;
+  border: 2px solid #d1d1d1;
+  color: white;
+  font-size: 32px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-arrow:hover {
+  background: #ffffff22;
+}
+
 }
 
   </style>
@@ -112,7 +158,14 @@
   <div id="list-upcoming" class="section-box"></div>
 
   <h2>Open for registration</h2>
-  <div id="list-open" class="section-box"></div>
+<div class="tournaments-slider">
+  <button class="slider-arrow left" data-target="list-open">‹</button>
+
+  <div id="list-open" class="section-box slider-track"></div>
+
+  <button class="slider-arrow right" data-target="list-open">›</button>
+</div>
+
 
   <h2>Live</h2>
   <div id="list-live" class="section-box"></div>
