@@ -7,28 +7,13 @@
 </head>
 <body>
 
-<style>
-  .create-form-box {
-    justify-self: center;
-    justify-content: center;
-    border: 3px solid white;
-    padding: 20px;
-  }
+<div id="create-tournament-overlay">
 
-  .create-form-box label {
-    color: #572bde;
-  }
+     <div class="close-overlay-btn" id="close-create-overlay">
+   <a> Close</a>
+    </div>
 
-  .create-form-btn {
-    background-color: #572bde;
-    color: white;
-    border: 1px solid white;
-    width: 200px;
-    justify-self: center;
-  }
-</style>
-
-<div class="create-form-box">
+<div class="create-form-box" id="create-form-box">
 <h1>Create a tournament</h1>
 
 <form id="create-form" style="display:grid; gap:10px; max-width:520px;">
@@ -89,9 +74,9 @@
   <p id="msg" style="margin:0;"></p>
 </form>
 </div>
-
-<p><a href="/tournaments-final-version.html">Go to tournaments page</a></p>
-
 <script src="/create-tournament.js"></script>
+</div>
+
+
 </body>
 </html>

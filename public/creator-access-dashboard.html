@@ -7,13 +7,57 @@
 </head>
 <body> 
 <header> 
-    <a href="#overview"> Overview </a>    
-    <a href=""> My Tournaments </a> 
-    <a href=""> Create Tournament </a> 
-    <a href=""> Participants </a> 
+
+<nav> 
+    <div class="nav-user" id="nav-user">
+            <div class="logo">
+            <a class="logo" href="/" id="logo"> <img class="logo" src="/assets/logo-phantom-id-tom-et-texte-nexora-color.png" alt="PhantomID logo"> </a>
+            </div>
+            <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>
+            <a href="/rating-system"> Rating system </a>
+            <a href="/phantomcard"> My PhantomCard </a>
+            <a id="nav-logout"> Log out </a>
+        </div>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="topnav" id="mobileTopnav">
+  <div class="navbar-box">
+  <a href="/" class="active"><img src="https://i.imgur.com/BVwaA2k.png" class="logo"></a> 
+  <a href="javascript:void(0);" class="icon" onclick="myFunction()" id="hamburger">
+    <i class="fa fa-bars"></i>
+  </a>
+</div>
+   <div id="Links">
+  <div class="user-link" id="user-link">
+   <a href="/tournaments"> Tournaments </a>
+            <a href="/creator-access"> Creator access </a>
+            <a href="/rating-system"> Rating system </a>
+            <a href="/phantomcard"> My PhantomCard </a>
+            <a id="mobile-nav-logout"> Log out </a>
+  </div>
+        </div>
+</div>
+
+        <script src="navbar.js"></script>
+    </nav>   
+
+
+    <div class="dashboard-nav" style="display: flex; gap:600px; justify-self: center">
+    <div class="left-dashboard-nav" style="display:flex; gap:10px">
+    <a href="#overview"> Overview </a>   
     <a href=""> Stats & Analytics </a> 
     <a href=""> Community </a> 
-    <a href=""> Settings </a> 
+    <a href=""> Settings </a>    
+    </div>
+
+    <div class="right-dashboard-nav" style="display:flex; gap:10px">
+    <a href=""> My Tournaments </a> 
+    <a href=""> Participants </a> 
+    <a id="open-create-tournament"> Create Tournament </a> 
+</div>
+</div>
+
 </header>
 <main> 
 <section class="overview" id="overview"> 
@@ -41,5 +85,84 @@
 
 
 </main>
+
+<!-- Overlay -->
+ <div id="create-tournament-overlay">
+
+     
+
+<div class="create-form-box" id="create-form-box">
+    
+    <div class="close-overlay-btn" id="close-create-overlay">
+   <a> Close</a>
+    </div>
+<h1>Create a tournament</h1>
+
+
+
+<form id="create-form" style="display:grid; gap:10px; max-width:520px;">
+  <input name="name" placeholder="Tournament name" required />
+  <input name="organizer" placeholder="Organizer username" required />
+
+  <select name="game" required>
+    <option value="" disabled selected>Game</option>
+    <option>Fortnite</option>
+    <option>Valorant</option>
+    <option>CS2</option>
+    <option>League of Legends</option>
+  </select>
+
+  <select name="region" required>
+    <option value="" disabled selected>Region</option>
+    <option>NA</option>
+    <option>EU</option>
+    <option>LATAM</option>
+    <option>ASIA</option>
+    <option>GLOBAL</option>
+  </select>
+
+  <select name="format">
+    <option value="" disabled selected>Format</option>
+    <option>Solo</option>
+    <option>Duo</option>
+    <option>Trio</option>
+    <option>Squad</option>
+    <option>5v5</option>
+  </select>
+
+  <select name="status">
+    <option value="upcoming">Upcoming</option>
+    <option value="open" selected>Open</option>
+    <option value="live">Live</option>
+    <option value="finished">Finished</option>
+  </select>
+
+  <label>
+    Tournament start:
+    <input type="datetime-local" name="startAt" required />
+  </label>
+
+ <label> <!-- Ne change rien a date, a retoucher -->
+    Registration start:
+    <input type="datetime-local" name="inscriptionStartAt" required />
+  </label>
+
+  <label>
+    Maximum player:
+  <input type="number" name="maxSlots" value="32" min="2" />
+</label>
+
+  <input name="bannerUrl" placeholder="Banner URL (optional)" />
+
+  <button type="submit" class="create-form-btn">Create</button>
+  <p id="msg" style="margin:0;"></p>
+</form>
+</div>
+<script src="/create-tournament.js"></script>
+</div>
+
+
+
+<script src="builder-dashboard.js"></script>
 </body>
 </html>

@@ -1829,10 +1829,42 @@ ol {
     display: flex;
 }
 
+
+
+/*Builder dashboard*/
+ .create-form-box {
+    justify-self: center;
+    justify-content: center;
+    border: 3px solid white;
+    border-radius: 5px;
+    padding: 20px;
+  }
+
+  .create-form-box input {
+    border: 2px solid #572bde;
+    border-radius: 5px;
+  }
+  .create-form-box select {
+    border: 2px solid #572bde;
+    border-radius: 5px;
+  }
+
+
+  .create-form-box label {
+    color: #572bde;
+  }
+
+  .create-form-btn {
+    background-color: #572bde;
+    color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 200px;
+    justify-self: center;
+  }
+
+
 /*Overlay*/
-
-
-
 #login-overlay {
   position: fixed;
   inset: 0;
@@ -1960,6 +1992,19 @@ position: fixed;
     align-self: center;
     text-align: center;
     color: white;
+}
+
+#create-tournament-overlay {
+    position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+#create-tournament-overlay.active {
+    display: flex;
 }
 
 
