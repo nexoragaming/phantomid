@@ -1838,6 +1838,7 @@ ol {
     border: 3px solid white;
     border-radius: 5px;
     padding: 20px;
+    background-color: #0e0e0e;
   }
 
   .create-form-box input {
