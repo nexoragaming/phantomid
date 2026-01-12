@@ -42,36 +42,59 @@
         <script src="navbar.js"></script>
     </nav>   
 
-<style> .dashboard-nav a{padding: 5px;} </style>
-    <div class="dashboard-nav" style="display: flex; gap:600px; justify-self: center; margin-top: 20px;">
-    <div class="left-dashboard-nav" style="display:flex; gap:10px">
+<style> 
+.dashboard-nav a{padding: 5px; border: 1px solid white; border-radius: 5px;} 
+.dashboard-center { justify-content: center; justify-self: center;}
+.overview-btn-box {display: flex; justify-content: center; justify-self: center; gap: 20px}
+.overview-btn {display: grid; text-align: center; justify-content: center; justify-self: center; border: 3px solid white ; border-radius: 5px; background-color: #0e0e0e; padding: 10px;}
+</style>
+</div>
+
+</header>
+<main style="display: flex; gap: 100px; margin-left:40px; margin-right:40px"> 
+
+<div class="dashboard-left">
+
+ <div class="dashboard-nav" style="display: grid; gap:10px; justify-self: left; margin-top: 20px;">
     <a href="#overview"> Overview </a>   
     <a href=""> Stats & Analytics </a> 
     <a href=""> Community </a> 
     <a href=""> Settings </a>    
+</div>
+
+<div class="tournament-stats">
+    
+</div>
+
+</div>
+
+
+<div class="dashboard-center">
+<h1> Builder Dashboard </h1>
+
+    <div id="overview">
+
+        <div class="overview-btn-box">
+        <div class="overview-btn"> <img src=""> <p> Create a tournament <br> <span> Launch a new tournament </span>  </p></div>
+        <div class="overview-btn"> <img src=""> <p> View tournaments <br> <span> See all your tournaments </span>  </p></div>
+        <div class="overview-btn"> <img src=""> <p> Share tournament link <br> <span> Invite players to join </span>  </p></div>
     </div>
 
-    <div class="right-dashboard-nav" style="display:flex; gap:10px">
-        <a href=""> Participants </a> 
-    <a href=""> My Tournaments </a> 
-    <a id="open-create-tournament"> Create Tournament </a> 
-</div>
+    <div class="recent-tournaments"> <!-- Afficher seulement si a tournoi de créer -->
+    <h3> Recent Tournaments </h3>
+    <!-- Les 3 tournois les plus récent -->
+    <a>View all tournaments</a> <!-- Afficher seulement si + de 3 tournois  -->
+    </div>
+
+    </div>
+
+
 </div>
 
-</header>
-<main> 
-<section class="overview" id="overview"> 
-    <h1> <!-- Nom du créateur + badge Creator --> </h1>
-    <h2> <!-- Statut de l’abonnement (Active) --> </h2>
-    <ul>
-        <li>  Active tournaments: </li> <!-- Nombre de tournoi actif -->
-        <li>  Total tournaments hosted: </li> <!-- Nombre total de tournoi hébergé -->
-        <li>  Total players registered </li> <!-- Nombre total de joueur enregistré -->
-    </ul>
-    <a href=""> Create a tournament </a>
-    <a href=""> View tournaments </a>
-    <a href=""> Share tournament link </a>
-</section>
+<div class="dashboard-quick-actions">
+
+</div>
+
 
 
 
