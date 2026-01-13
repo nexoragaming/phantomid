@@ -116,6 +116,38 @@ function renderTournament(t, status) {
     actionsBox.appendChild(makeAction("More info", "action-info", t.slug));
   }
 
+  // --------------------
+// Click actions (Info / Bracket / Stats etc.)
+// --------------------
+document.addEventListener("click", (e) => {
+  const infoEl = e.target.closest(".action-info");
+  if (infoEl) {
+    const slug = infoEl.getAttribute("data-slug");
+    if (!slug) return;
+    // page details tournoi
+    window.location.href = `/tournament.html?slug=${encodeURIComponent(slug)}`;
+    return;
+  }
+
+  const bracketEl = e.target.closest(".action-bracket");
+  if (bracketEl) {
+    const slug = bracketEl.getAttribute("data-slug");
+    if (!slug) return;
+    // même page pour l’instant (onglet bracket)
+    window.location.href = `/tournament.html?slug=${encodeURIComponent(slug)}#bracket`;
+    return;
+  }
+
+  const statsEl = e.target.closest(".action-stats");
+  if (statsEl) {
+    const slug = statsEl.getAttribute("data-slug");
+    if (!slug) return;
+    window.location.href = `/tournament.html?slug=${encodeURIComponent(slug)}#stats`;
+    return;
+  }
+});
+
+
   if (status === "live") {
     actionsBox.appendChild(makeAction("View bracket", "action-bracket", t.slug));
     actionsBox.appendChild(makeAction("Tournament stats", "action-stats", t.slug));

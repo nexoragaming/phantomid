@@ -295,5 +295,83 @@ export default function createTournamentRouter(pool) {
     }
   });
 
+  // =====================================================
+  // GET /api/tournaments/:slug  ✅ DETAILS TOURNOI
+  // =====================================================
+  router.get("/:slug", async (req, res) => {
+    try {
+      const slug = String(req.params.slug || "").trim();
+      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
+
+      const tRes = await pool.query(
+        `
+        SELECT
+          id, slug, name, organizer, game, region, format, status, start_at, max_slots, banner_url
+        FROM tournaments
+        WHERE slug = $1
+        LIMIT 1
+        `,
+        [slug]
+      );
+
+      if (tRes.rowCount === 0) {
+        return res.status(404).json({ ok: false, error: "Tournament not found" });
+      }
+
+      const t = tRes.rows[0];
+
+      const countRes = await pool.query(
+        `SELECT COUNT(*)::int AS n FROM tournament_participants WHERE tournament_id = $1`,
+        [t.id]
+      );
+
+      return res.json({
+        ok: true,
+        tournament: {
+          id: t.id,
+          slug: t.slug,
+          name: t.name,
+          organizer: t.organizer,
+          game: t.game,
+          region: t.region,
+          format: t.format,
+          status: t.status,
+          startAt: t.start_at,
+          maxSlots: t.max_slots,
+          currentSlots: countRes.rows[0].n,
+          bannerUrl: t.banner_url,
+        },
+      });
+    } catch (err) {
+      console.error("GET /api/tournaments/:slug error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
+    }
+  });
+
+  // =====================================================
+  // GET /api/tournaments/:slug/bracket  ✅ MVP (vide)
+  // =====================================================
+  router.get("/:slug/bracket", async (req, res) => {
+    try {
+      const slug = String(req.params.slug || "").trim();
+      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
+
+      const tRes = await pool.query(
+        `SELECT id FROM tournaments WHERE slug = $1 LIMIT 1`,
+        [slug]
+      );
+
+      if (tRes.rowCount === 0) {
+        return res.status(404).json({ ok: false, error: "Tournament not found" });
+      }
+
+      // MVP: pas encore de table bracket -> vide, mais endpoint prêt
+      return res.json({ ok: true, matches: [] });
+    } catch (err) {
+      console.error("GET /api/tournaments/:slug/bracket error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
+    }
+  });
+
   return router;
 }
