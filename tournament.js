@@ -109,9 +109,7 @@ export default function createTournamentRouter(pool) {
       } = req.body || {};
 
       if (!name || !organizer || !game || !region || !startAt) {
-        return res.status(400).json({
-          error: "Missing required fields",
-        });
+        return res.status(400).json({ error: "Missing required fields" });
       }
 
       const normalizedStatus = String(status).toLowerCase();
@@ -154,7 +152,6 @@ export default function createTournamentRouter(pool) {
       ];
 
       const { rows } = await pool.query(sql, values);
-
       return res.status(201).json({ ok: true, tournament: rows[0] });
     } catch (err) {
       console.error("POST /api/tournaments error:", err);
@@ -168,9 +165,7 @@ export default function createTournamentRouter(pool) {
   router.post("/:slug/join", async (req, res) => {
     try {
       const userId = req.session?.userId;
-      if (!userId) {
-        return res.status(401).json({ ok: false, error: "Not logged in" });
-      }
+      if (!userId) return res.status(401).json({ ok: false, error: "Not logged in" });
 
       const slug = String(req.params.slug || "").trim();
 
@@ -182,15 +177,11 @@ export default function createTournamentRouter(pool) {
         [slug]
       );
 
-      if (tRes.rowCount === 0) {
-        return res.status(404).json({ ok: false, error: "Tournament not found" });
-      }
+      if (tRes.rowCount === 0) return res.status(404).json({ ok: false, error: "Tournament not found" });
 
       const t = tRes.rows[0];
 
-      if (t.status !== "open") {
-        return res.status(400).json({ ok: false, error: "Tournament is not open" });
-      }
+      if (t.status !== "open") return res.status(400).json({ ok: false, error: "Tournament is not open" });
 
       const countRes = await pool.query(
         `SELECT COUNT(*)::int AS n
@@ -246,9 +237,7 @@ export default function createTournamentRouter(pool) {
         [slug]
       );
 
-      if (tRes.rowCount === 0) {
-        return res.status(404).json({ ok: false, error: "Tournament not found" });
-      }
+      if (tRes.rowCount === 0) return res.status(404).json({ ok: false, error: "Tournament not found" });
 
       const t = tRes.rows[0];
 
@@ -292,6 +281,180 @@ export default function createTournamentRouter(pool) {
     } catch (err) {
       console.error("GET /api/tournaments/:slug/participants error:", err);
       return res.status(500).json({ ok: false, error: "Server error" });
+    }
+  });
+
+  // =====================================================
+  // GET /api/tournaments/:slug/bracket ✅ READ BRACKET
+  // =====================================================
+  router.get("/:slug/bracket", async (req, res) => {
+    try {
+      const slug = String(req.params.slug || "").trim();
+      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
+
+      const tRes = await pool.query(`SELECT id FROM tournaments WHERE slug = $1 LIMIT 1`, [slug]);
+      if (tRes.rowCount === 0) return res.status(404).json({ ok: false, error: "Tournament not found" });
+
+      const tournamentId = tRes.rows[0].id;
+
+      const mRes = await pool.query(
+        `
+        SELECT
+          m.id,
+          m.round,
+          m.match_number AS "matchNumber",
+          m.player1_user_id AS "player1UserId",
+          m.player2_user_id AS "player2UserId",
+          m.winner_user_id AS "winnerUserId",
+          m.score1,
+          m.score2,
+          u1.username AS "player1Name",
+          u2.username AS "player2Name",
+          uw.username AS "winnerName"
+        FROM tournament_matches m
+        LEFT JOIN users u1 ON u1.id = m.player1_user_id
+        LEFT JOIN users u2 ON u2.id = m.player2_user_id
+        LEFT JOIN users uw ON uw.id = m.winner_user_id
+        WHERE m.tournament_id = $1
+        ORDER BY m.round ASC, m.match_number ASC
+        `,
+        [tournamentId]
+      );
+
+      return res.json({ ok: true, matches: mRes.rows });
+    } catch (err) {
+      console.error("GET /api/tournaments/:slug/bracket error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
+    }
+  });
+
+  // =====================================================
+  // POST /api/tournaments/:slug/bracket/generate ✅ SINGLE ELIM
+  // - génère Round 1 basé sur les participants (random)
+  // - crée les rounds suivants (vides) pour afficher le bracket complet
+  // =====================================================
+  router.post("/:slug/bracket/generate", async (req, res) => {
+    const client = await pool.connect();
+    try {
+      const slug = String(req.params.slug || "").trim();
+      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
+
+      await client.query("BEGIN");
+
+      const tRes = await client.query(
+        `SELECT id, max_slots FROM tournaments WHERE slug = $1 LIMIT 1`,
+        [slug]
+      );
+      if (tRes.rowCount === 0) {
+        await client.query("ROLLBACK");
+        return res.status(404).json({ ok: false, error: "Tournament not found" });
+      }
+
+      const tournamentId = tRes.rows[0].id;
+
+      // déjà généré ?
+      const exists = await client.query(
+        `SELECT 1 FROM tournament_matches WHERE tournament_id = $1 LIMIT 1`,
+        [tournamentId]
+      );
+      if (exists.rowCount > 0) {
+        await client.query("ROLLBACK");
+        return res.status(409).json({ ok: false, error: "Bracket already generated" });
+      }
+
+      // participants
+      const pRes = await client.query(
+        `SELECT user_id
+         FROM tournament_participants
+         WHERE tournament_id = $1
+         ORDER BY joined_at ASC`,
+        [tournamentId]
+      );
+
+      const players = pRes.rows.map((r) => r.user_id);
+      if (players.length < 2) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({ ok: false, error: "Not enough participants (need 2+)" });
+      }
+
+      // shuffle
+      for (let i = players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [players[i], players[j]] = [players[j], players[i]];
+      }
+
+      // next power of 2 (bracket size)
+      const nextPow2 = (n) => {
+        let p = 1;
+        while (p < n) p *= 2;
+        return p;
+      };
+
+      const bracketSize = nextPow2(players.length);
+      const totalRounds = Math.log2(bracketSize);
+
+      // pad with null = BYE slots
+      while (players.length < bracketSize) players.push(null);
+
+      // create Round 1 matches
+      // match_number = 1..(bracketSize/2)
+      const round1Matches = bracketSize / 2;
+
+      for (let m = 0; m < round1Matches; m++) {
+        const p1 = players[m * 2];
+        const p2 = players[m * 2 + 1];
+
+        // si BYE, winner direct = l'autre
+        let winnerUserId = null;
+        if (p1 && !p2) winnerUserId = p1;
+        if (!p1 && p2) winnerUserId = p2;
+
+        await client.query(
+          `
+          INSERT INTO tournament_matches
+            (tournament_id, round, match_number, player1_user_id, player2_user_id, winner_user_id)
+          VALUES
+            ($1,$2,$3,$4,$5,$6)
+          `,
+          [tournamentId, 1, m + 1, p1, p2, winnerUserId]
+        );
+      }
+
+      // create empty matches for next rounds (structure)
+      // Round r has (bracketSize / 2^r) matches
+      for (let r = 2; r <= totalRounds; r++) {
+        const matchesThisRound = bracketSize / Math.pow(2, r);
+        for (let m = 0; m < matchesThisRound; m++) {
+          await client.query(
+            `
+            INSERT INTO tournament_matches
+              (tournament_id, round, match_number, player1_user_id, player2_user_id, winner_user_id)
+            VALUES
+              ($1,$2,$3,NULL,NULL,NULL)
+            `,
+            [tournamentId, r, m + 1]
+          );
+        }
+      }
+
+      await client.query("COMMIT");
+
+      return res.json({
+        ok: true,
+        generated: true,
+        tournamentId,
+        participants: pRes.rowCount,
+        bracketSize,
+        rounds: totalRounds,
+      });
+    } catch (err) {
+      try {
+        await client.query("ROLLBACK");
+      } catch {}
+      console.error("POST /api/tournaments/:slug/bracket/generate error:", err);
+      return res.status(500).json({ ok: false, error: "Server error" });
+    } finally {
+      client.release();
     }
   });
 
@@ -344,31 +507,6 @@ export default function createTournamentRouter(pool) {
       });
     } catch (err) {
       console.error("GET /api/tournaments/:slug error:", err);
-      return res.status(500).json({ ok: false, error: "Server error" });
-    }
-  });
-
-  // =====================================================
-  // GET /api/tournaments/:slug/bracket  ✅ MVP (vide)
-  // =====================================================
-  router.get("/:slug/bracket", async (req, res) => {
-    try {
-      const slug = String(req.params.slug || "").trim();
-      if (!slug) return res.status(400).json({ ok: false, error: "Missing slug" });
-
-      const tRes = await pool.query(
-        `SELECT id FROM tournaments WHERE slug = $1 LIMIT 1`,
-        [slug]
-      );
-
-      if (tRes.rowCount === 0) {
-        return res.status(404).json({ ok: false, error: "Tournament not found" });
-      }
-
-      // MVP: pas encore de table bracket -> vide, mais endpoint prêt
-      return res.json({ ok: true, matches: [] });
-    } catch (err) {
-      console.error("GET /api/tournaments/:slug/bracket error:", err);
       return res.status(500).json({ ok: false, error: "Server error" });
     }
   });
