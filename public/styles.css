@@ -2412,6 +2412,7 @@ background-color: #000;
   }
 
   .phantomcard{
+    justify-self: center;
     width: 900px !important;
     max-width: none !important;
     margin: 0 auto !important;
